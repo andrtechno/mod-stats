@@ -2,7 +2,7 @@
 
 // change table name "surf" to "collector"
 namespace panix\mod\stats\components;
-
+use Yii;
 class Stats extends \yii\base\Component {
 
     //  protected $fx;
@@ -18,7 +18,7 @@ class Stats extends \yii\base\Component {
     // protected $today, $dt;
 
     public function getFx() {
-        if (file_exists(Yii::getPathOfAlias('mod.stats') . "/fix.dat")) {
+        if (file_exists(Yii::getAlias('@panix/mod/stats') . "/fix.dat")) {
             return true;
         } else {
             return false;
@@ -31,7 +31,7 @@ class Stats extends \yii\base\Component {
     }
 
     public function getSe_n() {
-        if ($se_m = file(Yii::getPathOfAlias('mod.stats') . "/se.dat")) {
+        if ($se_m = file(Yii::getAlias('panix/mod/stats') . "/se.dat")) {
             for ($i = 0; $i < count($se_m); $i++)
                 $se_m[$i] = iconv("CP1251", "UTF-8", $se_m[$i]);
             foreach ($se_m as $vl) {
@@ -52,7 +52,7 @@ class Stats extends \yii\base\Component {
     }
 
     public function initRun() {
-        if ($robots = file(Yii::getPathOfAlias('mod.stats') . "/robots.dat")) {
+        if ($robots = file(Yii::getAlias('@stats') . "/robots.dat")) {
             $i = 0;
             for ($i = 0; $i < count($robots); $i++)
                 $robots[$i] = iconv("CP1251", "UTF-8", $robots[$i]);
@@ -66,7 +66,7 @@ class Stats extends \yii\base\Component {
             }
         }
 
-        if ($hosts = file(Yii::getPathOfAlias('mod.stats') . "/hosts.dat")) {
+        if ($hosts = file(Yii::getAlias('@stats') . "/hosts.dat")) {
             $i = 0;
             for ($i = 0; $i < count($hosts); $i++)
                 $hosts[$i] = iconv("CP1251", "UTF-8", $hosts[$i]);
@@ -84,19 +84,19 @@ class Stats extends \yii\base\Component {
 
 
 
-
-
+        $zp2 = '';
+        $zp='';
         foreach ($this->rbd as $val) {
             $zp .= " LOWER(user) NOT LIKE '%" . mb_strtolower($val) . "%' AND";
         }
-        if (filesize(Yii::getPathOfAlias('mod.stats') . "/hosts.dat")) {
+        if (filesize(Yii::getAlias('@stats') . "/hosts.dat")) {
             foreach ($this->hbd as $val) {
                 $zp .= " LOWER(host) NOT LIKE '%" . mb_strtolower($val) . "%' AND";
             }
         }
         $zp .= " LOWER(user) NOT LIKE '' AND";
-        if (file_exists(Yii::getPathOfAlias('mod.stats') . "/skip.dat")) {
-            if ($skip = file(Yii::getPathOfAlias('mod.stats') . "/skip.dat")) {
+        if (file_exists(Yii::getAlias('@stats') . "/skip.dat")) {
+            if ($skip = file(Yii::getAlias('@stats') . "/skip.dat")) {
                 foreach ($skip as $vl) {
                     list($s1, $s2) = explode("|", $vl);
                     $zp2 .= " $s1 NOT LIKE '%" . rtrim($s2) . "%' AND";
@@ -108,7 +108,7 @@ class Stats extends \yii\base\Component {
         $this->_zp = substr($zp, 0, -4);
 
 
-        if ($se_m = file(Yii::getPathOfAlias('mod.stats') . "/se.dat")) {
+        if ($se_m = file(Yii::getAlias('@stats') . "/se.dat")) {
             for ($i = 0; $i < count($se_m); $i++)
                 $se_m[$i] = iconv("CP1251", "UTF-8", $se_m[$i]);
             foreach ($se_m as $vl) {
@@ -117,8 +117,8 @@ class Stats extends \yii\base\Component {
                 $se_nn[$s1] = $s2;
             }
         }
-        if (file_exists(Yii::getPathOfAlias('mod.stats') . "/fix.dat")) {
-            if ($fx_m = file(Yii::getPathOfAlias('mod.stats') . "/fix.dat")) {
+        if (file_exists(Yii::getAlias('@stats') . "/fix.dat")) {
+            if ($fx_m = file(Yii::getAlias('@stats') . "/fix.dat")) {
                 $this->_zfx = "";
                 $pf = "";
                 for ($i = 0; $i < count($fx_m); $i++)

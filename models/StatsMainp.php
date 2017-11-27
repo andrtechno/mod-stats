@@ -1,22 +1,18 @@
 <?php
+namespace panix\mod\stats\models;
 
-class StatsMainp extends ActiveRecord {
+
+class StatsMainp extends \panix\engine\db\ActiveRecord {
 
     const MODULE_ID = 'stats';
 
-    /**
-     * Returns the static model of the specified AR class.
-     * @return Page the static model class
-     */
-    public static function model($className = __CLASS__) {
-        return parent::model($className);
-    }
+
 
     /**
      * @return string the associated database table name
      */
-    public function tableName() {
-        return '{{mainp}}';
+    public static function tableName() {
+        return '{{%mainp}}';
     }
 
 
@@ -41,18 +37,5 @@ class StatsMainp extends ActiveRecord {
         );
     }
 
-    /**
-     * Retrieves a list of models based on the current search/filter conditions. Used in admin search.
-     * @return ActiveDataProvider the data provider that can return the models based on the search/filter conditions.
-     */
-    public function search() {
-        $criteria = new CDbCriteria;
-
-        $criteria->compare('t.id', $this->id);
-        $criteria->compare('user.username', $this->user_id, true);
-        return new ActiveDataProvider($this, array(
-                    'criteria' => $criteria,
-                ));
-    }
 
 }

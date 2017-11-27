@@ -2,19 +2,22 @@
 
 namespace panix\mod\stats\controllers\admin;
 
+use Yii;
+use panix\mod\stats\models\StatsMainHistory;
+use panix\mod\stats\models\StatsMainp;
 class DefaultController extends \panix\mod\stats\components\StatsController {
 
     public function actionIndex() {
 
         $this->pageName = Yii::t('stats/default', 'MODULE_NAME');
-  
+
         $result = array();
 
 
         $stats = Yii::$app->stats;
         $s = $stats->initRun();
      
-        foreach (StatsMainHistory::model()->findAll(array('order' => '`t`.`i` ASC')) as $rw) {
+        foreach (StatsMainHistory::find()->orderBy(['i'=>SORT_ASC])->all() as $rw) {
 
             $dt_i = $rwz["dt"][] = $rw->dt;
             $rwz["hosts"][$dt_i] = $rw->hosts;
@@ -24,7 +27,7 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
             $rwz["fix"][$dt_i] = $rw->fix;
         }
 
-        foreach (StatsMainp::model()->findAll() as $rww) {
+        foreach (StatsMainp::find()->all() as $rww) {
             $dt_i = $rww["dt"] . $rww->god;
             $rwzz[$dt_i]["hosts"] = $rww->hosts;
             $rwzz[$dt_i]["hits"] = $rww->hits;

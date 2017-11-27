@@ -1,22 +1,16 @@
 <?php
-
-class StatsMainHistory extends ActiveRecord {
+namespace panix\mod\stats\models;
+class StatsMainHistory extends \panix\engine\db\ActiveRecord {
 
     const MODULE_ID = 'stats';
 
-    /**
-     * Returns the static model of the specified AR class.
-     * @return Page the static model class
-     */
-    public static function model($className = __CLASS__) {
-        return parent::model($className);
-    }
+
 
     /**
      * @return string the associated database table name
      */
-    public function tableName() {
-        return '{{main_history}}';
+    public static function tableName() {
+        return '{{%main_history}}';
     }
 
 
