@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
     'MODULE_NAME' => 'Статистика',
     'MODULE_DESC' => 'Статистика посещейний сайта.',
     'BROWSERS' => 'Браузеры',
@@ -15,4 +15,4 @@ return array(
     'DETAIL'=>'Подробней',
     'PLATFORM'=>'Платформа: {name}',
     'BROWSER'=>'Браузер: {name} {v}',
-);
+];

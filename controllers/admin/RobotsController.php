@@ -1,9 +1,9 @@
 <?php
-
-class RobotsController extends CStatsController {
+namespace panix\mod\stats\controllers\admin;
+class RobotsController extends \panix\mod\stats\components\StatsController {
 
     public function actionIndex() {
-        $this->pageName = Yii::t('StatsModule.default', 'ROBOTS');
+        $this->pageName = Yii::t('stats/default', 'ROBOTS');
         foreach ($this->robo as $val) {
             $zs = "";
             $pf = "";
@@ -84,9 +84,9 @@ class RobotsController extends CStatsController {
 
     public function actionDetail() {
         $qs = $_GET['qs'];
-        $this->pageName = Yii::t('StatsModule.default', 'ROBOTS');
+        $this->pageName = Yii::t('stats/default', 'ROBOTS');
         $this->breadcrumbs = array(
-            Yii::t('StatsModule.default', 'MODULE_NAME') => array('/admin/stats'),
+            Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
             $this->pageName => array('/admin/stats/robots'),
             $qs
         );

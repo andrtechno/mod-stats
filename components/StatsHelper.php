@@ -1,5 +1,5 @@
 <?php
-
+namespace panix\mod\stats\components;
 class StatsHelper {
 
     public static function getRowUserAgent($user_agent, $refer) {
@@ -12,7 +12,7 @@ class StatsHelper {
             if ($brw != "")
                 $content.= Html::image(Yii::app()->getModule('stats')->assetsUrl . '/images/browsers/' . $brw, $user_agent, array(
                             //'title' => $user_agent,
-                            'title' => Yii::t('StatsModule.default', 'BROWSER', array(
+                            'title' => Yii::t('stats/default', 'BROWSER', array(
                                 '{name}' => $browser->getBrowser(), //.' '.$user_agent,
                                 '{v}' => $browser->getVersion()
                             )),
@@ -86,12 +86,12 @@ class StatsHelper {
                     'data-placement' => "top",
                     'class' => 'platform',
                     'class' => 'img-thumbnail',
-                    'title' => Yii::t('StatsModule.default', 'PLATFORM', array('{name}' => $browser->getPlatform()))
+                    'title' => Yii::t('stats/default', 'PLATFORM', array('{name}' => $browser->getPlatform()))
         ));
     }
 
     public static function linkDetail($link) {
-        return Html::link(Yii::t('StatsModule.default', 'DETAIL'), $link, array('target' => '_blank', 'class' => 'btn btn-xs btn-info'));
+        return Html::link(Yii::t('stats/default', 'DETAIL'), $link, array('target' => '_blank', 'class' => 'btn btn-xs btn-info'));
     }
 
     public static function getRowHost($ip, $proxy, $host, $lang) {

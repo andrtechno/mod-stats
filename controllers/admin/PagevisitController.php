@@ -1,15 +1,15 @@
 <?php
-
-class PagevisitController extends CStatsController {
+namespace panix\mod\stats\controllers\admin;
+class PagevisitController extends \panix\mod\stats\components\StatsController {
 
 
     public function actionIndex() {
-        $this->pageName = Yii::t('StatsModule.default', 'PAGEVISIT');
+        $this->pageName = Yii::t('stats/default', 'PAGEVISIT');
         $this->breadcrumbs = array(
-            Yii::t('StatsModule.default', 'MODULE_NAME') => array('/admin/stats'),
+            Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
             $this->pageName
         );
-        $stats = Yii::app()->stats->initRun();
+        $stats = Yii::$app->stats->initRun();
         $zp = $stats['zp'];
 
         if ($this->sort == "hi") {

@@ -1,11 +1,11 @@
 <?php
-
-class TimevisitController extends CStatsController {
+namespace panix\mod\stats\controllers\admin;
+class TimevisitController extends \panix\mod\stats\components\StatsController {
 
     public function actionIndex() {
-        $this->pageName = Yii::t('StatsModule.default', 'TIMEVISIT');
+        $this->pageName = Yii::t('stats/default', 'TIMEVISIT');
         $this->breadcrumbs = array(
-            Yii::t('StatsModule.default', 'MODULE_NAME') => array('/admin/stats'),
+            Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
             $this->pageName
         );
 
@@ -86,9 +86,9 @@ class TimevisitController extends CStatsController {
         $res = $this->db->createCommand($sql);
 
         
-        $this->pageName = Yii::t('StatsModule.default', 'TIMEVISIT');
+        $this->pageName = Yii::t('stats/default', 'TIMEVISIT');
         $this->breadcrumbs = array(
-            Yii::t('StatsModule.default', 'MODULE_NAME') => array('/admin/stats'),
+            Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
             $this->pageName => array('/admin/stats/timevisit'),
             $qs
         );

@@ -1,11 +1,11 @@
 <?php
-
-class SearchqueryController extends CStatsController {
+namespace panix\mod\stats\controllers\admin;
+class SearchqueryController extends \panix\mod\stats\components\StatsController {
 
     public function actionIndex() {
         $engin = $_GET['engin'];
         $pages = $_GET['pages'];
-       // $db = Yii::app()->db;
+       // $db = Yii::$app->db;
         //  if (isset($engin) or $top == 1) {
         if (isset($engin)) {
             switch ($engin) {
@@ -64,7 +64,7 @@ class SearchqueryController extends CStatsController {
             }
         }
         //if (!isset($qmas)) {
-           // Yii::app()->tpl->alert('info','sad');
+           // Yii::$app->tpl->alert('info','sad');
             //echo "<center>Нет данных2</center>";
            // die;
       //  }

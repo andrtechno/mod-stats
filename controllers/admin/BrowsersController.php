@@ -1,11 +1,11 @@
 <?php
-
-class BrowsersController extends StatsController {
+namespace panix\mod\stats\components;
+class BrowsersController extends panix\mod\stats\components\StatsController {
 
     public function actionIndex() {
-        $this->pageName = Yii::t('StatsModule.default', 'BROWSERS');
+        $this->pageName = Yii::t('stats/default', 'BROWSERS');
         $this->breadcrumbs = array(
-            Yii::t('StatsModule.default', 'MODULE_NAME') => array('/admin/stats'),
+            Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
             $this->pageName
         );
 
@@ -95,7 +95,7 @@ class BrowsersController extends StatsController {
 
         $vse = 0;
         $k = 0;
-        //$db = Yii::app()->db;
+        //$db = Yii::$app->db;
         if ($this->sort == "hi") {
             $sql = "SELECT user, COUNT(user) cnt FROM {{surf}} WHERE";
             $sql .= $this->_zp . " AND dt >= '$this->sdate' AND dt <= '$this->fdate' " . (isset($brw) ? StatsHelper::GetBrw($brw) : "") . " GROUP BY user ORDER BY 2 DESC";

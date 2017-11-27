@@ -1,6 +1,7 @@
 <?php
+namespace panix\mod\stats\components;
 
-class CStatsController extends AdminController {
+class StatsController extends \panix\engine\controllers\AdminController {
 
     public $db;
 
@@ -83,17 +84,18 @@ class CStatsController extends AdminController {
             ' . $value . '%</div></div>';
     }
 
-    public function init() {
-        $this->db = Yii::app()->db;
+    public function init2() {
+
+        $this->db = Yii::$app->db;
         //   list($s_date, $f_date) = str_replace("+", "", array($this->sdate, $this->fdate));
 
         //if ($_SERVER['REMOTE_ADDR'] != '127.0.0.1' || $_SERVER['REMOTE_ADDR'] !== '195.78.247.104') {
         //    throw new CHttpException(401);
        // }
         if (!preg_match("/^[0-9]{4}-([0-9]{2})-([0-9]{2})$/", $this->fdate) && !preg_match("/^[0-9]{4}-([0-9]{2})-([0-9]{2})$/", $this->sdate)) {
-            throw new CException('Не верный формат даты!');
+            throw new Exception('Не верный формат даты!');
         }
-        if ($robots = file(Yii::getPathOfAlias('mod.stats') . "/robots.dat")) {
+        if ($robots = file(Yii::getAlias('panix/mod/stats') . "/robots.dat")) {
             $i = 0;
             for ($i = 0; $i < count($robots); $i++)
                 $robots[$i] = iconv("CP1251", "UTF-8", $robots[$i]);
@@ -106,7 +108,7 @@ class CStatsController extends AdminController {
                 $robo[] = $rb2;
             }
         }
-        if ($hosts = file(Yii::getPathOfAlias('mod.stats') . "/hosts.dat")) {
+        if ($hosts = file(Yii::getAlias('panix/mod/stats') . "/hosts.dat")) {
             $i = 0;
             for ($i = 0; $i < count($hosts); $i++)
                 $hosts[$i] = iconv("CP1251", "UTF-8", $hosts[$i]);
@@ -203,27 +205,28 @@ class CStatsController extends AdminController {
           $pages = 1; */
 
         // $this->_site = str_replace("www.", "", $_SERVER["HTTP_HOST"]);
-        $this->_site = str_replace("www.", "", Yii::app()->request->serverName);
-        parent::init();
+        $this->_site = str_replace("www.", "", Yii::$app->request->serverName);
+       return parent::init();
+
     }
 
     /* public function c_other($dt) {
       $sql = "SELECT COUNT(refer) FROM cms_surf WHERE dt='" . $dt . "' AND refer <> '' AND LOWER(refer) NOT REGEXP '^(ftp|http|https):\/\/(www.)*" . $this->_site . "' AND (LOWER(refer) NOT LIKE '%yand%' AND LOWER(refer) NOT LIKE '%google.%' AND LOWER(refer) NOT LIKE '%go.mail.ru%' AND LOWER(refer) NOT LIKE '%rambler.%' AND LOWER(refer) NOT LIKE '%search.yahoo%' AND LOWER(refer) NOT LIKE '%search.msn%' AND LOWER(refer) NOT LIKE '%bing%' AND LOWER(refer) NOT LIKE '%search.live.com%' AND LOWER(refer) NOT LIKE '%?q=%' AND LOWER(refer) NOT LIKE '%&q=%' AND LOWER(refer) NOT LIKE '%query=%'" . $this->_cot_m . ") AND " . $this->_zp . "";
-      $command = Yii::app()->db->createCommand($sql);
+      $command = Yii::$app->db->createCommand($sql);
       $res = $command->queryRow(false);
       return $res[0];
       }
 
       public function c_fix($dt) {
       $sql = "SELECT COUNT(i) FROM cms_surf WHERE (" . $this->_zfx . ") AND dt='" . $dt . "' AND " . $this->_zp . "";
-      $command = Yii::app()->db->createCommand($sql);
+      $command = Yii::$app->db->createCommand($sql);
       $res = $command->queryRow(false);
       return $res[0];
       }
 
       public function c_se($dt) {
       $sql = "SELECT COUNT(refer) FROM cms_surf WHERE dt='" . $dt . "' AND (LOWER(refer) LIKE '%yand%' OR LOWER(refer) LIKE '%google.%' OR LOWER(refer) LIKE '%go.mail.ru%' OR LOWER(refer) LIKE '%rambler.%' OR LOWER(refer) LIKE '%search.yahoo%' OR LOWER(refer) LIKE '%search.msn%' OR LOWER(refer) LIKE '%bing%' OR LOWER(refer) LIKE '%search.live.com%'" . $this->_cse_m . ") AND LOWER(refer) NOT LIKE '%@%' AND " . $this->_zp . "";
-      $command = Yii::app()->db->createCommand($sql);
+      $command = Yii::$app->db->createCommand($sql);
       $res = $command->queryRow(false);
       return $res[0];
       }
@@ -231,7 +234,7 @@ class CStatsController extends AdminController {
       public function c_uniqs_hits($dt) {
       $this->
       $sql = "SELECT COUNT(DISTINCT ip),COUNT(i) FROM cms_surf WHERE dt='" . $dt . "' AND " . $this->_zp . "";
-      $command = Yii::app()->db->createCommand($sql);
+      $command = Yii::$app->db->createCommand($sql);
       return $command->queryRow(false);
       } */
 
@@ -364,25 +367,25 @@ class CStatsController extends AdminController {
     }
 
     public function getSdate() {
-        $sdate = Yii::app()->request->getParam('s_date');
+        $sdate = Yii::$app->request->getParam('s_date');
         return ($sdate) ? $sdate : date('Y-m-d');
     }
 
     public function getFdate() {
-        $fdate = Yii::app()->request->getParam('f_date');
+        $fdate = Yii::$app->request->getParam('f_date');
         return ($fdate) ? $fdate : date('Y-m-d');
     }
 
     public function getBwr() {
-        return Yii::app()->request->getParam('bwr');
+        return Yii::$app->request->getParam('bwr');
     }
 
     public function getSort() {
-        return Yii::app()->request->getParam('sort');
+        return Yii::$app->request->getParam('sort');
     }
 
     public function getPos() {
-        return Yii::app()->request->getParam('pos');
+        return Yii::$app->request->getParam('pos');
     }
 
 }

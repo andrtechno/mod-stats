@@ -1,5 +1,5 @@
 <?php
-
+namespace panix\mod\stats\components;
 /**
  * @version 1.0
  * @author Andrew S. <andrew.panix@gmail.com>

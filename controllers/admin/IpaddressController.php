@@ -1,11 +1,11 @@
 <?php
-
-class IpaddressController extends CStatsController {
+namespace panix\mod\stats\controllers\admin;
+class IpaddressController extends panix\mod\stats\components\StatsController {
 
     public function actionIndex() {
-        $this->pageName = Yii::t('StatsModule.default', 'IP_ADDRESS');
+        $this->pageName = Yii::t('stats/default', 'IP_ADDRESS');
         $this->breadcrumbs = array(
-            Yii::t('StatsModule.default', 'MODULE_NAME') => array('/admin/stats'),
+            Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
             $this->pageName
         );
 
@@ -67,8 +67,8 @@ class IpaddressController extends CStatsController {
         $title .= ' (' . $country . ')';
 
         $this->breadcrumbs = array(
-            Yii::t('StatsModule.default', 'MODULE_NAME') => array('/admin/stats'),
-            Yii::t('StatsModule.default', 'IP_ADDRESS') => array('/admin/stats/ipaddress'),
+            Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
+            Yii::t('stats/default', 'IP_ADDRESS') => array('/admin/stats/ipaddress'),
             $qs
         );
 

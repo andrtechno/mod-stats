@@ -1,18 +1,19 @@
 <?php
 
-class DefaultController extends CStatsController {
+namespace panix\mod\stats\controllers\admin;
+
+class DefaultController extends \panix\mod\stats\components\StatsController {
 
     public function actionIndex() {
-        $this->pageName = Yii::t('StatsModule.default', 'MODULE_NAME');
-        $this->breadcrumbs = array(
-            Yii::t('StatsModule.default', 'MODULE_NAME') => array('/admin/stats'),
-            $this->pageName
-        );
+
+        $this->pageName = Yii::t('stats/default', 'MODULE_NAME');
+  
         $result = array();
 
 
-        $stats = Yii::app()->stats;
+        $stats = Yii::$app->stats;
         $s = $stats->initRun();
+     
         foreach (StatsMainHistory::model()->findAll(array('order' => '`t`.`i` ASC')) as $rw) {
 
             $dt_i = $rwz["dt"][] = $rw->dt;
@@ -94,17 +95,17 @@ class DefaultController extends CStatsController {
 
                 if (isset($rwz)) {
 
-                if ($dt != $fdate && !in_array($dt, $rwz["dt"])) {
-                    // die('save');
-                    $sql_insert = "INSERT INTO {{main_history}}(dt,hosts,hits,search,other,fix) VALUES('" . $dt . "','" . $m_uniqs[$dt] . "','" . $m_hits[$dt] . "','" . $m_se[$dt] . "','" . $m_other[$dt] . "','" . $m_fix[$dt] . "')";
-                    $this->db->createCommand($sql_insert)->execute();
+                    if ($dt != $fdate && !in_array($dt, $rwz["dt"])) {
+                        // die('save');
+                        $sql_insert = "INSERT INTO {{main_history}}(dt,hosts,hits,search,other,fix) VALUES('" . $dt . "','" . $m_uniqs[$dt] . "','" . $m_hits[$dt] . "','" . $m_se[$dt] . "','" . $m_other[$dt] . "','" . $m_fix[$dt] . "')";
+                        $this->db->createCommand($sql_insert)->execute();
 
-                    $sql_del = "DELETE me FROM {{main_history}} as me, {{main_history}} as clone WHERE me.dt = clone.dt AND me.i > clone.i";
-                    $this->db->createCommand($sql_del)->execute();
+                        $sql_del = "DELETE me FROM {{main_history}} as me, {{main_history}} as clone WHERE me.dt = clone.dt AND me.i > clone.i";
+                        $this->db->createCommand($sql_del)->execute();
 
-                    //mysql_query("DELETE me FROM mainh as me, mainh as clone WHERE me.dt = clone.dt AND me.i > clone.i");
+                        //mysql_query("DELETE me FROM mainh as me, mainh as clone WHERE me.dt = clone.dt AND me.i > clone.i");
+                    }
                 }
-                 }
             }
 
 
@@ -136,10 +137,10 @@ class DefaultController extends CStatsController {
 
 
 
-       // if(file_exists(Yii::getPathOfAlias('mod.stats') . "/total.dat")){
+        // if(file_exists(Yii::getPathOfAlias('mod.stats') . "/total.dat")){
         //if ($total = file(Yii::getPathOfAlias('mod.stats') . "/total.dat"))
-       //     $total = explode("|", $total[0]);
-       // }
+        //     $total = explode("|", $total[0]);
+        // }
 
         $uniq_total = $this->db->createCommand("SELECT COUNT(DISTINCT ip) as total FROM {{surf}} WHERE " . $this->_zp);
 
@@ -177,14 +178,15 @@ class DefaultController extends CStatsController {
             $d = $m_date[$i];
             $weekResult['hits'][] = (int) $m_hits[$d];
             $weekResult['hosts'][] = (int) $m_uniqs[$d];
-            $weekResult['cats'][] = date('m.d',strtotime($d)).' '.$dday[date('w', strtotime($d))];
+            $weekResult['cats'][] = date('m.d', strtotime($d)) . ' ' . $dday[date('w', strtotime($d))];
             //echo key($dday[date('w', strtotime($d))]);
-            if($i==7) break;
+            if ($i == 7)
+                break;
         }
 
 
 
-        $this->render('index', array(
+        return $this->render('index', array(
             'weekResult' => $weekResult,
             'dataProvider' => $dataProvider,
             'm_date' => $m_date,
@@ -207,7 +209,7 @@ class DefaultController extends CStatsController {
 
 
       $sql = "SELECT tm,refer,ip,proxy,host,lang,user,req FROM cms_surf WHERE dt='" . $detail . "' ORDER BY i DESC";
-      $command = Yii::app()->db->createCommand($sql);
+      $command = Yii::$app->db->createCommand($sql);
       foreach ($command->queryAll() as $row) {
 
       //while ($row = mysql_fetch_row($r)) {
@@ -276,7 +278,7 @@ class DefaultController extends CStatsController {
       } else {
       echo "<table id=table align=center width=100% cellpadding=5 cellspacing=1 border=0><tr class=h><td width=90>IP-адрес <a class=d href=\"?detail=" . $detail . "&group=false\"\"\">&plusmn;</a></td><td>Хост</td><td>User-Agent</td><td width=30%>Referer</td><td width=35>Время</td><td>Страница</td></tr>";
       $sql = "SELECT tm,refer,ip,proxy,host,lang,user,req FROM cms_surf WHERE dt='" . $detail . "' ORDER BY i DESC";
-      $command = Yii::app()->db->createCommand($sql);
+      $command = Yii::$app->db->createCommand($sql);
       foreach ($command->queryAll() as $r) {
       //print_r($r);
       //die;
@@ -357,8 +359,8 @@ class DefaultController extends CStatsController {
       }
      */
     public function actionLast() {
-        $getSite = Yii::app()->request->getParam('site');
-        $getQuery = Yii::app()->request->getParam('query');
+        $getSite = Yii::$app->request->getParam('site');
+        $getQuery = Yii::$app->request->getParam('query');
         if (isset($getSite)) {
             $sql = "SELECT refer,day,dt,tm,req FROM {{surf}} WHERE refer <> '' AND LOWER(refer) NOT LIKE '%://" . $this->_site . "%' AND LOWER(refer) NOT LIKE '%://www." . $this->_site . "%' AND LOWER(refer) NOT LIKE '" . $this->_site . "%' AND (LOWER(refer) NOT LIKE '%yand%' AND LOWER(refer) NOT LIKE '%google.%' AND LOWER(refer) NOT LIKE '%go.mail.ru%' AND LOWER(refer) NOT LIKE '%rambler.%' AND LOWER(refer) NOT LIKE '%search.yahoo%' AND LOWER(refer) NOT LIKE '%search.msn%' AND LOWER(refer) NOT LIKE '%bing%' AND LOWER(refer) NOT LIKE '%search.live.com%' AND LOWER(refer) NOT LIKE '%&q=%' AND LOWER(refer) NOT LIKE '%?q=%' AND LOWER(refer) NOT LIKE '%query=%'" . $this->_cot_m . ") AND " . $this->_zp . " ORDER BY i DESC LIMIT " . $getSite;
             $cmd = $this->db->createCommand($sql);

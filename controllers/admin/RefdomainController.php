@@ -1,15 +1,15 @@
 <?php
-
-class RefdomainController extends CStatsController {
+namespace panix\mod\stats\controllers\admin;
+class RefdomainController extends \panix\mod\stats\components\StatsController {
 
     //Переходы с доменов
     public function actionIndex() {
         $result=array();
-      //  $stats = Yii::app()->stats;
+      //  $stats = Yii::$app->stats;
       //  $s = $stats->initRun();
-        $this->pageName = Yii::t('StatsModule.default', 'REF_DOMAIN');
+        $this->pageName = Yii::t('stats/default', 'REF_DOMAIN');
         $this->breadcrumbs = array(
-            Yii::t('StatsModule.default', 'MODULE_NAME') => array('/admin/stats'),
+            Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
             $this->pageName
         );
         

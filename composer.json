@@ -1,7 +1,7 @@
 {
     "name": "panix/mod-stats",
     "description": "Module sitemap",
-    "keywords": ["corner-cms", "module", "sitemap"],
+    "keywords": ["corner-cms", "module", "stats"],
     "homepage": "https://github.com/andrtechno/mod-stats",
     "type": "yii2-extension",
     "license": "MIT",
