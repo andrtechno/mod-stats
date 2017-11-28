@@ -28,7 +28,7 @@ class PagevisitController extends \panix\mod\stats\components\StatsController {
             $res = $this->db->createCommand($z)->queryAll();
 
             $z2 = "SELECT SUM(t.cnt) as cnt FROM (" . $z . ") t";
-            $r = $this->db->createCommand($z2)->queryRow();
+            $r = $this->db->createCommand($z2)->queryOne();
         } else {
             $z = "CREATE TEMPORARY TABLE IF NOT EXISTS {{%tmp_surf}} SELECT ip, req FROM {{%surf}} WHERE";
             $z .= $zp . " AND dt >= '$this->sdate' AND dt <= '$this->fdate' GROUP BY ip, req";
@@ -55,10 +55,10 @@ class PagevisitController extends \panix\mod\stats\components\StatsController {
                 $transaction2->rollBack();
             }
 
-            $r = $this->db->createCommand($z3)->queryColumn();
+            $r = $this->db->createCommand($z3)->queryOne();
         }
 
-        $cnt = $r[0];
+        $cnt = $r['cnt'];
 
 
         $k = 0;

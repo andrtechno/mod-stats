@@ -9,19 +9,6 @@ class Module extends \panix\engine\WebModule {
 
     public $icon = 'stats';
 
-    public function init() {
-
-        // parent::init();
-        /*
-         * Баг, при ошибки на сайте, показывается админская ошибка!
-         * Yii::$app->setComponents(array(
-          'errorHandler' => array(
-          'errorAction' => 'site/errorAdmin',
-          ),
-          )); */
-         parent::init();
-    }
-
     public function afterInstall() {
 
         /* Yii::$app->settings->set('stats', array(
@@ -43,6 +30,7 @@ class Module extends \panix\engine\WebModule {
 
     public function getAdminMenu() {
         $c =Yii::$app->controller->id;
+        $a =Yii::$app->controller->action->id;
         return [
             'modules' => [
                 'items' => [

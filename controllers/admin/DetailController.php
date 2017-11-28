@@ -1,20 +1,28 @@
 <?php
+
 namespace panix\mod\stats\controllers\admin;
+
 use Yii;
-class DefaultController extends \panix\mod\stats\components\StatsController {
+use panix\mod\stats\models\StatsMainHistory;
+use panix\mod\stats\models\StatsMainp;
+
+class DetailController extends \panix\mod\stats\components\StatsController {
 
     public function actionIndex() {
         $this->pageName = Yii::t('stats/default', 'MODULE_NAME');
-        $this->breadcrumbs = array(
-            Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
+        $this->breadcrumbs = [
+            [
+                'label' => Yii::t('stats/default', 'MODULE_NAME'),
+                'url' => ['/admin/stats']
+            ],
             $this->pageName
-        );
+        ];
         $result = array();
 
 
         $stats = Yii::$app->stats;
         $s = $stats->initRun();
-        foreach (StatsMainHistory::model()->findAll(array('order' => '`t`.`i` ASC')) as $rw) {
+        foreach (StatsMainHistory::find()->orderBy(['i' => SORT_ASC])->all() as $rw) {
 
             $dt_i = $rwz["dt"][] = $rw->dt;
             $rwz["hosts"][$dt_i] = $rw->hosts;
@@ -24,7 +32,7 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
             $rwz["fix"][$dt_i] = $rw->fix;
         }
 
-        foreach (StatsMainp::model()->findAll() as $rww) {
+        foreach (StatsMainp::find()->all() as $rww) {
             $dt_i = $rww["dt"] . $rww->god;
             $rwzz[$dt_i]["hosts"] = $rww->hosts;
             $rwzz[$dt_i]["hits"] = $rww->hits;
@@ -46,16 +54,16 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
 
 
 
-        
-            $query = new \yii\db\Query;
-                   $query->from('{{%surf}}')
-                           ->select(['day', 'dt'])
-                           ->distinct()
-                    //->where(['product_id' => $this->id])
-                    ->orderBy(['i'=>SORT_DESC]);
-            $res = $query->createCommand()->queryOne();
-        
-        
+
+        $query = new \yii\db\Query;
+        $query->from('{{%surf}}')
+                ->select(['day', 'dt'])
+                ->distinct()
+                //->where(['product_id' => $this->id])
+                ->orderBy(['i' => SORT_DESC]);
+        $res = $query->createCommand()->queryOne();
+
+
         $fdate = date('Y-m-d');
 
 
@@ -100,17 +108,17 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
 
                 if (isset($rwz)) {
 
-                if ($dt != $fdate && !in_array($dt, $rwz["dt"])) {
-                    // die('save');
-                    $sql_insert = "INSERT INTO {{%main_history}}(dt,hosts,hits,search,other,fix) VALUES('" . $dt . "','" . $m_uniqs[$dt] . "','" . $m_hits[$dt] . "','" . $m_se[$dt] . "','" . $m_other[$dt] . "','" . $m_fix[$dt] . "')";
-                    $this->db->createCommand($sql_insert)->execute();
+                    if ($dt != $fdate && !in_array($dt, $rwz["dt"])) {
+                        // die('save');
+                        $sql_insert = "INSERT INTO {{%main_history}}(dt,hosts,hits,search,other,fix) VALUES('" . $dt . "','" . $m_uniqs[$dt] . "','" . $m_hits[$dt] . "','" . $m_se[$dt] . "','" . $m_other[$dt] . "','" . $m_fix[$dt] . "')";
+                        $this->db->createCommand($sql_insert)->execute();
 
-                    $sql_del = "DELETE me FROM {{%main_history}} as me, {{%main_history}} as clone WHERE me.dt = clone.dt AND me.i > clone.i";
-                    $this->db->createCommand($sql_del)->execute();
+                        $sql_del = "DELETE me FROM {{%main_history}} as me, {{%main_history}} as clone WHERE me.dt = clone.dt AND me.i > clone.i";
+                        $this->db->createCommand($sql_del)->execute();
 
-                    //mysql_query("DELETE me FROM mainh as me, mainh as clone WHERE me.dt = clone.dt AND me.i > clone.i");
+                        //mysql_query("DELETE me FROM mainh as me, mainh as clone WHERE me.dt = clone.dt AND me.i > clone.i");
+                    }
                 }
-                 }
             }
 
 
@@ -142,10 +150,10 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
 
 
 
-       // if(file_exists(Yii::getPathOfAlias('mod.stats') . "/total.dat")){
+        // if(file_exists(Yii::getPathOfAlias('mod.stats') . "/total.dat")){
         //if ($total = file(Yii::getPathOfAlias('mod.stats') . "/total.dat"))
-       //     $total = explode("|", $total[0]);
-       // }
+        //     $total = explode("|", $total[0]);
+        // }
 
         $uniq_total = $this->db->createCommand("SELECT COUNT(DISTINCT ip) as total FROM {{%surf}} WHERE " . $this->_zp);
 
@@ -158,33 +166,33 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
 
         $dday = array(0 => "ВС", 1 => "ПН", 2 => "ВТ", 3 => "СР", 4 => "ЧТ", 5 => "ПТ", 6 => "СБ");
 
-        
-        
 
-        
-            $dataProvider = new \yii\data\ArrayDataProvider([
-                'allModels' => $result,
-                'pagination' => [
+
+
+
+        $dataProvider = new \yii\data\ArrayDataProvider([
+            'allModels' => $result,
+            'pagination' => [
                 'pageSize' => 10,
             ]
-            ]);
-        
-        
-       /* $dataProvider = new CArrayDataProvider($result, array(
-            'sort' => array(
-                'attributes' => array(
-                    'hosts',
-                    'hits',
-                    'graphic',
-                    'search',
-                    'sites',
-                    'date',
-                ),
-            ),
-            'pagination' => array(
-                'pageSize' => 10,
-            ),
-        ));*/
+        ]);
+
+
+        /* $dataProvider = new CArrayDataProvider($result, array(
+          'sort' => array(
+          'attributes' => array(
+          'hosts',
+          'hits',
+          'graphic',
+          'search',
+          'sites',
+          'date',
+          ),
+          ),
+          'pagination' => array(
+          'pageSize' => 10,
+          ),
+          )); */
         $m_date = array_keys($m_hits);
         $mmx = max($m_hits);
         $weekResult = array();
@@ -195,22 +203,23 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
             $d = $m_date[$i];
             $weekResult['hits'][] = (int) $m_hits[$d];
             $weekResult['hosts'][] = (int) $m_uniqs[$d];
-            $weekResult['cats'][] = date('m.d',strtotime($d)).' '.$dday[date('w', strtotime($d))];
+            $weekResult['cats'][] = date('m.d', strtotime($d)) . ' ' . $dday[date('w', strtotime($d))];
             //echo key($dday[date('w', strtotime($d))]);
-            if($i==7) break;
+            if ($i == 7)
+                break;
         }
 
 
 
-        $this->render('index', array(
-            'weekResult' => $weekResult,
-            'dataProvider' => $dataProvider,
-            'm_date' => $m_date,
-            'mmx' => $mmx,
-            'all_uniqs' => $all_uniqs[0],
-            'total_hits' => (array_sum($m_hits)),
-            'total_search' => (array_sum($m_se)),
-            'total_other' => (array_sum($m_other)),
+        return $this->render('index', array(
+                    'weekResult' => $weekResult,
+                    'dataProvider' => $dataProvider,
+                    'm_date' => $m_date,
+                    'mmx' => $mmx,
+                    'all_uniqs' => $all_uniqs[0],
+                    'total_hits' => (array_sum($m_hits)),
+                    'total_search' => (array_sum($m_se)),
+                    'total_other' => (array_sum($m_other)),
         ));
     }
 
@@ -375,18 +384,18 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
       }
      */
     public function actionLast() {
-        $getSite = Yii::$app->request->getParam('site');
-        $getQuery = Yii::$app->request->getParam('query');
+        $getSite = Yii::$app->request->get('site');
+        $getQuery = Yii::$app->request->get('query');
         if (isset($getSite)) {
             $sql = "SELECT refer,day,dt,tm,req FROM {{surf}} WHERE refer <> '' AND LOWER(refer) NOT LIKE '%://" . $this->_site . "%' AND LOWER(refer) NOT LIKE '%://www." . $this->_site . "%' AND LOWER(refer) NOT LIKE '" . $this->_site . "%' AND (LOWER(refer) NOT LIKE '%yand%' AND LOWER(refer) NOT LIKE '%google.%' AND LOWER(refer) NOT LIKE '%go.mail.ru%' AND LOWER(refer) NOT LIKE '%rambler.%' AND LOWER(refer) NOT LIKE '%search.yahoo%' AND LOWER(refer) NOT LIKE '%search.msn%' AND LOWER(refer) NOT LIKE '%bing%' AND LOWER(refer) NOT LIKE '%search.live.com%' AND LOWER(refer) NOT LIKE '%&q=%' AND LOWER(refer) NOT LIKE '%?q=%' AND LOWER(refer) NOT LIKE '%query=%'" . $this->_cot_m . ") AND " . $this->_zp . " ORDER BY i DESC LIMIT " . $getSite;
             $cmd = $this->db->createCommand($sql);
-            $this->render('last_site', array('items' => $cmd->queryAll(), 'n' => $getSite));
+            return $this->render('last_site', array('items' => $cmd->queryAll(), 'n' => $getSite));
         } elseif (isset($getQuery)) {
             $sql = "SELECT refer,day,dt,tm,req FROM {{surf}} WHERE (LOWER(refer) LIKE '%yand%' OR LOWER(refer) LIKE '%google.%' OR LOWER(refer) LIKE '%go.mail.ru%' OR LOWER(refer) LIKE '%rambler.%' OR LOWER(refer) LIKE '%search.yahoo%' OR LOWER(refer) LIKE '%search.msn%' OR LOWER(refer) LIKE '%bing%' OR LOWER(refer) LIKE '%search.live.com%'" . $this->_cse_m . ") AND LOWER(refer) NOT LIKE '%@%' AND " . $this->_zp . " ORDER BY i DESC LIMIT " . $getQuery;
             $cmd = $this->db->createCommand($sql);
-            $this->render('last_query', array('items' => $cmd->queryAll(), 'n' => $getQuery));
+            return $this->render('last_query', array('items' => $cmd->queryAll(), 'n' => $getQuery));
         } else {
-            throw new CHttpException(404);
+            throw new HttpException(404);
         }
     }
 

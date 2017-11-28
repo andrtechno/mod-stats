@@ -5,8 +5,8 @@ use panix\engine\Html;
 class SearchqueryController extends \panix\mod\stats\components\StatsController {
 
     public function actionIndex() {
-        $engin = $_GET['engin'];
-        $pages = $_GET['pages'];
+        $engin = Yii::$app->request->get('engin');
+        $pages = Yii::$app->request->get('pages');
        // $db = Yii::$app->db;
         //  if (isset($engin) or $top == 1) {
         if (isset($engin)) {
@@ -41,8 +41,12 @@ class SearchqueryController extends \panix\mod\stats\components\StatsController 
             $sql = "SELECT refer,req,ip FROM {{%surf}} WHERE dt >= '$this->sdate' AND dt <= '$this->fdate' AND ($e) AND LOWER(refer) NOT LIKE '%@%' AND" . $this->_zp . " GROUP BY ip,refer";
         }
         $res = $this->db->createCommand($sql);
+        $qmas = [];
+        $pmas = [];
+        $results = $res->queryAll();
         // while ($row = $res->queryAll()) {
-        foreach ($res->queryAll(false) as $row) {
+        if($results){
+        foreach ($res->queryAll() as $row) {
             $refer = StatsHelper::Ref($row[0]);
             if (is_array($refer)) {
                 list($engine, $query) = $refer;
@@ -112,28 +116,23 @@ class SearchqueryController extends \panix\mod\stats\components\StatsController 
         }
         // echo "<tr class=h><td></td><td align=left><b>Всего:</b></td>" . (($pages <> 1) ? "" : "<td></td>") . "<td><b>$vse</b></td><td align=left>из $cnt</td><td></td></tr></table>";
 
-
-
-        $dataProvider = new CArrayDataProvider($this->result, array(
-            'sort' => array(
-                'attributes' => array(
-                    'query',
-                    'val',
-                ),
-            ),
-            'pagination' => array(
+        }
+                  $dataProvider = new \yii\data\ArrayDataProvider([
+                'allModels' => $this->result,
+                'pagination' => [
                 'pageSize' => 10,
-            ),
-        ));
+            ]
+            ]);
 
-        $this->render('index', array(
+
+        return $this->render('index', array(
             'dataProvider' => $dataProvider,
         ));
     }
 
     public function actionSystem() {
-        $engin = $_GET['engin'];
-        $pages = $_GET['pages'];
+        $engin = Yii::$app->request->get('engin');
+        $pages = Yii::$app->request->get('pages');
         //  if (isset($engin) or $top == 1) {
         if (isset($engin)) {
             switch ($engin) {
@@ -169,7 +168,9 @@ class SearchqueryController extends \panix\mod\stats\components\StatsController 
         }
         $res = $this->db->createCommand($sql);
         // while ($row = mysql_fetch_row($res)) {
-        foreach ($res->queryAll(false) as $row) {
+        $results = $res->queryAll();
+        if($results){
+        foreach ($results as $row) {
             $refer = StatsHelper::Ref($row[0]);
             if (is_array($refer)) {
                 list($engine, $query) = $refer;
@@ -209,22 +210,16 @@ class SearchqueryController extends \panix\mod\stats\components\StatsController 
                 'progressbar' => $this->progressBar(ceil(($val * 100) / $mmx), number_format((($val * 100) / $cnt), 1, ',', ''), (($this->sort == "hi") ? "success" : "warning")),
             );
         }
+        }
         // echo "<tr class=h><td></td><td align=left><b>Всего:</b></td><td><b>$vse</b></td><td align=left>из $cnt</td><td></td><td></td></tr></table>";
-
-        $dataProvider = new CArrayDataProvider($this->result, array(
-            'sort' => array(
-                // 'defaultOrder'=>'id ASC',
-                'attributes' => array(
-                    'engine',
-                    'val',
-                ),
-            ),
-            'pagination' => array(
+             $dataProvider = new \yii\data\ArrayDataProvider([
+                'allModels' => $this->result,
+                'pagination' => [
                 'pageSize' => 10,
-            ),
-        ));
+            ]
+            ]);
 
-        $this->render('system', array(
+        return $this->render('system', array(
             'dataProvider' => $dataProvider,
         ));
     }
