@@ -1,7 +1,5 @@
 <?php
-Yii::app()->tpl->openWidget(array(
-    'title' => 'Фильтр',
-));
+
 ?>
 
 <table class="table table-bordered">
@@ -10,9 +8,9 @@ Yii::app()->tpl->openWidget(array(
                 <div class="input-group">
                     <span class="input-group-addon">с</span> 
                     <?php
-                    $this->widget('zii.widgets.jui.CJuiDatePicker', array(
+                   /* $this->widget('zii.widgets.jui.CJuiDatePicker', array(
                         'name' => 's_date',
-                        'value' => $this->sdate,
+                        'value' => $this->context->sdate,
                         // additional javascript options for the date picker plugin
                         'options' => array(
                             'dateFormat' => 'yy-mm-dd',
@@ -21,15 +19,15 @@ Yii::app()->tpl->openWidget(array(
                         'htmlOptions' => array(
                             'class' => 'form-control'
                         ),
-                    ));
+                    ));*/
                     ?>
           
                     <span class="input-group-addon">до</span>  
 
                     <?php
-                    $this->widget('zii.widgets.jui.CJuiDatePicker', array(
+                    /*$this->widget('zii.widgets.jui.CJuiDatePicker', array(
                         'name' => 'f_date',
-                        'value' => $this->fdate,
+                        'value' => $this->context->fdate,
                         // additional javascript options for the date picker plugin
                         'options' => array(
                             'dateFormat' => 'yy-mm-dd',
@@ -38,7 +36,7 @@ Yii::app()->tpl->openWidget(array(
                         'htmlOptions' => array(
                             'class' => 'form-control'
                         ),
-                    ));
+                    ));*/
                     ?>
                 </div>
 
@@ -49,23 +47,23 @@ Yii::app()->tpl->openWidget(array(
                     &nbsp;<span style="vertical-align: middle;"></span> 
                     <?php
                     if ($sort) {
-                        $this->widget('ext.bootstrap.selectinput.SelectInput', array(
+                      /*  $this->widget('ext.bootstrap.selectinput.SelectInput', array(
                             'name' => 'sort',
-                            'data' => array('ho' => Yii::t('StatsModule.default', 'HOSTS'), 'hi' => Yii::t('StatsModule.default', 'HITS')),
-                            'value' => $this->sort
-                        ));
+                            'data' => array('ho' => Yii::t('stats/default', 'HOSTS'), 'hi' => Yii::t('stats/default', 'HITS')),
+                            'value' => $this->context->sort
+                        ));*/
                     }
                 }
                 ?>
-                <?php if ($_GET['engin']) echo "<input name='engin' value=" . $_GET['engin'] . " type='hidden'>"; ?>
-                <?php if ($_GET['domen']) echo "<input name='domen' value=" . $_GET['domen'] . " type='hidden'>"; ?>
-                <?php if ($_GET['brw']) echo "<input name='brw' value='" . $_GET['brw'] . "' type='hidden'>"; ?>
-                <?php if ($_GET['qq']) echo "<input name='qq' value='" . $_GET['qq'] . "' type='hidden'>"; ?>
-                <?php if (isset($_GET['domen']) or ! empty($_GET['engin'])) { ?>
-                    &nbsp;<span>строка</span> <input type=text name="str_f"  value="<?php if ($_GET['str_f']) echo $_GET['str_f']; ?>">
+                <?php if (Yii::$app->request->get('engin')) echo "<input name='engin' value=" . Yii::$app->request->get('engin') . " type='hidden'>"; ?>
+                <?php if (Yii::$app->request->get('domen')) echo "<input name='domen' value=" . Yii::$app->request->get('domen') . " type='hidden'>"; ?>
+                <?php if (Yii::$app->request->get('brw')) echo "<input name='brw' value='" . Yii::$app->request->get('brw') . "' type='hidden'>"; ?>
+                <?php if (Yii::$app->request->get('qq')) echo "<input name='qq' value='" . Yii::$app->request->get('qq') . "' type='hidden'>"; ?>
+                <?php if (Yii::$app->request->get('domen') || !Yii::$app->request->get('engin')) { ?>
+                    &nbsp;<span>строка</span> <input type=text name="str_f"  value="<?php if (Yii::$app->request->get('str_f')) echo Yii::$app->request->get('str_f'); ?>">
                 <?php } ?>
                 <input class="btn btn-success" type=submit value="Показать!">
             </form></td>
     </tr>
 </table>
-<?php Yii::app()->tpl->closeWidget(); ?>
+

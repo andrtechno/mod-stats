@@ -1,4 +1,7 @@
-
+<?php
+use panix\engine\Html;
+use panix\engine\grid\GridView;
+?>
 <div class="row">
     <div class="col-sm-6 col-xs-12">
         <div class="panel panel-default">
@@ -7,7 +10,61 @@
             </div>
             <div class="panel-body">
                 <?php
-                $this->Widget('ext.highcharts.HighchartsWidget', array(
+                
+                echo panix\engine\widgets\highcharts\Highcharts::widget([
+'options' => array(
+                        'chart' => array(
+                            'height' => 250,
+                            'defaultSeriesType' => 'areaspline',
+                            'type' => 'column',
+                            'plotBackgroundColor' => null,
+                            'plotBorderWidth' => null,
+                            'plotShadow' => false,
+                            'backgroundColor' => 'rgba(255, 255, 255, 0)'
+                        ),
+                        'credits' => array(
+                            'enabled' => false
+                        ),
+                        'exporting' => false,
+                        'title' => array('text' => null),
+                        'subtitle' => array(
+                            //'text' => "Monitoring: " . date('F', mktime(0, 0, 0, substr($m_dt[0], 0, 2), 1, 0)) . " " . $m_gd[0] . " - " . date('F', mktime(0, 0, 0, substr($m_dt[count($m_dt) - 1], 0, 2), 1, 0)) . " " . $m_gd[count($m_gd) - 1],
+                        ),
+                        'xAxis' => false,
+                        'yAxis' => array(
+                            'title' => array('text' => null),
+                            'visible' => false
+                        ),
+                        'plotOptions' => array(
+                            'column' => array(
+                                'dataLabels' => array(
+                                    'enabled' => false,
+                                ),
+                            ),
+                            'series' => array(
+                                'cursor' => 'pointer',
+                                'point' => array(
+                                    'events' => array(
+                                        'click' => "js:function (e) {
+//location.href = this.options.url;
+                            }"
+                                    )
+                                ),
+                                'marker' => array(
+                                    'lineWidth' => 1,
+                                    'enabled' => false
+                                )
+                            )
+                        ),
+                        'series' => array(
+                            array('name' => 'Скоро', 'data' => array(0)),
+                        )
+                    )
+                ]);
+                
+                
+                
+                /*$this->Widget('ext.highcharts.HighchartsWidget', array(
                     'scripts' => array(
                         'highcharts-more',
                         // 'columnrange', // enables supplementary chart types (gauge, arearange, columnrange, etc.)
@@ -61,7 +118,7 @@
                             array('name' => 'Скоро', 'data' => array(0)),
                         )
                     )
-                ));
+                ));*/
                 ?>
             </div>
         </div>
@@ -73,7 +130,7 @@
             </div>
             <div class="panel-body">
                 <?php
-                $this->widget('ext.highcharts.HighchartsWidget', array(
+                /*$this->widget('ext.highcharts.HighchartsWidget', array(
                     'options' => array(
                         'chart' => array(
                             'height' => 250,
@@ -113,7 +170,7 @@
                             array('type' => 'line', 'name' => Yii::t('StatsModule.default', 'HOSTS'), 'data' => $weekResult['hosts']),
                         )
                     )
-                ));
+                ));*/
                 ?>
             </div>
         </div>
@@ -142,10 +199,10 @@
                         <td class="text-center"><span class="badge"><?= $total_other; ?></span></td>
                     </tr>
                     <tr>
-                        <td colspan="2"><?= Html::link('Последние 100 запроса', array('/admin/stats/default/last', 'query' => 100)) ?></td>
+                        <td colspan="2"><?= Html::a('Последние 100 запроса', ['/admin/stats/default/last', 'query' => 100]) ?></td>
                     </tr>
                     <tr>
-                        <td colspan="2"><?= Html::link('Последние 100 других сайта', array('/admin/stats/default/last', 'site' => 100)) ?></td>
+                        <td colspan="2"><?= Html::a('Последние 100 других сайта', ['/admin/stats/default/last', 'site' => 100]) ?></td>
                     </tr>
                 </table>
             </div>
@@ -153,62 +210,62 @@
     </div>
     <div class="col-sm-8">
         <?php
-        Yii::app()->tpl->openWidget(array(
-            'title' => $this->pageName,
-        ));
+   
+        
+        
+        
+echo GridView::widget([
+    'tableOptions' => ['class' => 'table table-striped'],
+    'dataProvider' => $dataProvider,
+    //'filterModel' => $searchModel,
+    'layoutOptions' => ['title' => $this->context->pageName],
+    'columns' => [
+        [
+            'attribute' => 'date',
+            'header' => Yii::t('app', 'date'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-left'],
+        ],
+        [
+            'attribute' => 'graphic',
+            'header' => Yii::t('app', 'graphic'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'hosts',
+            'header' => Yii::t('app', 'hosts'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'hits',
+            'header' => Yii::t('app', 'hits'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'search',
+            'header' => Yii::t('app', 'search'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'sites',
+            'header' => Yii::t('app', 'sites'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'fix',
+            'header' => Yii::t('app', 'fix'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
 
-        $this->widget('ext.adminList.GridView', array(//ext.adminList.GridView
-            'dataProvider' => $dataProvider,
-            'selectableRows' => false,
-            'enableHeader' => false,
-            'autoColumns' => false,
-            'enablePagination' => true,
-            'columns' => array(
-                array(
-                    'name' => 'date',
-                    'header' => 'Дата',
-                    'type' => 'raw',
-                    'htmlOptions' => array('width' => '15%')
-                ),
-                array(
-                    'name' => 'graphic',
-                    'header' => Yii::t('StatsModule.default', 'GRAPH'),
-                    'type' => 'raw',
-                ),
-                array(
-                    'name' => 'hosts',
-                    'header' => Yii::t('StatsModule.default', 'HOSTS'),
-                    'type' => 'raw',
-                    'htmlOptions' => array('class' => 'text-center', 'width' => '10%')
-                ),
-                array(
-                    'name' => 'hits',
-                    'header' => Yii::t('StatsModule.default', 'HITS'),
-                    'type' => 'raw',
-                    'htmlOptions' => array('class' => 'text-center', 'width' => '10%')
-                ),
-                array(
-                    'name' => 'search',
-                    'header' => 'С поиска',
-                    'type' => 'raw',
-                    'htmlOptions' => array('class' => 'text-center', 'width' => '10%')
-                ),
-                array(
-                    'name' => 'sites',
-                    'header' => 'С сайтов',
-                    'type' => 'raw',
-                    'htmlOptions' => array('class' => 'text-center', 'width' => '10%')
-                ),
-                array(
-                    'name' => 'fix',
-                    'header' => 'fix',
-                    'type' => 'raw',
-                    'htmlOptions' => array('class' => 'text-center', 'width' => '10%')
-                ),
-            )
-        ));
-
-        Yii::app()->tpl->closeWidget();
+            ]
+        ]);
+                
         ?>
     </div>
 </div>

@@ -1,5 +1,9 @@
 <?php
 namespace panix\mod\stats\components;
+
+use Yii;
+use panix\engine\Html;
+
 class StatsHelper {
 
     public static function getRowUserAgent($user_agent, $refer) {
@@ -10,7 +14,7 @@ class StatsHelper {
         if (!self::is_robot($user_agent, $refer)) {
             $brw = self::getBrowser($user_agent);
             if ($brw != "")
-                $content.= Html::image(Yii::app()->getModule('stats')->assetsUrl . '/images/browsers/' . $brw, $user_agent, array(
+                $content.= Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/browsers/' . $brw, $user_agent, array(
                             //'title' => $user_agent,
                             'title' => Yii::t('stats/default', 'BROWSER', array(
                                 '{name}' => $browser->getBrowser(), //.' '.$user_agent,
@@ -42,7 +46,7 @@ class StatsHelper {
         } else {
             return;
         }
-        return Html::image(Yii::app()->getModule('stats')->assetsUrl . '/images/platform/' . $img, $name, array(
+        return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/' . $img, $name, array(
                     'data-toggle' => "tooltip",
                     'data-placement' => "top",
                     'class' => 'img-thumbnail',
@@ -56,7 +60,7 @@ class StatsHelper {
         $browser->setUserAgent($user_agent);
         // return $browser->getPlatform();
         if ($browser->isRobot()) {
-            return Html::image(Yii::app()->getModule('stats')->assetsUrl . '/images/platform/robot.png', $browser->getPlatform(), array(
+            return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/robot.png', $browser->getPlatform(), array(
                         'data-toggle' => "tooltip",
                         'data-placement' => "top",
                         'title' => 'Робот',
@@ -81,7 +85,7 @@ class StatsHelper {
             case Browser::PLATFORM_IPAD: $img = "apple.png";
                 break;
         }
-        return Html::image(Yii::app()->getModule('stats')->assetsUrl . '/images/platform/' . $img, $browser->getPlatform(), array(
+        return Html::image(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/' . $img, $browser->getPlatform(), array(
                     'data-toggle' => "tooltip",
                     'data-placement' => "top",
                     'class' => 'platform',
@@ -91,7 +95,7 @@ class StatsHelper {
     }
 
     public static function linkDetail($link) {
-        return Html::link(Yii::t('stats/default', 'DETAIL'), $link, array('target' => '_blank', 'class' => 'btn btn-xs btn-info'));
+        return Html::a(Yii::t('stats/default', 'DETAIL'), $link, array('target' => '_blank', 'class' => 'btn btn-xs btn-info'));
     }
 
     public static function getRowHost($ip, $proxy, $host, $lang) {
@@ -105,7 +109,7 @@ class StatsHelper {
         if ($host != "") {
             $content .= "<br>Язык: " . (!empty($p) ? $p : "<font color=grey>неизвестно</font>");
             if (file_exists(Yii::getPathOfAlias('webroot.uploads.language') . DS . mb_strtolower($lang) . ".png")) {
-                $content.= Html::image('/uploads/language/' . mb_strtolower($lang) . '.png', $p);
+                $content.= Html::img('/uploads/language/' . mb_strtolower($lang) . '.png', $p);
             }
         }
         return $content;
@@ -133,11 +137,11 @@ class StatsHelper {
                 break;
         }
         if (!empty($brw)) {
-            $img = Html::image(Yii::app()->getModule('stats')->assetsUrl . '/images/browsers/' . $brw, $name);
+            $img = Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/browsers/' . $brw, $name);
         } else {
             $img = '';
         }
-        $content = Html::link($img . ' ' . $name, "/admin/stats/browsers/detail?s_date=" . $this->sdate . "&f_date=" . $this->fdate . "&qs=" . $brw . "&sort=" . (empty($this->sort) ? "ho" : $this->sort), array('target' => '_blank'));
+        $content = Html::a($img . ' ' . $name, "/admin/stats/browsers/detail?s_date=" . $this->sdate . "&f_date=" . $this->fdate . "&qs=" . $brw . "&sort=" . (empty($this->sort) ? "ho" : $this->sort), array('target' => '_blank'));
         return $content;
     }
 
@@ -164,7 +168,7 @@ class StatsHelper {
         $content = '';
         if ($engine == "G" and ! empty($query) and stristr($refer, "/url?"))
             $refer = str_replace("/url?", "/search?", $refer);
-        $content.= Yii::app()->controller->echo_se($engine);
+        $content.= Yii::$app->controller->echo_se($engine);
         if (empty($query))
             $query = '<span class="text-muted">неизвестно</span>';
         $content.= ": <a target=_blank href=\"" . $refer . "\">" . $query . "</a>";
@@ -178,7 +182,7 @@ class StatsHelper {
             list($engine, $query) = $refer;
             if ($engine == "G" and ! empty($query) and stristr($ref, "/url?"))
                 $ref = str_replace("/url?", "/search?", $ref);
-            $text.=Yii::app()->controller->echo_se($engine);
+            $text.=Yii::$app->controller->echo_se($engine);
             if (empty($query))
                 $query = '<span class="text-muted">неизвестно</span>';
             $text.= ': <a target="_blank" href="' . $ref . '">' . $query . '</a>';
@@ -630,7 +634,7 @@ class StatsHelper {
     }
 
     public static function is_robot($check, $check2) {
-        $app = Yii::app()->stats;
+        $app = Yii::$app->stats;
         $rbd = $app->rbd;
         $hbd = $app->hbd;
 
@@ -660,7 +664,7 @@ class StatsHelper {
     }
 
     public static function se_sp($ref) {
-        $app = Yii::app()->stats->se_n;
+        $app = Yii::$app->stats->se_n;
         foreach ($app['se_n'] as $key => $val) {
             if (stristr($ref, $se_nn[$key])) {
                 $engine = $key;
@@ -751,7 +755,7 @@ class StatsHelper {
     }
 
     public static function Ref($ref) {
-        $site = Yii::app()->stats->getSite();
+        $site = Yii::$app->stats->getSite();
         if (($ref != "") and ! (stristr($ref, "://" . $site) and stripos($ref, "://" . $site, 6) == 0) and ! (stristr($ref, "://www." . $site) and stripos($ref, "://www." . $site, 6) == 0)) {
 
             $reff = str_replace("www.", "", $ref);

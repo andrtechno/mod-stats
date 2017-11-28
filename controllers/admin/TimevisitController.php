@@ -1,23 +1,29 @@
 <?php
+
 namespace panix\mod\stats\controllers\admin;
+
+use Yii;
+
 class TimevisitController extends \panix\mod\stats\components\StatsController {
 
     public function actionIndex() {
         $this->pageName = Yii::t('stats/default', 'TIMEVISIT');
-        $this->breadcrumbs = array(
-            Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
+        $this->breadcrumbs = [
+            [
+                'label' => Yii::t('stats/default', 'MODULE_NAME'),
+                'url' => ['/admin/stats']
+            ],
             $this->pageName
-        );
-
+        ];
         $vse = 0;
         $k = 0;
 
         if ($this->sort == "hi") {
-            $sql = "SELECT substr(tm,-5,2) as tm FROM {{surf}} WHERE";
+            $sql = "SELECT substr(tm,-5,2) as tm FROM {{%surf}} WHERE";
             $sql .= $this->_zp . " AND dt >= '$this->sdate' AND dt <= '$this->fdate'";
             $res = $this->db->createCommand($sql);
         } else {
-            $sql = "SELECT substr(tm,-5,2) as tm,ip FROM {{surf}} WHERE";
+            $sql = "SELECT substr(tm,-5,2) as tm,ip FROM {{%surf}} WHERE";
             $sql .= $this->_zp . " AND dt >= '$this->sdate' AND dt <= '$this->fdate' GROUP BY 2,1";
             $res = $this->db->createCommand($sql);
         }
@@ -82,24 +88,24 @@ class TimevisitController extends \panix\mod\stats\components\StatsController {
     public function actionDetail() {
         $qs = $_GET['qs'];
         $tz = $_GET['tz'];
-        $sql = "SELECT day,dt,tm,refer,ip,proxy,host,lang,user,req FROM {{surf}} WHERE (tm LIKE '%" . addslashes($qs) .  "%') AND dt >= '$this->sdate' AND dt <= '$this->fdate' " . (($_GET['pz'] == 1) ? "AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY " . (($tz == 7) ? "host" : "ip") : "") . " ORDER BY i DESC";
+        $sql = "SELECT day,dt,tm,refer,ip,proxy,host,lang,user,req FROM {{%surf}} WHERE (tm LIKE '%" . addslashes($qs) . "%') AND dt >= '$this->sdate' AND dt <= '$this->fdate' " . (($_GET['pz'] == 1) ? "AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY " . (($tz == 7) ? "host" : "ip") : "") . " ORDER BY i DESC";
         $res = $this->db->createCommand($sql);
 
-        
+
         $this->pageName = Yii::t('stats/default', 'TIMEVISIT');
         $this->breadcrumbs = array(
             Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
             $this->pageName => array('/admin/stats/timevisit'),
             $qs
         );
-        
-        
+
+
         foreach ($res->queryAll() as $row) {
 
             $ip = CMS::ip($row['ip']);
             if ($row['proxy'] != "") {
-                $ip.= '<br>';
-                $ip.= Html::link('через proxy', '?item=ip&qs=' . $row['proxy'], array('target' => '_blank'));
+                $ip .= '<br>';
+                $ip .= Html::link('через proxy', '?item=ip&qs=' . $row['proxy'], array('target' => '_blank'));
             }
             $this->result[] = array(
                 'date' => StatsHelper::$DAY[$row['day']] . ' ' . $row['dt'],

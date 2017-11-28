@@ -1,15 +1,23 @@
 <?php
 namespace panix\mod\stats\controllers\admin;
-class IpaddressController extends panix\mod\stats\components\StatsController {
+
+use Yii;
+use panix\engine\CMS;
+use panix\engine\Html;
+use panix\mod\stats\components\StatsHelper;
+class IpaddressController extends \panix\mod\stats\components\StatsController {
 
     public function actionIndex() {
         $this->pageName = Yii::t('stats/default', 'IP_ADDRESS');
-        $this->breadcrumbs = array(
-            Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
+        $this->breadcrumbs = [
+            [
+                'label'=>Yii::t('stats/default', 'MODULE_NAME'),
+                'url'=>['/admin/stats']
+            ],
             $this->pageName
-        );
+        ];
 
-        $sql = "SELECT ip, COUNT(ip) cnt FROM {{surf}} WHERE";
+        $sql = "SELECT ip, COUNT(ip) cnt FROM {{%surf}} WHERE";
         $sql .= $this->_zp . " AND dt >= '$this->sdate' AND dt <= '$this->fdate' GROUP BY ip ORDER BY 2 DESC";
 
         $res = $this->db->createCommand($sql)->queryAll(false);
@@ -18,10 +26,11 @@ class IpaddressController extends panix\mod\stats\components\StatsController {
 
 
         $total_cmd = $this->db->createCommand($sql2);
-        $total = $total_cmd->queryRow(false);
+        $total = $total_cmd->queryColumn(false);
 
 //echo $total[0];
-
+$k = 0;
+$vse = 0;
         foreach ($res as $row) {
 
             if ($k == 0)
@@ -43,9 +52,14 @@ class IpaddressController extends panix\mod\stats\components\StatsController {
         }
 
 
+            $dataProvider = new \yii\data\ArrayDataProvider([
+                'allModels' => $this->result,
+                'pagination' => [
+                'pageSize' => 10,
+            ]
+            ]);
 
-
-        $dataProvider = new CArrayDataProvider($this->result, array(
+        /*$dataProvider = new CArrayDataProvider($this->result, array(
             'sort' => array(
                 // 'defaultOrder'=>'ip ASC',
                 'attributes' => array(
@@ -54,8 +68,8 @@ class IpaddressController extends panix\mod\stats\components\StatsController {
                 ),
             ),
             'pagination' => array('pageSize' => 10)
-        ));
-        $this->render('index', array('dataProvider' => $dataProvider));
+        ));*/
+       return $this->render('index', array('dataProvider' => $dataProvider));
     }
 
     public function actionDetail() {

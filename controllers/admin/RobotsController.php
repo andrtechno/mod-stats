@@ -4,6 +4,13 @@ class RobotsController extends \panix\mod\stats\components\StatsController {
 
     public function actionIndex() {
         $this->pageName = Yii::t('stats/default', 'ROBOTS');
+        $this->breadcrumbs = [
+            [
+                'label'=>Yii::t('stats/default', 'MODULE_NAME'),
+                'url'=>['/admin/stats']
+            ],
+            $this->pageName
+        ];
         foreach ($this->robo as $val) {
             $zs = "";
             $pf = "";

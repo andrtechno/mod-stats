@@ -3,8 +3,11 @@
 namespace panix\mod\stats\controllers\admin;
 
 use Yii;
+use panix\engine\Html;
 use panix\mod\stats\models\StatsMainHistory;
 use panix\mod\stats\models\StatsMainp;
+use panix\mod\stats\components\StatsHelper;
+
 class DefaultController extends \panix\mod\stats\components\StatsController {
 
     public function actionIndex() {
@@ -49,16 +52,27 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
 
 
 
-        $r = $this->db->createCommand();
-        $r->selectDistinct('day, dt');
-        $r->from('{{surf}}');
-        $r->order('i DESC');
-        $res = $r->queryRow(false);
+        //$r = $this->db->createCommand();
+        //$r->selectDistinct('day, dt');
+       // $r->from('{{surf}}');
+       // $r->order('i DESC');
+       // $res = $r->queryRow(false);
+        
+            $query = new \yii\db\Query;
+                   $query->from('{{%surf}}')
+                           ->select(['day', 'dt'])
+                           ->distinct()
+                    //->where(['product_id' => $this->id])
+                    ->orderBy(['i'=>SORT_DESC]);
+            $res = $query->createCommand()->queryOne();
+        
+        //print_r($res);die;
+        
         $fdate = date('Y-m-d');
 
 
 
-        foreach ($r->queryAll() as $dtm) {
+        foreach ($query->createCommand()->queryAll() as $dtm) {
             if (substr($sdate, 4, 2) <> substr($dtm['dt'], 4, 2) && $sdate <> 0)
                 $c++;
             $sdate = $dtm['dt'];
@@ -79,7 +93,7 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
 
         $max_hits = max($m_hits);
 
-        foreach ($r->queryAll() as $row) {
+        foreach ($query->createCommand()->queryAll() as $row) {
 
             $dt = $row['dt'];
             if ($dt != $fdate && isset($rwz["search"][$dt])) {
@@ -100,10 +114,10 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
 
                     if ($dt != $fdate && !in_array($dt, $rwz["dt"])) {
                         // die('save');
-                        $sql_insert = "INSERT INTO {{main_history}}(dt,hosts,hits,search,other,fix) VALUES('" . $dt . "','" . $m_uniqs[$dt] . "','" . $m_hits[$dt] . "','" . $m_se[$dt] . "','" . $m_other[$dt] . "','" . $m_fix[$dt] . "')";
+                        $sql_insert = "INSERT INTO {{%main_history}}(dt,hosts,hits,search,other,fix) VALUES('" . $dt . "','" . $m_uniqs[$dt] . "','" . $m_hits[$dt] . "','" . $m_se[$dt] . "','" . $m_other[$dt] . "','" . $m_fix[$dt] . "')";
                         $this->db->createCommand($sql_insert)->execute();
 
-                        $sql_del = "DELETE me FROM {{main_history}} as me, {{main_history}} as clone WHERE me.dt = clone.dt AND me.i > clone.i";
+                        $sql_del = "DELETE me FROM {{%main_history}} as me, {{%main_history}} as clone WHERE me.dt = clone.dt AND me.i > clone.i";
                         $this->db->createCommand($sql_del)->execute();
 
                         //mysql_query("DELETE me FROM mainh as me, mainh as clone WHERE me.dt = clone.dt AND me.i > clone.i");
@@ -129,12 +143,12 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
             $result[] = array(
                 'date' => StatsHelper::$DAY[$row['day']] . $dt,
                 'graphic' => $graphic,
-                //'hosts' => Html::link($m_uniqs[$dt], '/admin/stats/detail/hosts?date=' . $dt),
-                'hosts' => Html::link($m_uniqs[$dt], array('/admin/stats/detail/hosts', 'date' => $dt)),
-                'hits' => Html::link($m_hits[$dt], array('/admin/stats/detail/hits', 'date' => $dt)),
-                'search' => Html::link($m_se[$dt], array('/admin/stats/detail/search', 'date' => $dt)),
-                'sites' => Html::link($m_other[$dt], array('/admin/stats/detail/other', 'date' => $dt)),
-                'fix' => Html::link($m_fix[$dt], array('/admin/stats/detail/fix', 'date' => $dt))
+                //'hosts' => Html::a($m_uniqs[$dt], '/admin/stats/detail/hosts?date=' . $dt),
+                'hosts' => Html::a($m_uniqs[$dt], array('/admin/stats/detail/hosts', 'date' => $dt)),
+                'hits' => Html::a($m_hits[$dt], array('/admin/stats/detail/hits', 'date' => $dt)),
+                'search' => Html::a($m_se[$dt], array('/admin/stats/detail/search', 'date' => $dt)),
+                'sites' => Html::a($m_other[$dt], array('/admin/stats/detail/other', 'date' => $dt)),
+                'fix' => Html::a($m_fix[$dt], array('/admin/stats/detail/fix', 'date' => $dt))
             );
         }
 
@@ -145,9 +159,9 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
         //     $total = explode("|", $total[0]);
         // }
 
-        $uniq_total = $this->db->createCommand("SELECT COUNT(DISTINCT ip) as total FROM {{surf}} WHERE " . $this->_zp);
+        $uniq_total = $this->db->createCommand("SELECT COUNT(DISTINCT ip) as total FROM {{%surf}} WHERE " . $this->_zp);
 
-        $all_uniqs = $uniq_total->queryRow(false);
+        $all_uniqs = $uniq_total->queryOne(false);
 
 
 
@@ -156,7 +170,7 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
 
         $dday = array(0 => "ВС", 1 => "ПН", 2 => "ВТ", 3 => "СР", 4 => "ЧТ", 5 => "ПТ", 6 => "СБ");
 
-        $dataProvider = new CArrayDataProvider($result, array(
+        /*$dataProvider = new CArrayDataProvider($result, array(
             'sort' => array(
                 'attributes' => array(
                     'hosts',
@@ -170,7 +184,27 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
             'pagination' => array(
                 'pageSize' => 10,
             ),
-        ));
+        ));*/
+        
+        
+
+        
+            $dataProvider = new \yii\data\ArrayDataProvider([
+                'allModels' => $result,
+                'pagination' => [
+                'pageSize' => 10,
+            ]
+            ]);
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         $m_date = array_keys($m_hits);
         $mmx = max($m_hits);
         $weekResult = array();
@@ -262,7 +296,7 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
       if ($row['lang'] != "") {
       echo "<br>Язык: " . (!empty(StatsHelper::$LANG[mb_strtoupper($row['lang'])]) ? StatsHelper::$LANG[mb_strtoupper($row['lang'])] : "<font color=grey>неизвестно</font>");
       if (file_exists("/stats/flags/" . mb_strtolower(StatsHelper::$LANG[mb_strtoupper($row['lang'])]) . ".gif"))
-      echo Html::image('/uploads/language/' . mb_strtolower(StatsHelper::$LANG[$row['lang']]) . '.gif'); //" <img align=absmiddle src=/stats/flags/" . mb_strtolower(StatsHelper::$LANG[mb_strtoupper($row['lang'])]) . ".gif width=16 height=12>";
+      echo Html::img('/uploads/language/' . mb_strtolower(StatsHelper::$LANG[$row['lang']]) . '.gif'); //" <img align=absmiddle src=/stats/flags/" . mb_strtolower(StatsHelper::$LANG[mb_strtoupper($row['lang'])]) . ".gif width=16 height=12>";
       }
       echo "</td>";
 

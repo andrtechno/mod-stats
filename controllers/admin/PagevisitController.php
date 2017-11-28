@@ -5,10 +5,16 @@ class PagevisitController extends \panix\mod\stats\components\StatsController {
 
     public function actionIndex() {
         $this->pageName = Yii::t('stats/default', 'PAGEVISIT');
-        $this->breadcrumbs = array(
-            Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
+
+        
+        $this->breadcrumbs = [
+            [
+                'label'=>Yii::t('stats/default', 'MODULE_NAME'),
+                'url'=>['/admin/stats']
+            ],
             $this->pageName
-        );
+        ];
+        
         $stats = Yii::$app->stats->initRun();
         $zp = $stats['zp'];
 

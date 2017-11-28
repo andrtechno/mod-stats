@@ -1,6 +1,7 @@
 <?php
 namespace panix\mod\stats\components;
 
+use Yii;
 class StatsController extends \panix\engine\controllers\AdminController {
 
     public $db;
@@ -84,7 +85,7 @@ class StatsController extends \panix\engine\controllers\AdminController {
             ' . $value . '%</div></div>';
     }
 
-    public function init2() {
+    public function init() {
 
         $this->db = Yii::$app->db;
         //   list($s_date, $f_date) = str_replace("+", "", array($this->sdate, $this->fdate));
@@ -95,7 +96,7 @@ class StatsController extends \panix\engine\controllers\AdminController {
         if (!preg_match("/^[0-9]{4}-([0-9]{2})-([0-9]{2})$/", $this->fdate) && !preg_match("/^[0-9]{4}-([0-9]{2})-([0-9]{2})$/", $this->sdate)) {
             throw new Exception('Не верный формат даты!');
         }
-        if ($robots = file(Yii::getAlias('panix/mod/stats') . "/robots.dat")) {
+        if ($robots = file(Yii::getAlias('@stats') . "/robots.dat")) {
             $i = 0;
             for ($i = 0; $i < count($robots); $i++)
                 $robots[$i] = iconv("CP1251", "UTF-8", $robots[$i]);
@@ -108,7 +109,7 @@ class StatsController extends \panix\engine\controllers\AdminController {
                 $robo[] = $rb2;
             }
         }
-        if ($hosts = file(Yii::getAlias('panix/mod/stats') . "/hosts.dat")) {
+        if ($hosts = file(Yii::getAlias('@stats') . "/hosts.dat")) {
             $i = 0;
             for ($i = 0; $i < count($hosts); $i++)
                 $hosts[$i] = iconv("CP1251", "UTF-8", $hosts[$i]);
@@ -125,12 +126,12 @@ class StatsController extends \panix\engine\controllers\AdminController {
 
         foreach ($this->rbd as $val)
             $this->_zp .= " LOWER(user) NOT LIKE '%" . mb_strtolower($val) . "%' AND";
-        if (filesize(Yii::getPathOfAlias('mod.stats') . "/hosts.dat"))
+        if (filesize(Yii::getAlias('@stats') . "/hosts.dat"))
             foreach ($hbd as $val)
                 $this->_zp .= " LOWER(host) NOT LIKE '%" . mb_strtolower($val) . "%' AND";
         $this->_zp .= " LOWER(user) NOT LIKE '' AND";
-        if (file_exists(Yii::getPathOfAlias('mod.stats') . "/skip.dat")) {
-            if ($skip = file(Yii::getPathOfAlias('mod.stats') . "/skip.dat")) {
+        if (file_exists(Yii::getAlias('@stats') . "/skip.dat")) {
+            if ($skip = file(Yii::getAlias('@stats') . "/skip.dat")) {
                 foreach ($skip as $vl) {
                     list($s1, $s2) = explode("|", $vl);
                     $this->_zp2 .= " $s1 NOT LIKE '%" . rtrim($s2) . "%' AND";
@@ -141,7 +142,7 @@ class StatsController extends \panix\engine\controllers\AdminController {
         $this->_zp .= $this->_zp2;
         $this->_zp = substr($this->_zp, 0, -4);
 
-        if ($se_m = file(Yii::getPathOfAlias('mod.stats') . "/se.dat")) {
+        if ($se_m = file(Yii::getAlias('@stats') . "/se.dat")) {
             for ($i = 0; $i < count($se_m); $i++)
                 $se_m[$i] = iconv("CP1251", "UTF-8", $se_m[$i]);
             foreach ($se_m as $vl) {
@@ -301,21 +302,21 @@ class StatsController extends \panix\engine\controllers\AdminController {
         //  global $s_date, $f_date, $u;
 
 
-        $sql = "SELECT DISTINCT dt FROM {{surf}} ORDER BY 1 DESC";
+        $sql = "SELECT DISTINCT dt FROM {{%surf}} ORDER BY 1 DESC";
         $command = $this->db->createCommand($sql);
 
 
 
         //$res = mysql_query("SELECT DISTINCT dt FROM cms_surf ORDER BY 1 DESC");
-        if ($_GET['dy'])
-            switch ($_GET['dy']) {
+        if (Yii::$app->request->get('dy'))
+            switch (Yii::$app->request->get('dy')) {
                 case 1:
-                    $cmd = $command->queryRow();
+                    $cmd = $command->queryColumn();
                     $s_date = $cmd['dt'];
                     $f_date = $s_date;
                     break;
                 case 2:
-                    $cmd = $command->queryRow();
+                    $cmd = $command->queryColumn();
                     $s_date = $cmd['dt'];
                     $f_date = $s_date;
                     break;
@@ -324,7 +325,7 @@ class StatsController extends \panix\engine\controllers\AdminController {
                     $s_date = substr($f_date, 0, 6) . "01";
                     break;
                 case 4:
-                    $cmd = $command->queryRow();
+                    $cmd = $command->queryColumn();
                     $f_date = $cmd['dt'];
                     //die($f_date);
                     //$f_date = mysql_result($res, 0);
@@ -345,15 +346,16 @@ class StatsController extends \panix\engine\controllers\AdminController {
                     break;
             }
         if (empty($s_date)) {
-            $cmd = $command->queryRow();
-            $s_date = $cmd['dt'];
+            $cmd = $command->queryColumn();
+
+            $s_date = $cmd[0];
         }
         if (empty($f_date)) {
-            $cmd = $command->queryRow();
-            $f_date = $cmd['dt'];
+            $cmd = $command->queryColumn();
+            $f_date = $cmd[0];
         }
 
-        $this->renderPartial('stats.views.admin.default._filters', array(
+        echo $this->renderPartial('@stats/views/admin/default/_filters', array(
             'sort' => $sort
         ));
     }
@@ -367,25 +369,25 @@ class StatsController extends \panix\engine\controllers\AdminController {
     }
 
     public function getSdate() {
-        $sdate = Yii::$app->request->getParam('s_date');
+        $sdate = Yii::$app->request->get('s_date');
         return ($sdate) ? $sdate : date('Y-m-d');
     }
 
     public function getFdate() {
-        $fdate = Yii::$app->request->getParam('f_date');
+        $fdate = Yii::$app->request->get('f_date');
         return ($fdate) ? $fdate : date('Y-m-d');
     }
 
     public function getBwr() {
-        return Yii::$app->request->getParam('bwr');
+        return Yii::$app->request->get('bwr');
     }
 
     public function getSort() {
-        return Yii::$app->request->getParam('sort');
+        return Yii::$app->request->get('sort');
     }
 
     public function getPos() {
-        return Yii::$app->request->getParam('pos');
+        return Yii::$app->request->get('pos');
     }
 
 }
