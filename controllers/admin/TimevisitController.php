@@ -98,7 +98,7 @@ class TimevisitController extends \panix\mod\stats\components\StatsController {
     public function actionDetail() {
         $qs = Yii::$app->request->get('qs');
         $tz = Yii::$app->request->get('tz');
-        $sql = "SELECT day,dt,tm,refer,ip,proxy,host,lang,user,req FROM {{%surf}} WHERE (tm LIKE '%" . addslashes($qs) . "%') AND dt >= '$this->sdate' AND dt <= '$this->fdate' " . (($_GET['pz'] == 1) ? "AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY " . (($tz == 7) ? "host" : "ip") : "") . " ORDER BY i DESC";
+        $sql = "SELECT day,dt,tm,refer,ip,proxy,host,lang,user,req FROM {{%surf}} WHERE (tm LIKE '%" . addslashes($qs) . "%') AND dt >= '$this->sdate' AND dt <= '$this->fdate' " . ((Yii::$app->request->get('pz') == 1) ? "AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY " . (($tz == 7) ? "host" : "ip") : "") . " ORDER BY i DESC";
         $res = $this->db->createCommand($sql);
 
 

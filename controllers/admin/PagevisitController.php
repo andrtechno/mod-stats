@@ -1,5 +1,9 @@
 <?php
 namespace panix\mod\stats\controllers\admin;
+
+use Yii;
+use panix\engine\Html;
+use panix\mod\stats\components\StatsHelper;
 class PagevisitController extends \panix\mod\stats\components\StatsController {
 
 
@@ -19,16 +23,16 @@ class PagevisitController extends \panix\mod\stats\components\StatsController {
         $zp = $stats['zp'];
 
         if ($this->sort == "hi") {
-            $z = "SELECT req, COUNT(req) cnt FROM {{surf}} WHERE";
+            $z = "SELECT req, COUNT(req) cnt FROM {{%surf}} WHERE";
             $z .= $zp . " AND dt >= '$this->sdate' AND dt <= '$this->fdate' GROUP BY req ORDER BY 2 DESC";
             $res = $this->db->createCommand($z)->queryAll();
 
             $z2 = "SELECT SUM(t.cnt) as cnt FROM (" . $z . ") t";
             $r = $this->db->createCommand($z2)->queryRow();
         } else {
-            $z = "CREATE TEMPORARY TABLE IF NOT EXISTS {{tmp_surf}} SELECT ip, req FROM {{surf}} WHERE";
+            $z = "CREATE TEMPORARY TABLE IF NOT EXISTS {{%tmp_surf}} SELECT ip, req FROM {{%surf}} WHERE";
             $z .= $zp . " AND dt >= '$this->sdate' AND dt <= '$this->fdate' GROUP BY ip, req";
-            $z2 = "SELECT req, COUNT(req) cnt FROM {{tmp_surf}} GROUP BY req ORDER BY 2 DESC";
+            $z2 = "SELECT req, COUNT(req) cnt FROM {{%tmp_surf}} GROUP BY req ORDER BY 2 DESC";
 
             $transaction = $this->db->beginTransaction();
             try {
@@ -51,10 +55,10 @@ class PagevisitController extends \panix\mod\stats\components\StatsController {
                 $transaction2->rollBack();
             }
 
-            $r = $this->db->createCommand($z3)->queryRow();
+            $r = $this->db->createCommand($z3)->queryColumn();
         }
 
-        $cnt = $r['cnt'];
+        $cnt = $r[0];
 
 
         $k = 0;
@@ -72,16 +76,23 @@ class PagevisitController extends \panix\mod\stats\components\StatsController {
 
             $result[] = array(
                 'num' => $k,
-                'req' => Html::link($row['req'], $row['req'], array('traget' => '_blank')),
+                'req' => Html::a($row['req'], $row['req'], array('traget' => '_blank')),
                 'count' => $row['cnt'],
                 'graphic' => $this->progressBar(ceil((($row['cnt'] * 100) / $max)), number_format((($row['cnt'] * 100) / $cnt), 1, '.', ''), (($this->sort == "hi") ? "success" : "warning")), //"<img align=left src=/stats/px" . (($this->sort == "hi") ? "h" : "u") . ".gif width=" . ceil(($row['cnt'] * 100) / $max) . " height=11 border=0>",
                 'detail' => StatsHelper::linkDetail("?pz=1&tz=1&item=req&s_date=" . $this->sdate . "&f_date=" . $this->fdate . "&qs=" . urlencode($row['req']) . "&sort=" . (empty($this->sort) ? "ho" : $this->sort))
             );
         }
 
+        
+        
+                       $dataProvider = new \yii\data\ArrayDataProvider([
+                'allModels' => $result,
+                'pagination' => [
+                'pageSize' => 10,
+            ]
+            ]);
 
-
-        $dataProvider = new CArrayDataProvider($result, array(
+       /* $dataProvider = new CArrayDataProvider($result, array(
             'sort' => array(
                 'attributes' => array(
                     'req',
@@ -91,9 +102,9 @@ class PagevisitController extends \panix\mod\stats\components\StatsController {
             'pagination' => array(
                 'pageSize' => 10,
             ),
-        ));
+        ));*/
 
-        $this->render('index', array(
+        return $this->render('index', array(
             'dataProvider' => $dataProvider
         ));
     }
