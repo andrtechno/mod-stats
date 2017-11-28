@@ -1,10 +1,12 @@
 <?php
 
-namespace panix\mod\stats\components;
+namespace panix\mod\stats\controllers\admin;
 
 use Yii;
-
-class BrowsersController extends panix\mod\stats\components\StatsController {
+use panix\engine\CMS;
+use panix\engine\Html;
+use panix\mod\stats\components\StatsHelper;
+class BrowsersController extends \panix\mod\stats\components\StatsController {
 
     public function actionIndex() {
         $this->pageName = Yii::t('stats/default', 'BROWSERS');
@@ -17,9 +19,9 @@ class BrowsersController extends panix\mod\stats\components\StatsController {
         ];
 
 
-        $vse = 0;
-        $k = 0;
 
+        $bmas = [];
+        $ipmas = [];
         if ($this->sort == "hi") {
             $sql = "SELECT user FROM {{%surf}} WHERE dt >= '$this->sdate' AND dt <= '$this->fdate' AND " . $this->_zp;
             $command = $this->db->createCommand($sql);
@@ -29,23 +31,34 @@ class BrowsersController extends panix\mod\stats\components\StatsController {
         } else {
             $sql = "SELECT user, ip FROM {{%surf}} WHERE dt >= '$this->sdate' AND dt <= '$this->fdate' AND " . $this->_zp . " GROUP BY ip, user";
             $command = $this->db->createCommand($sql);
+            $bcount = 1;
             foreach ($command->queryAll() as $row) {
                 $gb = StatsHelper::getBrowser($row['user']);
+                $bmas[$gb] = [];//NEW
                 if (!isset($ipmas[$row['ip']][$gb])) {
-                    $bmas[$gb] ++;
+
+                    //$bmas[$gb] ++;
+                    $bmas[$gb] = $bcount;
+                    //$bmas[] = $gb;
                     $ipmas[$row['ip']][$gb] = 1;
                 }
+                $bcount++;
             }
         }
 
 
 
-
+        $vse = 0;
+        $k = 0;
         arsort($bmas);
         $mmx = max($bmas);
         $cnt = array_sum($bmas);
         $pie = array();
         $helper = new StatsHelper;
+        
+           // print_r($bmas);
+            //die();
+        
         foreach ($bmas as $brw => $val) {
 
             $k++;
@@ -69,7 +82,7 @@ class BrowsersController extends panix\mod\stats\components\StatsController {
 
 
 
-
+/*
         $dataProvider = new CArrayDataProvider($this->result, array(
             'sort' => array(
                 // 'defaultOrder'=>'id ASC',
@@ -81,9 +94,15 @@ class BrowsersController extends panix\mod\stats\components\StatsController {
             'pagination' => array(
                 'pageSize' => 10,
             ),
-        ));
+        ));*/
+                   $dataProvider = new \yii\data\ArrayDataProvider([
+                'allModels' => $this->result,
+                'pagination' => [
+                'pageSize' => 10,
+            ]
+            ]);
 
-        $this->render('index', array(
+       return  $this->render('index', array(
             'dataProvider' => $dataProvider,
             'bmas' => $bmas,
             'cnt' => $cnt,
@@ -162,7 +181,7 @@ class BrowsersController extends panix\mod\stats\components\StatsController {
             }
         }
 
-        $this->render('view', array(
+        return $this->render('view', array(
             'items' => $res->queryAll(),
             'cnt' => $cnt,
             'max' => $max,
@@ -174,7 +193,8 @@ class BrowsersController extends panix\mod\stats\components\StatsController {
     }
 
     public function actionDetail() {
-        $sql = "SELECT day,dt,tm,refer,ip,proxy,host,lang,user,req FROM {{%surf}} WHERE dt >= '$this->sdate' AND dt <= '$this->fdate' " . StatsHelper::GetBrw($_GET['brw']) . (($pz == 1) ? " AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY ip" : "") . " ORDER BY i DESC";
+        $pz=0;
+        $sql = "SELECT day,dt,tm,refer,ip,proxy,host,lang,user,req FROM {{%surf}} WHERE dt >= '$this->sdate' AND dt <= '$this->fdate' " . StatsHelper::GetBrw(Yii::$app->request->get('brw')) . (($pz == 1) ? " AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY ip" : "") . " ORDER BY i DESC";
         $cmd = $this->db->createCommand($sql);
 
         $items = $cmd->queryAll();
@@ -186,7 +206,7 @@ class BrowsersController extends panix\mod\stats\components\StatsController {
 
             if ($row['proxy'] != "") {
                 $ip .= '<br>';
-                $ip .= Html::link('через proxy', '?item=ip&qs=' . $row['proxy'], array('target' => '_blank'));
+                $ip .= Html::a('через proxy', '?item=ip&qs=' . $row['proxy'], array('target' => '_blank'));
             }
 
             $this->result[] = array(
@@ -196,11 +216,16 @@ class BrowsersController extends panix\mod\stats\components\StatsController {
                 'ip' => $ip,
                 'host' => StatsHelper::getRowHost($row['ip'], $row['proxy'], $row['host'], $row['lang']),
                 'user_agent' => StatsHelper::getRowUserAgent($row['user'], $row['refer']),
-                'page' => Html::link($row['req'], $row['req'], array('target' => '_blank')),
+                'page' => Html::a($row['req'], $row['req'], array('target' => '_blank')),
             );
         }
-
-        $dataProvider = new CArrayDataProvider($this->result, array(
+                   $dataProvider = new \yii\data\ArrayDataProvider([
+                'allModels' => $this->result,
+                'pagination' => [
+                'pageSize' => 10,
+            ]
+            ]);
+        /*$dataProvider = new CArrayDataProvider($this->result, array(
             'sort' => array(
                 // 'defaultOrder'=>'id ASC',
                 'attributes' => array(
@@ -210,9 +235,9 @@ class BrowsersController extends panix\mod\stats\components\StatsController {
             'pagination' => array(
                 'pageSize' => 101,
             ),
-        ));
+        ));*/
 
-        $this->render('detail', array(
+        return $this->render('detail', array(
             'dataProvider' => $dataProvider,
         ));
     }

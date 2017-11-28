@@ -1,57 +1,55 @@
 <?php
-
-$this->timefilter();
-
-
+use panix\engine\grid\GridView;
+$this->context->timefilter();
 
 
-Yii::app()->tpl->openWidget(array(
-    'title' => $this->pageName,
-));
-
-$this->widget('ext.adminList.GridView', array(//ext.adminList.GridView
+echo GridView::widget([
+    'tableOptions' => ['class' => 'table table-striped'],
     'dataProvider' => $dataProvider,
-    'selectableRows' => false,
-    'enableHeader' => false,
-    'autoColumns' => false,
-    'enablePagination' => true,
-    'columns' => array(
-        array(
-            'name' => 'num',
-            'header' => '№',
-            'type' => 'raw',
-            'htmlOptions' => array('class' => 'text-center', 'width' => '5%')
-        ),
-        array(
-            'name' => 'browser',
-            'header' => 'Браузер',
-            'type' => 'raw',
-            'htmlOptions' => array('width' => '20%')
-        ),
-        array(
-            'name' => 'val',
-            'header' => 'Хосты',
-            'type' => 'raw',
-            'htmlOptions' => array('class' => 'text-center', 'width' => '5%')
-        ),
-        array(
-            'name' => 'progressbar',
-            'header' => 'График',
-            'type' => 'raw',
-            'htmlOptions' => array('class' => 'text-center', 'width' => '15%')
-        ),
-        array(
-            'name' => 'detail',
-            'header' => Yii::t('StatsModule.default', 'DETAIL'),
-            'type' => 'raw',
-            'htmlOptions' => array('class' => 'text-center', 'width' => '10%')
-        ),
-    )
-));
-
-Yii::app()->tpl->closeWidget();
+    //'filterModel' => $searchModel,
+    'layoutOptions' => ['title' => $this->context->pageName],
+    'columns' => [
+        [
+            'attribute' => 'num',
+            'header' => Yii::t('app', 'num'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-left'],
+        ],
+        [
+            'attribute' => 'browser',
+            'header' => Yii::t('app', 'browser'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'val',
+            'header' => Yii::t('app', 'hosts'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'progressbar',
+            'header' => Yii::t('app', 'progressbar'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'detail',
+            'header' => Yii::t('stats/default', 'DETAIL'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
 
 
+            ]
+        ]);
+                
+        
+
+
+
+
+/*
 $this->Widget('ext.highcharts.HighchartsWidget', array(
     'scripts' => array(
         'highcharts-more',
@@ -96,5 +94,5 @@ $this->Widget('ext.highcharts.HighchartsWidget', array(
             array('data' => $pie),
         )
     )
-));
+));*/
 ?>

@@ -3,19 +3,24 @@ namespace panix\mod\stats\components;
 
 use Yii;
 use panix\engine\Html;
-
+use panix\engine\components\Browser;
 class StatsHelper {
-
+    public $sdata;
+    public function __construct() {
+        $this->sdata = Yii::$app->request->get('s_date');
+      //  $this->sdata = Yii::$app->request->get('s_date');
+    }
     public static function getRowUserAgent($user_agent, $refer) {
-        Yii::import('app.addons.Browser');
+
         $browser = new Browser();
         $browser->setUserAgent($user_agent);
         $content = '';
         if (!self::is_robot($user_agent, $refer)) {
             $brw = self::getBrowser($user_agent);
             if ($brw != "")
-                $content.= Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/browsers/' . $brw, $user_agent, array(
+                $content.= Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/browsers/' . $brw, array(
                             //'title' => $user_agent,
+                    'alt'=>$user_agent,
                             'title' => Yii::t('stats/default', 'BROWSER', array(
                                 '{name}' => $browser->getBrowser(), //.' '.$user_agent,
                                 '{v}' => $browser->getVersion()
@@ -33,7 +38,7 @@ class StatsHelper {
     }
 
     public static function getMobileByImage($user_agent) {
-        Yii::import('app.addons.Browser');
+
         $browser = new Browser();
         $browser->setUserAgent($user_agent);
         // return $browser->getPlatform();
@@ -46,31 +51,38 @@ class StatsHelper {
         } else {
             return;
         }
-        return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/' . $img, $name, array(
+        return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/' . $img, array(
                     'data-toggle' => "tooltip",
                     'data-placement' => "top",
                     'class' => 'img-thumbnail',
-                    'title' => $name
+                    'title' => $name,
+            'alt'=>$name
         ));
     }
 
     public static function getPlatformByImage($user_agent) {
-        Yii::import('app.addons.Browser');
+
         $browser = new Browser();
         $browser->setUserAgent($user_agent);
         // return $browser->getPlatform();
         if ($browser->isRobot()) {
-            return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/robot.png', $browser->getPlatform(), array(
+            return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/robot.png', array(
                         'data-toggle' => "tooltip",
                         'data-placement' => "top",
                         'title' => 'Робот',
                         'class' => 'img-thumbnail',
+                'alt'=>$browser->getPlatform(),
             ));
         }
+        
+        
+ 
         switch ($browser->getPlatform()) {
             case Browser::PLATFORM_ANDROID: $img = "android.png";
                 break;
             case Browser::PLATFORM_WINDOWS: $img = "windows.png";
+                break;
+            case Browser::PLATFORM_WINDOWS_7: $img = "windows.png";
                 break;
             case Browser::PLATFORM_WINDOWS_8: $img = "windows_8.png";
                 break;
@@ -85,12 +97,13 @@ class StatsHelper {
             case Browser::PLATFORM_IPAD: $img = "apple.png";
                 break;
         }
-        return Html::image(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/' . $img, $browser->getPlatform(), array(
+        return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/' . $img, array(
                     'data-toggle' => "tooltip",
                     'data-placement' => "top",
                     'class' => 'platform',
                     'class' => 'img-thumbnail',
-                    'title' => Yii::t('stats/default', 'PLATFORM', array('{name}' => $browser->getPlatform()))
+            'alt'=>$browser->getPlatform(),
+                    'title' => Yii::t('stats/default', 'PLATFORM', array('name' => $browser->getPlatform()))
         ));
     }
 
@@ -108,8 +121,8 @@ class StatsHelper {
         }
         if ($host != "") {
             $content .= "<br>Язык: " . (!empty($p) ? $p : "<font color=grey>неизвестно</font>");
-            if (file_exists(Yii::getPathOfAlias('webroot.uploads.language') . DS . mb_strtolower($lang) . ".png")) {
-                $content.= Html::img('/uploads/language/' . mb_strtolower($lang) . '.png', $p);
+            if (file_exists(Yii::getAlias('@webroot/uploads/language') . DIRECTORY_SEPARATOR . mb_strtolower($lang) . ".png")) {
+                $content.= Html::img('/uploads/language/' . mb_strtolower($lang) . '.png', ['alt'=>$p]);
             }
         }
         return $content;
@@ -137,11 +150,16 @@ class StatsHelper {
                 break;
         }
         if (!empty($brw)) {
-            $img = Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/browsers/' . $brw, $name);
+            //$img = Html::img(Yii::getAlias('@stats/assets') . '/images/browsers/' . $brw);//, $name
+            $img = Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/browsers/' . $brw,['alt'=> $name]);
         } else {
             $img = '';
         }
-        $content = Html::a($img . ' ' . $name, "/admin/stats/browsers/detail?s_date=" . $this->sdate . "&f_date=" . $this->fdate . "&qs=" . $brw . "&sort=" . (empty($this->sort) ? "ho" : $this->sort), array('target' => '_blank'));
+        
+        $content = Html::a($img . ' ' . $name, "/admin/stats/browsers/detail?s_date=&f_date=&qs=" . $brw . "&sort=" . (empty($this->sort) ? "ho" : $this->sort), array('target' => '_blank'));
+        
+        
+       // $content = Html::a($img . ' ' . $name, "/admin/stats/browsers/detail?s_date=" . $this->sdate . "&f_date=" . $this->fdate . "&qs=" . $brw . "&sort=" . (empty($this->sort) ? "ho" : $this->sort), array('target' => '_blank'));
         return $content;
     }
 

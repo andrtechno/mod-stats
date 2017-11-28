@@ -1,5 +1,7 @@
 <?php
 namespace panix\mod\stats\controllers\admin;
+use Yii;
+use panix\engine\Html;
 class SearchqueryController extends \panix\mod\stats\components\StatsController {
 
     public function actionIndex() {
@@ -89,7 +91,7 @@ class SearchqueryController extends \panix\mod\stats\components\StatsController 
             $k++;
             $vse += $val;
             // echo "<td>$k</td>";
-            $queryData = Html::link($query, '?tz=6' . (isset($engin) ? "&engin=" . $engin : "") . '&pz=1&s_date=' . $this->sdate . '&f_date=' . $this->fdate . '&qs=' . htmlspecialchars($query) . '&sort=' . (empty($this->sort) ? "ho" : $this->sort), array('target' => '_blank'));
+            $queryData = Html::a($query, '?tz=6' . (isset($engin) ? "&engin=" . $engin : "") . '&pz=1&s_date=' . $this->sdate . '&f_date=' . $this->fdate . '&qs=' . htmlspecialchars($query) . '&sort=' . (empty($this->sort) ? "ho" : $this->sort), array('target' => '_blank'));
             //     echo "<td align=left style='overflow: hidden;text-overflow: ellipsis;'><a target=_blank href=\"?tz=6" . (isset($engin) ? "&engin=" . $engin : "") . "&pz=1&s_date=" . $this->sdate . "&f_date=" . $this->fdate . "&qs=" . htmlspecialchars($query) . "&sort=" . (empty($this->sort) ? "ho" : $this->sort) . "\">" . $query . "</a></td>";
             if ($pages == 1) {
                 echo "<td align=left style='overflow: hidden;text-overflow: ellipsis;'>";
@@ -202,7 +204,7 @@ class SearchqueryController extends \panix\mod\stats\components\StatsController 
 
             $this->result[] = array(
                 'num' => $k,
-                'engine' => Html::link(StatsHelper::echo_se($engine), '?tz=6&engin=' . strip_tags($engine) . '&qs=allzz&pz=1&s_date=' . $this->sdate . '&f_date=' . $this->fdate . '&sort=' . (empty($this->sort) ? "ho" : $this->sort), array('target' => '_blank')),
+                'engine' => Html::a(StatsHelper::echo_se($engine), '?tz=6&engin=' . strip_tags($engine) . '&qs=allzz&pz=1&s_date=' . $this->sdate . '&f_date=' . $this->fdate . '&sort=' . (empty($this->sort) ? "ho" : $this->sort), array('target' => '_blank')),
                 'val' => $val,
                 'progressbar' => $this->progressBar(ceil(($val * 100) / $mmx), number_format((($val * 100) / $cnt), 1, ',', ''), (($this->sort == "hi") ? "success" : "warning")),
             );

@@ -9,7 +9,7 @@ class Module extends \panix\engine\WebModule {
 
     public $icon = 'stats';
 
-    public function init2() {
+    public function init() {
 
         // parent::init();
         /*
@@ -19,6 +19,7 @@ class Module extends \panix\engine\WebModule {
           'errorAction' => 'site/errorAdmin',
           ),
           )); */
+         parent::init();
     }
 
     public function afterInstall() {

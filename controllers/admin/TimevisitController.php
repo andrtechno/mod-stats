@@ -3,6 +3,9 @@
 namespace panix\mod\stats\controllers\admin;
 
 use Yii;
+use panix\engine\Html;
+use panix\engine\CMS;
+use panix\mod\stats\components\StatsHelper;
 
 class TimevisitController extends \panix\mod\stats\components\StatsController {
 
@@ -27,10 +30,12 @@ class TimevisitController extends \panix\mod\stats\components\StatsController {
             $sql .= $this->_zp . " AND dt >= '$this->sdate' AND dt <= '$this->fdate' GROUP BY 2,1";
             $res = $this->db->createCommand($sql);
         }
-
+        $tmas = [];
+        $bcount = 1;
         foreach ($res->queryAll() as $row) {
-
-            $tmas[$row['tm']] ++;
+      $tmas[$row['tm']] = $bcount;
+   
+            $bcount++;
         }
 
         $result = array();
@@ -58,14 +63,19 @@ class TimevisitController extends \panix\mod\stats\components\StatsController {
 
 
             $result[] = array(
-                'time' => Html::link('' . $tm . ':00 - ' . $tm2 . ':00', '/admin/stats/timevisit/detail?pz=1&s_date=' . $this->sdate . '&f_date=' . $this->fdate . '&qs=' . $tm . ':&sort=' . (empty($this->sort) ? "ho" : $this->sort), array('target' => '_blank')),
+                'time' => Html::a('' . $tm . ':00 - ' . $tm2 . ':00', '/admin/stats/timevisit/detail?pz=1&s_date=' . $this->sdate . '&f_date=' . $this->fdate . '&qs=' . $tm . ':&sort=' . (empty($this->sort) ? "ho" : $this->sort), array('target' => '_blank')),
                 'val' => $val,
                 'progressbar' => $this->progressBar(ceil(($val * 100) / $mmx), number_format((($val * 100) / $cnt), 1, '.', ''), (($this->sort == "hi") ? "success" : "warning")),
             );
         }
 
-
-        $dataProvider = new CArrayDataProvider($result, array(
+                 $dataProvider = new \yii\data\ArrayDataProvider([
+                'allModels' => $result,
+                'pagination' => [
+                'pageSize' => 10,
+            ]
+            ]);
+       /* $dataProvider = new CArrayDataProvider($result, array(
             'sort' => array(
                 // 'defaultOrder'=>'id ASC',
                 'attributes' => array(
@@ -76,9 +86,9 @@ class TimevisitController extends \panix\mod\stats\components\StatsController {
             'pagination' => array(
                 'pageSize' => 24,
             ),
-        ));
+        ));*/
 
-        $this->render('index', array(
+        return $this->render('index', array(
             'dataProvider' => $dataProvider,
             'times' => $times,
             'visits' => $visits,
@@ -86,26 +96,32 @@ class TimevisitController extends \panix\mod\stats\components\StatsController {
     }
 
     public function actionDetail() {
-        $qs = $_GET['qs'];
-        $tz = $_GET['tz'];
+        $qs = Yii::$app->request->get('qs');
+        $tz = Yii::$app->request->get('tz');
         $sql = "SELECT day,dt,tm,refer,ip,proxy,host,lang,user,req FROM {{%surf}} WHERE (tm LIKE '%" . addslashes($qs) . "%') AND dt >= '$this->sdate' AND dt <= '$this->fdate' " . (($_GET['pz'] == 1) ? "AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY " . (($tz == 7) ? "host" : "ip") : "") . " ORDER BY i DESC";
         $res = $this->db->createCommand($sql);
 
 
         $this->pageName = Yii::t('stats/default', 'TIMEVISIT');
-        $this->breadcrumbs = array(
-            Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
-            $this->pageName => array('/admin/stats/timevisit'),
-            $qs
-        );
 
+        $this->breadcrumbs = [
+            [
+                'label' => Yii::t('stats/default', 'MODULE_NAME'),
+                'url' => ['/admin/stats']
+            ],
+            [
+                'label' => $this->pageName,
+                'url' => ['/admin/stats/timevisit']
+            ],
+            $qs
+        ];
 
         foreach ($res->queryAll() as $row) {
 
             $ip = CMS::ip($row['ip']);
             if ($row['proxy'] != "") {
                 $ip .= '<br>';
-                $ip .= Html::link('через proxy', '?item=ip&qs=' . $row['proxy'], array('target' => '_blank'));
+                $ip .= Html::a('через proxy', '?item=ip&qs=' . $row['proxy'], array('target' => '_blank'));
             }
             $this->result[] = array(
                 'date' => StatsHelper::$DAY[$row['day']] . ' ' . $row['dt'],
@@ -114,10 +130,19 @@ class TimevisitController extends \panix\mod\stats\components\StatsController {
                 'ip' => $ip,
                 'host' => StatsHelper::getRowHost($row['ip'], $row['proxy'], $row['host'], $row['lang']),
                 'user_agent' => StatsHelper::getRowUserAgent($row['user'], $row['refer']),
-                'page' => Html::link($row['req'], $row['req'], array('target' => '_blank')),
+                'page' => Html::a($row['req'], $row['req'], array('target' => '_blank')),
             );
         }
-        $dataProvider = new CArrayDataProvider($this->result, array(
+        
+        
+                       $dataProvider = new \yii\data\ArrayDataProvider([
+                'allModels' => $this->result,
+                'pagination' => [
+                'pageSize' => 10,
+            ]
+            ]);
+                       
+        /*$dataProvider = new CArrayDataProvider($this->result, array(
             'sort' => array(
                 'attributes' => array(
                     'date',
@@ -128,8 +153,8 @@ class TimevisitController extends \panix\mod\stats\components\StatsController {
             'pagination' => array(
                 'pageSize' => 10,
             ),
-        ));
-        $this->render('detail', array('dataProvider' => $dataProvider));
+        ));*/
+        return $this->render('detail', array('dataProvider' => $dataProvider));
     }
 
 }

@@ -1,45 +1,45 @@
 <?php
+use panix\engine\grid\GridView;
+$this->context->timefilter();
 
-$this->timefilter();
 
-Yii::app()->tpl->openWidget(array(
-    'title' => $this->pageName,
-));
-
-$this->widget('ext.adminList.GridView', array(//ext.adminList.GridView
+echo GridView::widget([
+    'tableOptions' => ['class' => 'table table-striped'],
     'dataProvider' => $dataProvider,
-    'selectableRows' => false,
-    'enableHeader' => false,
-    'autoColumns' => false,
-    'enablePagination' => true,
-    'columns' => array(
-        array(
-            'name' => 'time',
-            'header' => 'Время',
-            'type' => 'raw',
-            'htmlOptions' => array('class' => 'text-center', 'width' => '10%')
-        ),
-        array(
-            'name' => 'val',
-            'header' => (($this->sort == "hi") ? Yii::t('StatsModule.default', 'HITS') : Yii::t('StatsModule.default', 'HOSTS')),
-            'type' => 'raw',
-            'htmlOptions' => array('class' => 'text-center', 'width' => '20%')
-        ),
-        array(
-            'name' => 'progressbar',
-            'header' => Yii::t('StatsModule.default', 'GRAPH'),
-            'type' => 'raw',
-            'htmlOptions' => array('width' => '70%')
-        ),
-    )
-));
+    //'filterModel' => $searchModel,
+    'layoutOptions' => ['title' => $this->context->pageName],
+    'columns' => [
+        [
+            'attribute' => 'time',
+            'header' => Yii::t('app', 'time'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-left'],
+        ],
+        
+         [
+            'attribute' => 'val',
+            'header' => (($this->context->sort == "hi") ? Yii::t('stats/default', 'HITS') : Yii::t('stats/default', 'HOSTS')),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-left'],
+        ],
 
-Yii::app()->tpl->closeWidget();
+        [
+            'attribute' => 'progressbar',
+            'header' => Yii::t('stats/default', 'GRAPH'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
 
 
-Yii::app()->tpl->openWidget(array(
-    'title' => $this->pageName,
-));
+            ]
+        ]);
+                
+        
+
+
+
+
+/*
 $this->Widget('ext.highcharts.HighchartsWidget', array(
     'scripts' => array(
         'highcharts-more',
@@ -120,5 +120,5 @@ $this->Widget('ext.highcharts.HighchartsWidget', array(
 ));
 
 
-Yii::app()->tpl->closeWidget();
+*/
 ?>

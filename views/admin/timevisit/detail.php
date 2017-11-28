@@ -1,63 +1,53 @@
 <?php
-
-
-Yii::app()->tpl->openWidget(array(
-    'title' => $this->pageName,
-));
-
-$this->widget('ext.adminList.GridView', array(//ext.adminList.GridView
+use panix\engine\grid\GridView;
+echo GridView::widget([
+    'tableOptions' => ['class' => 'table table-striped'],
     'dataProvider' => $dataProvider,
-    'selectableRows' => false,
-    'enableHeader' => false,
-    'autoColumns' => false,
-    'enablePagination' => true,
-    'columns' => array(
-        array(
-            'name' => 'date',
-            'header' => 'Дата',
-            'type' => 'raw',
-            'htmlOptions' => array('class' => 'text-center', 'width' => '10%')
-        ),
-        array(
-            'name' => 'time',
-            'header' => 'Время',
-            'type' => 'raw',
-            'htmlOptions' => array('class' => 'text-center', 'width' => '5%')
-        ),
-        array(
-            'name' => 'refer',
-            'header' => 'Referer',
-            'type' => 'raw',
-            'htmlOptions' => array('width' => '10%')
-        ),
-        array(
-            'name' => 'ip',
-            'header' => 'IP-адрес',
-            'type' => 'raw',
-            'htmlOptions' => array('class' => 'text-center', 'width' => '10%')
-        ),
-        array(
-            'name' => 'host',
-            'header' => 'Хост',
-            'type' => 'raw',
-            'htmlOptions' => array('width' => '10%')
-        ),
-        array(
-            'name' => 'user_agent',
-            'header' => 'User-agent',
-            'type' => 'raw',
-            'htmlOptions' => array('class' => 'text-center', 'width' => '10%')
-        ),
-        array(
-            'name' => 'page',
-            'header' => 'Страница',
-            'type' => 'raw',
-            'htmlOptions' => array('width' => '45%')
-        ),
+    //'filterModel' => $searchModel,
+    'layoutOptions' => ['title' => $this->context->pageName],
+    'columns' => [
+        [
+            'attribute' => 'date',
+            'header' => Yii::t('app', 'date'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-left'],
+        ],
+        [
+            'attribute' => 'time',
+            'header' => Yii::t('app', 'time'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-left'],
+        ],
+        [
+            'attribute' => 'refer',
+            'header' => Yii::t('stats/default', 'refer'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'ip',
+            'header' => Yii::t('stats/default', 'ip'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'user_agent',
+            'header' => Yii::t('stats/default', 'user_agent'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'host',
+            'header' => Yii::t('stats/default', 'host'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'page',
+            'header' => Yii::t('stats/default', 'host'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+    ]
+]);
 
-        
-    )
-));
-
-Yii::app()->tpl->closeWidget();
-?>
