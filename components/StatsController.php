@@ -5,7 +5,7 @@ use Yii;
 class StatsController extends \panix\engine\controllers\AdminController {
 
     public $db;
-
+    public $query;
     public function echo_se($engine) {
 // global $se_n;
         switch ($engine) {
@@ -86,7 +86,11 @@ class StatsController extends \panix\engine\controllers\AdminController {
     }
 
     public function init() {
-
+        
+            $this->query = new \yii\db\Query;
+            $this->query->from('{{%surf}}');
+            $this->query->select('*');
+            
         $this->db = Yii::$app->db;
         //   list($s_date, $f_date) = str_replace("+", "", array($this->sdate, $this->fdate));
 

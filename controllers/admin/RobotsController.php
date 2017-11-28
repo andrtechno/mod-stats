@@ -1,5 +1,7 @@
 <?php
 namespace panix\mod\stats\controllers\admin;
+use Yii;
+
 class RobotsController extends \panix\mod\stats\components\StatsController {
 
     public function actionIndex() {
@@ -11,42 +13,79 @@ class RobotsController extends \panix\mod\stats\components\StatsController {
             ],
             $this->pageName
         ];
+        
+
+            
         foreach ($this->robo as $val) {
+ 
+                      
+            $this->query->select(['COUNT(i) as count', 'MAX(i) as count_max']);
+            $this->query->andWhere(['>=', 'dt', $this->sdate]);
+            $this->query->andWhere(['<=', 'dt', $this->fdate]);
+            
+            
             $zs = "";
             $pf = "";
             if (empty($val))
                 continue;
-            if (isset($this->rbdn[$val]))
+            if (isset($this->rbdn[$val])){
                 foreach ($this->rbdn[$val] as $vl) {
-                    $zs .= $pf . "LOWER(user) LIKE '%" . mb_strtolower($vl) . "%'";
+                   $zs .= $pf . "LOWER(user) LIKE '%" . mb_strtolower($vl) . "%'";
                     $pf = " OR ";
+                   $this->query->andWhere(['like', 'LOWER(user)', mb_strtolower($vl)]);
                 }
+            }
             if (isset($this->hbdn[$val]))
                 foreach ($this->hbdn[$val] as $vl) {
                     $zs .= $pf . "LOWER(host) LIKE '%" . mb_strtolower($vl) . "%'";
                     $pf = " OR ";
+                    $this->query->andWhere(['like', 'LOWER(host)', '%' . mb_strtolower($vl) . '%']);
                 }
 
 
-            $sql = "SELECT COUNT(i),MAX(i) FROM {{surf}} WHERE (" . $zs . ") AND " . $this->_zp2 . " dt >= '$this->sdate' AND dt <= '$this->fdate'";
-            $cmd = $this->db->createCommand($sql);
+                 //   $res = $this->query->createCommand()->queryOne();  
+               // print_r($res);die;
+         //   echo $this->query->createCommand()->rawSql;die;
+        
+                
+                //print_r($res);die;
+                
+                
+            //$sql = "SELECT COUNT(i), MAX(i) FROM {{%surf}} WHERE (" . $zs . ") AND " . $this->_zp2 . " dt >= '$this->sdate' AND dt <= '$this->fdate'";
+            
 
-            $r = $cmd->queryRow(false);
+            //$cmd = $this->db->createCommand($sql);
 
-            $d = $r[1];
+            //$r = $cmd->queryOne();
+            $r = $this->query->createCommand()->queryOne();
 
-            $cnt[$val] = $r[0];
+            $d = $r['count_max'];
+
+            $cnt[$val] = $r['count'];
+
             if ($cnt[$val] > 0) {
-                $z2 = "SELECT dt,tm FROM {{surf}} WHERE i = " . $d;
-                $cmd2 = $this->db->createCommand($z2);
-                $r2 = $cmd2->queryRow(false);
+                die('s');
+                            $query = new \yii\db\Query;
+            $query->from('{{%surf}}');
+            $query->where(['i'=>$d]);
+            $query->select(['dt','tm']);
+            
+               // $z2 = "SELECT dt,tm FROM {{surf}} WHERE i = " . $d;
+               // $cmd2 = $this->db->createCommand($z2);
+               // $r2 = $cmd2->queryOne();
+                $r2= $query->createCommand()->queryOne();
+         
+                 $ff_date[$val] = $r2['dt'] . " &nbsp;<font color='#de3163'>" . $r2['tm'] . "</font>";
+            }else{
+                 $ff_date[$val] = "0 &nbsp;<font color='#de3163'>0</font>";
             }
-            $ff_date[$val] = $r2[0] . " &nbsp;<font color='#de3163'>" . $r2[1] . "</font>";
+           
         }
         arsort($cnt);
         $mmx = max($cnt);
         $cn = array_sum($cnt);
         $result = array();
+ $k=0;
         foreach ($cnt as $val => $co) {
             if ($co <> 0) {
                 $k++;
@@ -67,8 +106,13 @@ class RobotsController extends \panix\mod\stats\components\StatsController {
 
             }
         }
-
-        $dataProvider = new CArrayDataProvider($result, array(
+                 $dataProvider = new \yii\data\ArrayDataProvider([
+                'allModels' => $result,
+                'pagination' => [
+                'pageSize' => 10,
+            ]
+            ]);
+      /*  $dataProvider = new CArrayDataProvider($result, array(
             'sort' => array(
                 'attributes' => array(
                     'bot',
@@ -79,8 +123,8 @@ class RobotsController extends \panix\mod\stats\components\StatsController {
             'pagination' => array(
                 'pageSize' => 10,
             ),
-        ));
-        $this->render('index', array(
+        ));*/
+        return $this->render('index', array(
             'dataProvider' => $dataProvider,
             'cnt' => $cnt,
             'cn' => $cn,
