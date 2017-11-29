@@ -1,15 +1,20 @@
 <?php
+
 namespace panix\mod\stats\components;
 
 use Yii;
 use panix\engine\Html;
 use panix\engine\components\Browser;
+
 class StatsHelper {
+
     public $sdata;
+
     public function __construct() {
         $this->sdata = Yii::$app->request->get('s_date');
-      //  $this->sdata = Yii::$app->request->get('s_date');
+        //  $this->sdata = Yii::$app->request->get('s_date');
     }
+
     public static function getRowUserAgent($user_agent, $refer) {
 
         $browser = new Browser();
@@ -18,9 +23,9 @@ class StatsHelper {
         if (!self::is_robot($user_agent, $refer)) {
             $brw = self::getBrowser($user_agent);
             if ($brw != "")
-                $content.= Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/browsers/' . $brw, array(
+                $content .= Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/browsers/' . $brw, array(
                             //'title' => $user_agent,
-                    'alt'=>$user_agent,
+                            'alt' => $user_agent,
                             'title' => Yii::t('stats/default', 'BROWSER', array(
                                 '{name}' => $browser->getBrowser(), //.' '.$user_agent,
                                 '{v}' => $browser->getVersion()
@@ -49,18 +54,19 @@ class StatsHelper {
             $name = 'Планшет';
             $img = 'tablet.png';
         } else {
-            return;
+            $name = $browser->getPlatform();
+            $img = self::getPlatformByImage($user_agent, false);
         }
         return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/' . $img, array(
                     'data-toggle' => "tooltip",
                     'data-placement' => "top",
                     'class' => 'img-thumbnail',
                     'title' => $name,
-            'alt'=>$name
+                    'alt' => $name
         ));
     }
 
-    public static function getPlatformByImage($user_agent) {
+    public static function getPlatformByImage($user_agent, $render = true) {
 
         $browser = new Browser();
         $browser->setUserAgent($user_agent);
@@ -71,12 +77,12 @@ class StatsHelper {
                         'data-placement' => "top",
                         'title' => 'Робот',
                         'class' => 'img-thumbnail',
-                'alt'=>$browser->getPlatform(),
+                        'alt' => $browser->getPlatform(),
             ));
         }
-        
-        
- 
+
+
+
         switch ($browser->getPlatform()) {
             case Browser::PLATFORM_ANDROID: $img = "android.png";
                 break;
@@ -85,6 +91,8 @@ class StatsHelper {
             case Browser::PLATFORM_WINDOWS_7: $img = "windows.png";
                 break;
             case Browser::PLATFORM_WINDOWS_8: $img = "windows_8.png";
+                break;
+            case Browser::PLATFORM_WINDOWS_10: $img = "windows_8.png";
                 break;
             case Browser::PLATFORM_FREEBSD: $img = "freebsd.png";
                 break;
@@ -96,15 +104,23 @@ class StatsHelper {
                 break;
             case Browser::PLATFORM_IPAD: $img = "apple.png";
                 break;
+            default :
+                return $browser->getPlatform();
+                break;
         }
-        return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/' . $img, array(
-                    'data-toggle' => "tooltip",
-                    'data-placement' => "top",
-                    'class' => 'platform',
-                    'class' => 'img-thumbnail',
-            'alt'=>$browser->getPlatform(),
-                    'title' => Yii::t('stats/default', 'PLATFORM', array('name' => $browser->getPlatform()))
-        ));
+        if ($render) {
+
+            return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/' . $img, array(
+                        'data-toggle' => "tooltip",
+                        'data-placement' => "top",
+                        'class' => 'platform',
+                        'class' => 'img-thumbnail',
+                        'alt' => $browser->getPlatform(),
+                        'title' => Yii::t('stats/default', 'PLATFORM', array('name' => $browser->getPlatform()))
+            ));
+        } else {
+            return $img;
+        }
     }
 
     public static function linkDetail($link) {
@@ -113,7 +129,7 @@ class StatsHelper {
 
     public static function getRowHost($ip, $proxy, $host, $lang) {
         $content = '';
-        $p = self::$LANG[mb_strtoupper($lang)];
+        $p = ($lang) ? self::$LANG[mb_strtoupper($lang)] : '';
         if ($ip == "") {
             $content .= '<span class="text-muted">неизвестно</span>';
         } else {
@@ -122,7 +138,7 @@ class StatsHelper {
         if ($host != "") {
             $content .= "<br>Язык: " . (!empty($p) ? $p : "<font color=grey>неизвестно</font>");
             if (file_exists(Yii::getAlias('@webroot/uploads/language') . DIRECTORY_SEPARATOR . mb_strtolower($lang) . ".png")) {
-                $content.= Html::img('/uploads/language/' . mb_strtolower($lang) . '.png', ['alt'=>$p]);
+                $content .= Html::img('/uploads/language/' . mb_strtolower($lang) . '.png', ['alt' => $p]);
             }
         }
         return $content;
@@ -151,15 +167,15 @@ class StatsHelper {
         }
         if (!empty($brw)) {
             //$img = Html::img(Yii::getAlias('@stats/assets') . '/images/browsers/' . $brw);//, $name
-            $img = Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/browsers/' . $brw,['alt'=> $name]);
+            $img = Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/browsers/' . $brw, ['alt' => $name]);
         } else {
             $img = '';
         }
-        
+
         $content = Html::a($img . ' ' . $name, "/admin/stats/browsers/detail?s_date=&f_date=&qs=" . $brw . "&sort=" . (empty($this->sort) ? "ho" : $this->sort), array('target' => '_blank'));
-        
-        
-       // $content = Html::a($img . ' ' . $name, "/admin/stats/browsers/detail?s_date=" . $this->sdate . "&f_date=" . $this->fdate . "&qs=" . $brw . "&sort=" . (empty($this->sort) ? "ho" : $this->sort), array('target' => '_blank'));
+
+
+        // $content = Html::a($img . ' ' . $name, "/admin/stats/browsers/detail?s_date=" . $this->sdate . "&f_date=" . $this->fdate . "&qs=" . $brw . "&sort=" . (empty($this->sort) ? "ho" : $this->sort), array('target' => '_blank'));
         return $content;
     }
 
@@ -186,10 +202,10 @@ class StatsHelper {
         $content = '';
         if ($engine == "G" and ! empty($query) and stristr($refer, "/url?"))
             $refer = str_replace("/url?", "/search?", $refer);
-        $content.= Yii::$app->controller->echo_se($engine);
+        $content .= Yii::$app->controller->echo_se($engine);
         if (empty($query))
             $query = '<span class="text-muted">неизвестно</span>';
-        $content.= ": <a target=_blank href=\"" . $refer . "\">" . $query . "</a>";
+        $content .= ": <a target=_blank href=\"" . $refer . "\">" . $query . "</a>";
         return $content;
     }
 
@@ -200,20 +216,20 @@ class StatsHelper {
             list($engine, $query) = $refer;
             if ($engine == "G" and ! empty($query) and stristr($ref, "/url?"))
                 $ref = str_replace("/url?", "/search?", $ref);
-            $text.=Yii::$app->controller->echo_se($engine);
+            $text .= Yii::$app->controller->echo_se($engine);
             if (empty($query))
                 $query = '<span class="text-muted">неизвестно</span>';
-            $text.= ': <a target="_blank" href="' . $ref . '">' . $query . '</a>';
+            $text .= ': <a target="_blank" href="' . $ref . '">' . $query . '</a>';
         } else if ($refer == "")
-            $text.= '<span class="text-muted">неизвестно</span>';
+            $text .= '<span class="text-muted">неизвестно</span>';
         else {
-            $text.='<a target="_blank" href="' . $ref . '">';
+            $text .= '<a target="_blank" href="' . $ref . '">';
             if (stristr(urldecode($ref), "xn--")) {
                 $IDN = new idna_convert(array('idn_version' => 2008));
-                $text.=$IDN->decode(urldecode($ref));
+                $text .= $IDN->decode(urldecode($ref));
             } else
-                $text.=urldecode($ref);
-            $text.="</a>";
+                $text .= urldecode($ref);
+            $text .= "</a>";
         }
         return $text;
     }
@@ -230,15 +246,15 @@ class StatsHelper {
 
         $content = '';
         if ($ref == "")
-            $content.= "<font color=grey>неизвестно</font>";
+            $content .= "<font color=grey>неизвестно</font>";
         else {
-            $content.= "<a target=_blank href=\"" . $ref . "\">";
+            $content .= "<a target=_blank href=\"" . $ref . "\">";
             if (stristr(urldecode($ref), "xn--")) {
                 $IDN = new idna_convert(array('idn_version' => 2008));
-                $content.= $IDN->decode(urldecode($ref));
+                $content .= $IDN->decode(urldecode($ref));
             } else
-                $content.= urldecode($ref);
-            $content.= "</a>";
+                $content .= urldecode($ref);
+            $content .= "</a>";
         }
 
         return $content;

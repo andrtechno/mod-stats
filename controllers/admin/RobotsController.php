@@ -19,7 +19,7 @@ class RobotsController extends \panix\mod\stats\components\StatsController {
         foreach ($this->robo as $val) {
  
                       
-            $this->query->select(['COUNT(i) as count', 'MAX(i) as count_max']);
+            $this->query->select(['COUNT(i) as count', 'MAX(i) as count_max','dt']);
             $this->query->andWhere(['>=', 'dt', $this->sdate]);
             $this->query->andWhere(['<=', 'dt', $this->fdate]);
             
