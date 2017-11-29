@@ -1,8 +1,11 @@
 <?php
+
 namespace panix\mod\stats\models;
+
 class StatsSurf extends \panix\engine\db\ActiveRecord {
 
     const MODULE_ID = 'stats';
+
 
     /**
      * @return string the associated database table name
@@ -10,20 +13,21 @@ class StatsSurf extends \panix\engine\db\ActiveRecord {
     public static function tableName() {
         return '{{%surf}}';
     }
-/*
-    public function getIpAdress(){
-        $text='';
-                    if ($this->ip != "unknown")
-                $text .= Html::link($this->ip,'?item=ip&qs=' . $this->ip,array('target'=>'_blank'));
-            else
-                $text .= "<font color=grey>неизвестно</font>";
-            if ($this->proxy != ""){
-                $text .= '<br>';
-                  $text .= Html::link('через proxy','?item=ip&qs=' . $this->proxy,array('target'=>'_blank'));
 
-            }
-            return $text;
-    }*/
+    /*
+      public function getIpAdress(){
+      $text='';
+      if ($this->ip != "unknown")
+      $text .= Html::link($this->ip,'?item=ip&qs=' . $this->ip,array('target'=>'_blank'));
+      else
+      $text .= "<font color=grey>неизвестно</font>";
+      if ($this->proxy != ""){
+      $text .= '<br>';
+      $text .= Html::link('через proxy','?item=ip&qs=' . $this->proxy,array('target'=>'_blank'));
+
+      }
+      return $text;
+      } */
 
     /**
      * @return array validation rules for model attributes.
@@ -37,26 +41,13 @@ class StatsSurf extends \panix\engine\db\ActiveRecord {
             array('dt', 'length', 'min' => 8),
             array('tm', 'length', 'min' => 5),
             array('lang', 'length', 'min' => 2),
-            //array('title, seo_alias', 'required'),
-           // array('category_id', 'numerical', 'integerOnly' => true),
-           // array('date_create, date_update', 'date', 'format' => 'yyyy-MM-dd HH:mm:ss'),
-           // array('title, seo_alias, seo_title, seo_description, seo_keywords', 'length', 'max' => 255),
-            //array('id, user_id, category_id, title, seo_alias, short_text, full_text, seo_title, seo_description, seo_keywords, date_update, date_create', 'safe', 'on' => 'search'),
+                //array('title, seo_alias', 'required'),
+                // array('category_id', 'numerical', 'integerOnly' => true),
+                // array('date_create, date_update', 'date', 'format' => 'yyyy-MM-dd HH:mm:ss'),
+                // array('title, seo_alias, seo_title, seo_description, seo_keywords', 'length', 'max' => 255),
+                //array('id, user_id, category_id, title, seo_alias, short_text, full_text, seo_title, seo_description, seo_keywords, date_update, date_create', 'safe', 'on' => 'search'),
         );
     }
 
-    /**
-     * Retrieves a list of models based on the current search/filter conditions. Used in admin search.
-     * @return ActiveDataProvider the data provider that can return the models based on the search/filter conditions.
-     */
-    public function search() {
-        $criteria = new CDbCriteria;
-
-        $criteria->compare('t.id', $this->id);
-        $criteria->compare('user.username', $this->user_id, true);
-        return new ActiveDataProvider($this, array(
-                    'criteria' => $criteria,
-                ));
-    }
 
 }

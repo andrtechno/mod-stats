@@ -19,8 +19,8 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
 
         $stats = Yii::$app->stats;
         $s = $stats->initRun();
-     
-        foreach (StatsMainHistory::find()->orderBy(['i'=>SORT_ASC])->all() as $rw) {
+
+        foreach (StatsMainHistory::find()->orderBy(['i' => SORT_ASC])->all() as $rw) {
 
             $dt_i = $rwz["dt"][] = $rw->dt;
             $rwz["hosts"][$dt_i] = $rw->hosts;
@@ -54,25 +54,52 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
 
         //$r = $this->db->createCommand();
         //$r->selectDistinct('day, dt');
-       // $r->from('{{surf}}');
-       // $r->order('i DESC');
-       // $res = $r->queryRow(false);
+        // $r->from('{{surf}}');
+        // $r->order('i DESC');
+        // $res = $r->queryRow(false);
+
+        Yii::$app->set('db2',[
+            'class'=>'panix\engine\db\Connection',
+            'dsn' => 'mysql:host=localhost;dbname=yii2_test',
+            'username' => 'root',
+            'password' => '',
+            'charset' => 'utf8',
+            'tablePrefix' => 'cms_',
+
+        ]); 
         
-            $query = new \yii\db\Query;
-                   $query->from('{{%surf}}')
-                           ->select(['day', 'dt'])
-                           ->distinct()
-                    //->where(['product_id' => $this->id])
-                    ->orderBy(['i'=>SORT_DESC]);
-            $res = $query->createCommand()->queryOne();
+        $query = new \yii\db\Query;
+        $query->from('{{%surf}}');
+        $query->select(['day', 'dt']);
+        $query->distinct();
+        $query->orderBy(['i' => SORT_DESC])->createCommand(Yii::$app->db2);
+        //$query->createCommand();
         
-        //print_r($res);die;
         
+
+        
+       /* $query = Yii::$app->db2->createCommand((new \yii\db\Query)
+                ->select(['day', 'dt'])
+                ->from('{{%surf}}')
+                ->distinct()
+                ->orderBy(['i' => SORT_DESC]));*/
+     
+        
+//  print_r($query);die;
+        $res = $query->createCommand()->queryOne();
+
+        
+
+        
+        
+
+
         $fdate = date('Y-m-d');
 
 
-
-        foreach ($query->createCommand()->queryAll() as $dtm) {
+        
+        
+        foreach ($query->createCommand($this->db)->queryAll() as $dtm) {
             if (substr($sdate, 4, 2) <> substr($dtm['dt'], 4, 2) && $sdate <> 0)
                 $c++;
             $sdate = $dtm['dt'];
@@ -159,9 +186,9 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
         //     $total = explode("|", $total[0]);
         // }
 
-        $uniq_total = $this->db->createCommand("SELECT COUNT(DISTINCT ip) as total FROM {{%surf}} WHERE " . $this->_zp);
+      //  $uniq_total = $this->db->createCommand("SELECT COUNT(DISTINCT ip) as total FROM {{%surf}} WHERE " . $this->_zp);
 
-        $all_uniqs = $uniq_total->queryOne(false);
+      //  $all_uniqs = $uniq_total->queryOne(false);
 
 
 
@@ -170,41 +197,26 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
 
         $dday = array(0 => "ВС", 1 => "ПН", 2 => "ВТ", 3 => "СР", 4 => "ЧТ", 5 => "ПТ", 6 => "СБ");
 
-        /*$dataProvider = new CArrayDataProvider($result, array(
-            'sort' => array(
-                'attributes' => array(
-                    'hosts',
-                    'hits',
-                    'graphic',
-                    'search',
-                    'sites',
-                    'date',
-                ),
-            ),
-            'pagination' => array(
-                'pageSize' => 10,
-            ),
-        ));*/
-        
-        
 
-        
-            $dataProvider = new \yii\data\ArrayDataProvider([
-                'allModels' => $result,
-                'pagination' => [
+
+
+
+        $dataProvider = new \yii\data\ArrayDataProvider([
+            'allModels' => $result,
+            'pagination' => [
                 'pageSize' => 10,
             ]
-            ]);
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        ]);
+
+
+
+
+
+
+
+
+
+
         $m_date = array_keys($m_hits);
         $mmx = max($m_hits);
         $weekResult = array();
@@ -224,14 +236,14 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
 
 
         return $this->render('index', array(
-            'weekResult' => $weekResult,
-            'dataProvider' => $dataProvider,
-            'm_date' => $m_date,
-            'mmx' => $mmx,
-            'all_uniqs' => $all_uniqs[0],
-            'total_hits' => (array_sum($m_hits)),
-            'total_search' => (array_sum($m_se)),
-            'total_other' => (array_sum($m_other)),
+                    'weekResult' => $weekResult,
+                    'dataProvider' => $dataProvider,
+                    'm_date' => $m_date,
+                    'mmx' => $mmx,
+                    'all_uniqs' => $all_uniqs[0],
+                    'total_hits' => (array_sum($m_hits)),
+                    'total_search' => (array_sum($m_se)),
+                    'total_other' => (array_sum($m_other)),
         ));
     }
 

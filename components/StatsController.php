@@ -1,11 +1,14 @@
 <?php
+
 namespace panix\mod\stats\components;
 
 use Yii;
+
 class StatsController extends \panix\engine\controllers\AdminController {
 
     public $db;
     public $query;
+
     public function echo_se($engine) {
 // global $se_n;
         switch ($engine) {
@@ -51,31 +54,32 @@ class StatsController extends \panix\engine\controllers\AdminController {
     public function fixo($s, $str) {
         // global $fx_m;
         foreach ($this->fx_m as $vl) {
-          //  list($s1, $s2, $s3) = explode("|", $vl);
+            //  list($s1, $s2, $s3) = explode("|", $vl);
             $vl[2] = trim($vl[2]);
             if (stristr($str, $vl[1]) and ! empty($vl[2]) and $s == $vl[0])
                 return "<font color='#DE3163'><b>" . $vl[2] . " :</b></font><br>";
         }
         return;
     }
+
     /*
-     public function fixo($s, $str) {
-        foreach ($this->fx_m as $vl) {
-            list($s1, $s2, $s3) = explode("|", $vl);
-            $s3 = trim($s3);
-            if (stristr($str, $s2) and ! empty($s3) and $s == $s1)
-                return "<font color='#DE3163'><b>" . $s3 . " :</b></font><br>";
-        }
-        return;
-    }*/
+      public function fixo($s, $str) {
+      foreach ($this->fx_m as $vl) {
+      list($s1, $s2, $s3) = explode("|", $vl);
+      $s3 = trim($s3);
+      if (stristr($str, $s2) and ! empty($s3) and $s == $s1)
+      return "<font color='#DE3163'><b>" . $s3 . " :</b></font><br>";
+      }
+      return;
+      } */
 
     protected function progressBarStack($width = array(), $value = array(), $class = array(), $num = 2) {
         $content = '<div class="progress">';
         for ($x = 0; $x <= $num - 1; $x++) {
-            $content .='<div class="progress-bar progress-bar-' . $class[$x] . '" style="width: ' . $width[$x] . '%">
+            $content .= '<div class="progress-bar progress-bar-' . $class[$x] . '" style="width: ' . $width[$x] . '%">
             </div>';
         }
-        $content .='</div>';
+        $content .= '</div>';
         return $content;
     }
 
@@ -86,17 +90,29 @@ class StatsController extends \panix\engine\controllers\AdminController {
     }
 
     public function init() {
-        
-            $this->query = new \yii\db\Query;
-            $this->query->from('{{%surf}}');
-            $this->query->select('*');
-            
-        $this->db = Yii::$app->db;
-        //   list($s_date, $f_date) = str_replace("+", "", array($this->sdate, $this->fdate));
 
+        $this->query = new \yii\db\Query;
+        $this->query->from('{{%surf}}');
+        $this->query->select('*');
+
+         $this->db = Yii::$app->db;
+
+
+       /* $this->db = new \panix\engine\db\Connection([
+            'dsn' => 'mysql:host=localhost;dbname=yii2_test',
+            'username' => 'root',
+            'password' => '',
+            'charset' => 'utf8',
+            'tablePrefix' => 'cms_',
+        ]);*/
+
+
+
+
+        //   list($s_date, $f_date) = str_replace("+", "", array($this->sdate, $this->fdate));
         //if ($_SERVER['REMOTE_ADDR'] != '127.0.0.1' || $_SERVER['REMOTE_ADDR'] !== '195.78.247.104') {
         //    throw new CHttpException(401);
-       // }
+        // }
         if (!preg_match("/^[0-9]{4}-([0-9]{2})-([0-9]{2})$/", $this->fdate) && !preg_match("/^[0-9]{4}-([0-9]{2})-([0-9]{2})$/", $this->sdate)) {
             throw new Exception('Не верный формат даты!');
         }
@@ -156,42 +172,42 @@ class StatsController extends \panix\engine\controllers\AdminController {
             }
         }
         $newFixArray = array(
-          array('ip','195.78.247.104','Мой айпи')
+            array('ip', '195.78.247.104', 'Мой айпи')
         );
-        
-        if (count($newFixArray)>0) {
+
+        if (count($newFixArray) > 0) {
             $this->fx_m = $newFixArray;
-                $this->_zfx = "";
-                $pf = "";
-                for ($i = 0; $i < count($this->fx_m); $i++){
-                    $this->fx_m[$i] = $this->fx_m[$i];
-                }
-                foreach ($this->fx_m as $obj) {
-                    $this->_zfx .= $pf . "LOWER(" . $obj[0] . ") LIKE '%" . mb_strtolower($obj[1]) . "%'";
-                    $pf = " OR ";
-                    $obj[2] = rtrim($obj[2]);
-                    if (!empty($obj[2]))
-                        $fxn[$obj[2]][] = $obj[0] . "|" . $obj[1];
-                    $fxo[] = $obj[2];
-                }
-        }
-       /* if (file_exists(Yii::getPathOfAlias('mod.stats') . "/fix.dat")) {
-            if ($this->fx_m = file(Yii::getPathOfAlias('mod.stats') . "/fix.dat")) {
-                $this->_zfx = "";
-                $pf = "";
-                for ($i = 0; $i < count($this->fx_m); $i++)
-                    $this->fx_m[$i] = iconv("CP1251", "UTF-8", $this->fx_m[$i]);
-                foreach ($this->fx_m as $vl) {
-                    list($s1, $s2, $s3) = explode("|", $vl);
-                    $this->_zfx .= $pf . "LOWER(" . $s1 . ") LIKE '%" . mb_strtolower($s2) . "%'";
-                    $pf = " OR ";
-                    $s3 = rtrim($s3);
-                    if (!empty($s3))
-                        $fxn[$s3][] = $s1 . "|" . $s2;
-                    $fxo[] = $s3;
-                }
+            $this->_zfx = "";
+            $pf = "";
+            for ($i = 0; $i < count($this->fx_m); $i++) {
+                $this->fx_m[$i] = $this->fx_m[$i];
             }
-        }*/
+            foreach ($this->fx_m as $obj) {
+                $this->_zfx .= $pf . "LOWER(" . $obj[0] . ") LIKE '%" . mb_strtolower($obj[1]) . "%'";
+                $pf = " OR ";
+                $obj[2] = rtrim($obj[2]);
+                if (!empty($obj[2]))
+                    $fxn[$obj[2]][] = $obj[0] . "|" . $obj[1];
+                $fxo[] = $obj[2];
+            }
+        }
+        /* if (file_exists(Yii::getPathOfAlias('mod.stats') . "/fix.dat")) {
+          if ($this->fx_m = file(Yii::getPathOfAlias('mod.stats') . "/fix.dat")) {
+          $this->_zfx = "";
+          $pf = "";
+          for ($i = 0; $i < count($this->fx_m); $i++)
+          $this->fx_m[$i] = iconv("CP1251", "UTF-8", $this->fx_m[$i]);
+          foreach ($this->fx_m as $vl) {
+          list($s1, $s2, $s3) = explode("|", $vl);
+          $this->_zfx .= $pf . "LOWER(" . $s1 . ") LIKE '%" . mb_strtolower($s2) . "%'";
+          $pf = " OR ";
+          $s3 = rtrim($s3);
+          if (!empty($s3))
+          $fxn[$s3][] = $s1 . "|" . $s2;
+          $fxo[] = $s3;
+          }
+          }
+          } */
 
         foreach ($se_nn as $val) {
             $this->_cse_m .= " OR LOWER(refer) LIKE '%$val%'";
@@ -211,8 +227,7 @@ class StatsController extends \panix\engine\controllers\AdminController {
 
         // $this->_site = str_replace("www.", "", $_SERVER["HTTP_HOST"]);
         $this->_site = str_replace("www.", "", Yii::$app->request->serverName);
-       return parent::init();
-
+        return parent::init();
     }
 
     /* public function c_other($dt) {

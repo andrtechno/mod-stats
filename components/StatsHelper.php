@@ -5,7 +5,7 @@ namespace panix\mod\stats\components;
 use Yii;
 use panix\engine\Html;
 use panix\engine\components\Browser;
-
+use yii\helpers\StringHelper;
 class StatsHelper {
 
     public $sdata;
@@ -237,7 +237,7 @@ class StatsHelper {
     public static function timeLink($array, $key) {
         $tu = "";
         foreach ($array[$key] as $rw) {
-            $tu .= $rw[0] . " <a target=_blank href=" . $rw[1] . ">" . CMS::truncate($rw[1], 20) . "</a><br>";
+            $tu .= $rw[0] . " <a target=_blank href=" . $rw[1] . ">" . StringHelper::truncate($rw[1], 20) . "</a><br>";
         }
         return $tu;
     }
@@ -699,7 +699,9 @@ class StatsHelper {
 
     public static function se_sp($ref) {
         $app = Yii::$app->stats->se_n;
+        $se_nn= [];
         foreach ($app['se_n'] as $key => $val) {
+            if(isset($se_nn[$key])){
             if (stristr($ref, $se_nn[$key])) {
                 $engine = $key;
                 $sw = $val;
@@ -712,6 +714,7 @@ class StatsHelper {
                 $match1[1] = trim($match1[1]);
                 return array($engine, $match1[1]);
             }
+        }
         }
         return -1;
     }

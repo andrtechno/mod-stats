@@ -1,54 +1,47 @@
 <?php
-Yii::app()->tpl->openWidget(array(
-    'title' => $this->pageName,
-    'htmlOptions' => array('class' => '')
-));
 
+use panix\engine\grid\GridView;
 
-
-$this->widget('ext.adminList.GridView', array(//ext.adminList.GridView
+echo GridView::widget([
+    'tableOptions' => ['class' => 'table table-striped'],
     'dataProvider' => $dataProvider,
-    'selectableRows' => false,
-    'enableHeader' => false,
-    'autoColumns' => false,
-    'afterAjaxUpdate'=>"function(id, data){
-        $('[data-toggle=\"tooltip\"]').tooltip();
-    }",
-    'enablePagination' => true,
-    'columns' => array(
-        array(
-            'name' => 'refer',
-            'header' => 'Referer',
-            'type' => 'raw',
-        ),
-        array(
-            'name' => 'ip',
-            'header' => 'IP-адрес',
-            'type' => 'raw',
-                'htmlOptions'=>array('class'=>'text-center')
-        ),
-        array(
-            'name' => 'host',
-            'header' => 'Хост',
-            'type' => 'raw',
-        ),
-        array(
-            'name' => 'user_agent',
-            'header' => 'User-Agent',
-            'type' => 'raw',
-                'htmlOptions'=>array('class'=>'text-center')
-        ),
-        array(
-            'name' => 'timelink',
-            'header' => 'Время / Страница',
-            'type' => 'raw',
-            'htmlOptions'=>array('class'=>'textL')
-        ),
-    )
-));
-?>
+    //'filterModel' => $searchModel,
+    'layoutOptions' => ['title' => $this->context->pageName],
+    'columns' => [
+        [
+            'attribute' => 'refer',
+            'header' => Yii::t('app', 'refer'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-left'],
+        ],
+        [
+            'attribute' => 'ip',
+            'header' => Yii::t('app', 'ip'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'host',
+            'header' => Yii::t('app', 'host'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+
+        [
+            'attribute' => 'user_agent',
+            'header' => Yii::t('app', 'user_agent'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'timelink',
+            'header' => Yii::t('app', 'timelink'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+    ]
+]);
 
 
-<?php
-Yii::app()->tpl->closeWidget();
-?>
+
+
