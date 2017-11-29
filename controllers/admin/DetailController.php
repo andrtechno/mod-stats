@@ -96,6 +96,9 @@ class DetailController extends \panix\mod\stats\components\StatsController {
         $sql = "SELECT i,refer,ip,proxy,host,lang,user,tm,req FROM {{%surf}} WHERE dt='" . $date . "' AND " . $this->_zp . " ORDER BY i ASC";
         $cmd = $this->db->createCommand($sql);
         $result = array();
+        $i1=[];
+        $i1_ip=[];
+        $i2=[];
         foreach ($cmd->queryAll(false) as $row) {
             $refer = StatsHelper::Ref($row[1]);
             if (@array_key_exists($row[2], $i1_ip)) {
@@ -117,7 +120,7 @@ class DetailController extends \panix\mod\stats\components\StatsController {
                 list($engine, $query) = $refer;
                 $refer1 = StatsHelper::checkSearchEngine($row[0], $engine, $query);
             } else {
-                $refer1 = StatsHelper::checkIdna($row);
+                $refer1 = StatsHelper::checkIdna($row[0]);
             }
 
             $result[] = array(
