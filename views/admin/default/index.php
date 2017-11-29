@@ -1,6 +1,7 @@
 <?php
 use panix\engine\Html;
 use panix\engine\grid\GridView;
+echo \yii\helpers\StringHelper::truncate('$stringfasd fasd fas dfasd fasd fasd fasd f', 10);
 ?>
 <div class="row">
     <div class="col-sm-6 col-xs-12">
