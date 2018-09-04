@@ -1,6 +1,6 @@
 mod-stats
 ===========
-Module stats CORNER CMS
+Module stats PIXELION CMS
 
 [![Latest Stable Version](https://poser.pugx.org/panix/mod-stats/v/stable)](https://packagist.org/packages/panix/mod-stats) [![Total Downloads](https://poser.pugx.org/panix/mod-stats/downloads)](https://packagist.org/packages/panix/mod-stats) [![Monthly Downloads](https://poser.pugx.org/panix/mod-stats/d/monthly)](https://packagist.org/packages/panix/mod-stats) [![Daily Downloads](https://poser.pugx.org/panix/mod-stats/d/daily)](https://packagist.org/packages/panix/mod-stats) [![Latest Unstable Version](https://poser.pugx.org/panix/mod-stats/v/unstable)](https://packagist.org/packages/panix/mod-stats) [![License](https://poser.pugx.org/panix/mod-stats/license)](https://packagist.org/packages/panix/mod-stats)
 
