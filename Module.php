@@ -100,7 +100,7 @@ class Module extends \panix\engine\WebModule {
     }
 
     public function getAdminSideba2r() {
-        $mod = new \panix\engine\widgets\nav\Nav;
+        $mod = new \panix\engine\bootstrap\Nav;
         $items = $mod->findMenu($this->id);
         return $items['items'];
     }
