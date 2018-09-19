@@ -2,7 +2,9 @@
 
 namespace panix\mod\stats\models;
 
-class StatsSurf extends \panix\engine\db\ActiveRecord {
+use panix\engine\db\ActiveRecord;
+
+class StatsSurf extends ActiveRecord {
 
     const MODULE_ID = 'stats';
 
