@@ -36,7 +36,7 @@ class Module extends \panix\engine\WebModule {
                 'items' => [
                     [
                         'label' => Yii::t('stats/default', 'MODULE_NAME'),
-                        'url' => ['/admin/stats'],
+                        //'url' => ['/admin/stats'],
                         'icon' => $this->icon,
                         'items' => [
                             [

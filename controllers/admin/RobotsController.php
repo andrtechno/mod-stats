@@ -9,7 +9,7 @@ class RobotsController extends \panix\mod\stats\components\StatsController {
         $this->breadcrumbs = [
             [
                 'label'=>Yii::t('stats/default', 'MODULE_NAME'),
-                'url'=>['/admin/stats']
+                'url'=>['/stats']
             ],
             $this->pageName
         ];

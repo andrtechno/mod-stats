@@ -107,11 +107,11 @@ class TimevisitController extends \panix\mod\stats\components\StatsController {
         $this->breadcrumbs = [
             [
                 'label' => Yii::t('stats/default', 'MODULE_NAME'),
-                'url' => ['/admin/stats']
+                'url' => ['/stats']
             ],
             [
                 'label' => $this->pageName,
-                'url' => ['/admin/stats/timevisit']
+                'url' => ['/stats/timevisit']
             ],
             $qs
         ];
