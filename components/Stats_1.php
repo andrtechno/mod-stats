@@ -387,14 +387,14 @@ class Stats extends CApplicationComponent {
             $user = $_SERVER['HTTP_USER_AGENT'];
             $req = $_SERVER['REQUEST_URI'];
             if ($ip = $_SERVER['HTTP_X_FORWARDED_FOR']) {
-                if (!stristr($_SERVER['HTTP_X_FORWARDED_FOR'], CMS::getip()) and !empty($_SERVER['HTTP_X_FORWARDED_FOR']))
-                    $ip .= ", " . CMS::getip();
+                if (!stristr($_SERVER['HTTP_X_FORWARDED_FOR'], CMS::getIp()) and !empty($_SERVER['HTTP_X_FORWARDED_FOR']))
+                    $ip .= ", " . CMS::getIp();
                 else
-                    $ip = CMS::getip();
-                $proxy = CMS::getip();
+                    $ip = CMS::getIp();
+                $proxy = CMS::getIp();
             }
             else {
-                $ip = CMS::getip();
+                $ip = CMS::getIp();
                 $proxy = "";
             }
             if ($proxy == $ip)

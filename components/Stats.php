@@ -406,13 +406,13 @@ class Stats extends \yii\base\Component {
             $req = $_SERVER['REQUEST_URI'];
             $httpxforward = (isset($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:false;
             if ($ip = $httpxforward) {
-                if (!stristr($httpxforward, CMS::getip()) and !empty($httpxforward))
-                    $ip .= ", " . CMS::getip();
+                if (!stristr($httpxforward, CMS::getIp()) and !empty($httpxforward))
+                    $ip .= ", " . CMS::getIp();
                 else
-                    $ip = CMS::getip();
-                $proxy = CMS::getip();
+                    $ip = CMS::getIp();
+                $proxy = CMS::getIp();
             } else {
-                $ip = CMS::getip();
+                $ip = CMS::getIp();
                 $proxy = "";
             }
             if ($proxy == $ip)
