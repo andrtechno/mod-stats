@@ -11,13 +11,13 @@ echo GridView::widget([
     'columns' => [
         [
             'attribute' => 'num',
-            'header' => Yii::t('app', 'num'),
+            'header' => Yii::t('app/default', 'num'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-left'],
         ],
         [
             'attribute' => 'req',
-            'header' => Yii::t('app', 'req'),
+            'header' => Yii::t('app/default', 'req'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-left'],
         ],
@@ -35,7 +35,7 @@ echo GridView::widget([
         ],
         [
             'attribute' => 'detail',
-            'header' => Yii::t('app', 'OPTIONS'),
+            'header' => Yii::t('app/default', 'OPTIONS'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],

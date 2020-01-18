@@ -12,13 +12,13 @@ echo GridView::widget([
     'columns' => [
         [
             'attribute' => 'num',
-            'header' => Yii::t('app', 'num'),
+            'header' => Yii::t('app/default', 'num'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-left'],
         ],
         [
             'attribute' => 'bot',
-            'header' => Yii::t('app', 'Поисковый робот'),
+            'header' => Yii::t('app/default', 'Поисковый робот'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-left'],
         ],
@@ -43,7 +43,7 @@ echo GridView::widget([
         ],
         [
             'attribute' => 'detail',
-            'header' => Yii::t('app', 'OPTIONS'),
+            'header' => Yii::t('app/default', 'OPTIONS'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],

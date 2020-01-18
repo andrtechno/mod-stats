@@ -11,7 +11,7 @@ echo GridView::widget([
     'columns' => [
         [
             'attribute' => 'time',
-            'header' => Yii::t('app', 'time'),
+            'header' => Yii::t('app/default', 'time'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-left'],
         ],

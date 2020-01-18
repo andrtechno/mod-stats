@@ -8,13 +8,13 @@ echo GridView::widget([
     'columns' => [
         [
             'attribute' => 'date',
-            'header' => Yii::t('app', 'date'),
+            'header' => Yii::t('app/default', 'date'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-left'],
         ],
         [
             'attribute' => 'time',
-            'header' => Yii::t('app', 'time'),
+            'header' => Yii::t('app/default', 'time'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-left'],
         ],

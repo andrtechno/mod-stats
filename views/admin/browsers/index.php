@@ -11,25 +11,25 @@ echo GridView::widget([
     'columns' => [
         [
             'attribute' => 'num',
-            'header' => Yii::t('app', 'num'),
+            'header' => Yii::t('app/default', 'num'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-left'],
         ],
         [
             'attribute' => 'browser',
-            'header' => Yii::t('app', 'browser'),
+            'header' => Yii::t('app/default', 'browser'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],
         [
             'attribute' => 'val',
-            'header' => Yii::t('app', 'hosts'),
+            'header' => Yii::t('app/default', 'hosts'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],
         [
             'attribute' => 'progressbar',
-            'header' => Yii::t('app', 'progressbar'),
+            'header' => Yii::t('app/default', 'progressbar'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],

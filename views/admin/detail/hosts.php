@@ -10,37 +10,37 @@ echo GridView::widget([
     'columns' => [
         [
             'attribute' => 'time',
-            'header' => Yii::t('app', 'time'),
+            'header' => Yii::t('app/default', 'time'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-left'],
         ],
         [
             'attribute' => 'refer',
-            'header' => Yii::t('app', 'refer'),
+            'header' => Yii::t('app/default', 'refer'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],
         [
             'attribute' => 'ip',
-            'header' => Yii::t('app', 'ip'),
+            'header' => Yii::t('app/default', 'ip'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],
         [
             'attribute' => 'host',
-            'header' => Yii::t('app', 'host'),
+            'header' => Yii::t('app/default', 'host'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],
         [
             'attribute' => 'user_agent',
-            'header' => Yii::t('app', 'user_agent'),
+            'header' => Yii::t('app/default', 'user_agent'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],
         [
             'attribute' => 'timelink',
-            'header' => Yii::t('app', 'timelink'),
+            'header' => Yii::t('app/default', 'timelink'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],

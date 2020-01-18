@@ -10,25 +10,25 @@ echo GridView::widget([
     'columns' => [
         [
             'attribute' => 'date',
-            'header' => Yii::t('app', 'date'),
+            'header' => Yii::t('app/default', 'date'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-left'],
         ],
         [
             'attribute' => 'time',
-            'header' => Yii::t('app', 'time'),
+            'header' => Yii::t('app/default', 'time'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],
         [
             'attribute' => 'refer',
-            'header' => Yii::t('app', 'refer'),
+            'header' => Yii::t('app/default', 'refer'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],
         [
             'attribute' => 'ip',
-            'header' => Yii::t('app', 'ip'),
+            'header' => Yii::t('app/default', 'ip'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],

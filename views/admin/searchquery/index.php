@@ -11,13 +11,13 @@ echo GridView::widget([
     'columns' => [
         [
             'attribute' => 'num',
-            'header' => Yii::t('app', 'num'),
+            'header' => Yii::t('app/default', 'num'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-left'],
         ],
         [
             'attribute' => 'query',
-            'header' => Yii::t('app', 'Поисковый запрос'),
+            'header' => Yii::t('app/default', 'Поисковый запрос'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-left'],
         ],
