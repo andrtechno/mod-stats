@@ -110,21 +110,20 @@ class StatsHelper {
         }
         if ($render) {
 
-            return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/' . $img, array(
+            return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/' . $img, [
                         'data-toggle' => "tooltip",
                         'data-placement' => "top",
-                        'class' => 'platform',
-                        'class' => 'img-thumbnail',
+                        'class' => 'platform img-thumbnail',
                         'alt' => $browser->getPlatform(),
-                        'title' => Yii::t('stats/default', 'PLATFORM', array('name' => $browser->getPlatform()))
-            ));
+                        'title' => Yii::t('stats/default', 'PLATFORM', ['name' => $browser->getPlatform()])
+            ]);
         } else {
             return $img;
         }
     }
 
     public static function linkDetail($link) {
-        return Html::a(Yii::t('stats/default', 'DETAIL'), $link, array('target' => '_blank', 'class' => 'btn btn-xs btn-info'));
+        return Html::a(Yii::t('stats/default', 'DETAIL'), $link, ['target' => '_blank', 'class' => 'btn btn-sm btn-info']);
     }
 
     public static function getRowHost($ip, $proxy, $host, $lang) {

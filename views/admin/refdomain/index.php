@@ -2,9 +2,7 @@
 <?php
 
 $this->timefilter();
-Yii::app()->tpl->openWidget(array(
-    'title' => $this->pageName,
-));
+
 
 $this->widget('ext.adminList.GridView', array(//ext.adminList.GridView
     'dataProvider' => $dataProvider,
@@ -40,7 +38,6 @@ $this->widget('ext.adminList.GridView', array(//ext.adminList.GridView
     )
 ));
 
-Yii::app()->tpl->closeWidget();
 ?>
 
 

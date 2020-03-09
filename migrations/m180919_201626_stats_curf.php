@@ -1,4 +1,7 @@
 <?php
+
+namespace panix\mod\stats\migrations;
+
 /**
  * Generation migrate by PIXELION CMS
  *
@@ -8,11 +11,11 @@
  * Class m180919_201626_stats_curf
  */
 
-use yii\db\Schema;
 use panix\engine\db\Migration;
 use panix\mod\stats\models\StatsSurf;
 
-class m180919_201626_stats_curf extends Migration {
+class m180919_201626_stats_curf extends Migration
+{
 
     public function up()
     {

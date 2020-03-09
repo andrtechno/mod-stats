@@ -6,9 +6,13 @@ use Yii;
 use panix\engine\CMS;
 use panix\engine\Html;
 use panix\mod\stats\components\StatsHelper;
-class BrowsersController extends \panix\mod\stats\components\StatsController {
+use panix\mod\stats\components\StatsController;
 
-    public function actionIndex() {
+class BrowsersController extends StatsController
+{
+
+    public function actionIndex()
+    {
         $this->pageName = Yii::t('stats/default', 'BROWSERS');
         $this->breadcrumbs = [
             [
@@ -19,14 +23,13 @@ class BrowsersController extends \panix\mod\stats\components\StatsController {
         ];
 
 
-
         $bmas = [];
         $ipmas = [];
         if ($this->sort == "hi") {
             $sql = "SELECT user FROM {{%surf}} WHERE dt >= '$this->sdate' AND dt <= '$this->fdate' AND " . $this->_zp;
             $command = $this->db->createCommand($sql);
             foreach ($command->queryAll() as $row) {
-                $bmas[StatsHelper::getBrowser($row['user'])] ++;
+                $bmas[StatsHelper::getBrowser($row['user'])]++;
             }
         } else {
             $sql = "SELECT user, ip FROM {{%surf}} WHERE dt >= '$this->sdate' AND dt <= '$this->fdate' AND " . $this->_zp . " GROUP BY ip, user";
@@ -47,7 +50,6 @@ class BrowsersController extends \panix\mod\stats\components\StatsController {
         }
 
 
-
         $vse = 0;
         $k = 0;
         arsort($bmas);
@@ -55,54 +57,52 @@ class BrowsersController extends \panix\mod\stats\components\StatsController {
         $cnt = array_sum($bmas);
         $pie = array();
         $helper = new StatsHelper;
-        
-           // print_r($bmas);
-            //die();
-        
+
+        // print_r($bmas);
+        //die();
+
         foreach ($bmas as $brw => $val) {
 
             $k++;
             $vse += $val;
-            $this->result[] = array(
+            $this->result[] = [
                 'num' => $k,
                 'browser' => $helper->browserName($brw),
                 'val' => $val,
                 'progressbar' => $this->progressBar(ceil(($val * 100) / $mmx), number_format((($val * 100) / $cnt), 1, ',', ''), (($this->sort == "hi") ? "success" : "warning")),
                 'detail' => StatsHelper::linkDetail('/admin/stats/browsers/detail?s_date=' . $this->sdate . '&f_date=' . $this->fdate . '&brw=' . (empty($brw) ? "другие" : $brw) . "&sort=" . (empty($this->sort) ? "ho" : $this->sort)),
-            );
-            $pie[] = array(
+            ];
+            $pie[] = [
                 'name' => $helper->browserName($brw),
                 'y' => ceil(($val * 100) / $mmx),
                 'hosts' => $val
-                    //  'sliced'=> true,
-                    //'selected'=> true
-            );
+                //  'sliced'=> true,
+                //'selected'=> true
+            ];
         }
 
 
-
-
-/*
-        $dataProvider = new CArrayDataProvider($this->result, array(
-            'sort' => array(
-                // 'defaultOrder'=>'id ASC',
-                'attributes' => array(
-                    'browser',
-                    'val'
-                ),
-            ),
-            'pagination' => array(
-                'pageSize' => 10,
-            ),
-        ));*/
-                   $dataProvider = new \yii\data\ArrayDataProvider([
-                'allModels' => $this->result,
-                'pagination' => [
+        /*
+                $dataProvider = new CArrayDataProvider($this->result, array(
+                    'sort' => array(
+                        // 'defaultOrder'=>'id ASC',
+                        'attributes' => array(
+                            'browser',
+                            'val'
+                        ),
+                    ),
+                    'pagination' => array(
+                        'pageSize' => 10,
+                    ),
+                ));*/
+        $dataProvider = new \yii\data\ArrayDataProvider([
+            'allModels' => $this->result,
+            'pagination' => [
                 'pageSize' => 10,
             ]
-            ]);
+        ]);
 
-       return  $this->render('index', array(
+        return $this->render('index', [
             'dataProvider' => $dataProvider,
             'bmas' => $bmas,
             'cnt' => $cnt,
@@ -111,10 +111,11 @@ class BrowsersController extends \panix\mod\stats\components\StatsController {
             'mmx' => $mmx,
             'brw' => $brw,
             'k' => $k,
-        ));
+        ]);
     }
 
-    public function actionView1331312132() {
+    public function actionView1331312132()
+    {
         $this->pageName = 'dsadsa';
         $brw = $_GET['brw'];
 
@@ -126,13 +127,13 @@ class BrowsersController extends \panix\mod\stats\components\StatsController {
             $sql = "SELECT user, COUNT(user) cnt FROM {{%surf}} WHERE";
             $sql .= $this->_zp . " AND dt >= '$this->sdate' AND dt <= '$this->fdate' " . (isset($brw) ? StatsHelper::GetBrw($brw) : "") . " GROUP BY user ORDER BY 2 DESC";
             $res = $this->db->createCommand($sql);
-            $full_sql = "SELECT SUM(t.cnt) as cnt FROM (" . $sql . ") t";
+            $full_sql = "SELECT SUM(t.cnt) AS cnt FROM (" . $sql . ") t";
             $r = $this->db->createCommand($full_sql);
         } else {
 
             $sql = "CREATE TEMPORARY TABLE {{%tmp_surf}} SELECT ip, user FROM {{%surf}} WHERE";
             $sql .= $this->_zp . " AND dt >= '$this->sdate' AND dt <= '$this->fdate' " . (isset($brw) ? StatsHelper::GetBrw($brw) : "") . " GROUP BY ip" . (!isset($brw) ? ",user" : "");
-            $sql2 = "SELECT user, COUNT(user) cnt FROM {{%tmp_surf}} GROUP BY user ORDER BY 2 DESC";
+            $sql2 = "SELECT user, COUNT(user) cnt FROM {{%tmp_surf}} GROUP BY USER ORDER BY 2 DESC";
             $res = $this->db->createCommand($sql);
             $transaction = $this->db->beginTransaction();
             try {
@@ -143,7 +144,7 @@ class BrowsersController extends \panix\mod\stats\components\StatsController {
             }
 
 
-            $z3 = "SELECT SUM(t.cnt) as cnt FROM (" . $sql2 . ") t";
+            $z3 = "SELECT SUM(t.cnt) AS cnt FROM (" . $sql2 . ") t";
 
 
             $transaction2 = $this->db->beginTransaction();
@@ -160,23 +161,32 @@ class BrowsersController extends \panix\mod\stats\components\StatsController {
         $cnt = $smd['cnt'];
         if (!empty($brw)) {
             switch ($brw) {
-                case "ie.png": $browserName = "MS Internet Explorer";
+                case "ie.png":
+                    $browserName = "MS Internet Explorer";
                     break;
-                case "opera.png": $browserName = "Opera";
+                case "opera.png":
+                    $browserName = "Opera";
                     break;
-                case "firefox.png": $browserName = "Firefox";
+                case "firefox.png":
+                    $browserName = "Firefox";
                     break;
-                case "chrome.png": $browserName = "Google Chrome";
+                case "chrome.png":
+                    $browserName = "Google Chrome";
                     break;
-                case "mozilla.png": $browserName = "Mozilla";
+                case "mozilla.png":
+                    $browserName = "Mozilla";
                     break;
-                case "safari.png": $browserName = "Apple Safari";
+                case "safari.png":
+                    $browserName = "Apple Safari";
                     break;
-                case "mac.png": $browserName = "Macintosh";
+                case "mac.png":
+                    $browserName = "Macintosh";
                     break;
-                case "maxthon.png": $browserName = "Maxthon (MyIE)";
+                case "maxthon.png":
+                    $browserName = "Maxthon (MyIE)";
                     break;
-                default: $browserName = "другие";
+                default:
+                    $browserName = "другие";
                     break;
             }
         }
@@ -188,17 +198,17 @@ class BrowsersController extends \panix\mod\stats\components\StatsController {
             'browserName' => $browserName,
             'vse' => $vse,
             'k' => $k,
-                // 'pos' => $pos
+            // 'pos' => $pos
         ));
     }
 
-    public function actionDetail() {
-        $pz=0;
-        $sql = "SELECT day,dt,tm,refer,ip,proxy,host,lang,user,req FROM {{%surf}} WHERE dt >= '$this->sdate' AND dt <= '$this->fdate' " . StatsHelper::GetBrw(Yii::$app->request->get('brw')) . (($pz == 1) ? " AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY ip" : "") . " ORDER BY i DESC";
+    public function actionDetail()
+    {
+        $pz = 0;
+        $sql = "SELECT * FROM {{%surf}} WHERE dt >= '$this->sdate' AND dt <= '$this->fdate' " . StatsHelper::GetBrw(Yii::$app->request->get('brw')) . (($pz == 1) ? " AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY ip" : "") . " ORDER BY i DESC";
         $cmd = $this->db->createCommand($sql);
 
         $items = $cmd->queryAll();
-
 
 
         foreach ($items as $row) { //StatsHelper::$MONTH[substr($row['dt'], 4, 2)]
@@ -206,11 +216,11 @@ class BrowsersController extends \panix\mod\stats\components\StatsController {
 
             if ($row['proxy'] != "") {
                 $ip .= '<br>';
-                $ip .= Html::a('через proxy', '?item=ip&qs=' . $row['proxy'], array('target' => '_blank'));
+                $ip .= Html::a('через proxy', '?item=ip&qs=' . $row['proxy'], ['target' => '_blank']);
             }
 
             $this->result[] = array(
-                'date' => StatsHelper::$DAY[$row['day']] . ' ' . CMS::date($row['dt'] . ' ' . $row['tm']),
+                'date' => StatsHelper::$DAY[$row['day']] . ' ' . CMS::date(strtotime($row['dt'] . ' ' . $row['tm'])),
                 'time' => $row['tm'],
                 'refer' => StatsHelper::renderReferer($row['refer']),
                 'ip' => $ip,
@@ -219,12 +229,12 @@ class BrowsersController extends \panix\mod\stats\components\StatsController {
                 'page' => Html::a($row['req'], $row['req'], array('target' => '_blank')),
             );
         }
-                   $dataProvider = new \yii\data\ArrayDataProvider([
-                'allModels' => $this->result,
-                'pagination' => [
+        $dataProvider = new \yii\data\ArrayDataProvider([
+            'allModels' => $this->result,
+            'pagination' => [
                 'pageSize' => 10,
             ]
-            ]);
+        ]);
         /*$dataProvider = new CArrayDataProvider($this->result, array(
             'sort' => array(
                 // 'defaultOrder'=>'id ASC',
@@ -237,9 +247,9 @@ class BrowsersController extends \panix\mod\stats\components\StatsController {
             ),
         ));*/
 
-        return $this->render('detail', array(
+        return $this->render('detail', [
             'dataProvider' => $dataProvider,
-        ));
+        ]);
     }
 
 }
