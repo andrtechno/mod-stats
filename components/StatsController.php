@@ -5,27 +5,36 @@ namespace panix\mod\stats\components;
 use panix\mod\stats\models\StatsSurf;
 use Yii;
 
-class StatsController extends \panix\engine\controllers\AdminController {
+class StatsController extends \panix\engine\controllers\AdminController
+{
 
     public $db;
     public $query;
 
-    public function echo_se($engine) {
+    public function echo_se($engine)
+    {
 // global $se_n;
         switch ($engine) {
-            case "Y": return "<b><font color=#FF0000>Я</font>ndex</b>";
+            case "Y":
+                return "<b><font color=#FF0000>Я</font>ndex</b>";
                 break;
-            case "R": return "<b><font color=#0000FF>R</font>ambler</b>";
+            case "R":
+                return "<b><font color=#0000FF>R</font>ambler</b>";
                 break;
-            case "G": return "<b><font color=#2159D6>G</font><font color=#C61800>o</font><font color=#D6AE00>o</font><font color=#2159D6>g</font><font color=#18A221>l</font><font color=#C61800>e</font></b>";
+            case "G":
+                return "<b><font color=#2159D6>G</font><font color=#C61800>o</font><font color=#D6AE00>o</font><font color=#2159D6>g</font><font color=#18A221>l</font><font color=#C61800>e</font></b>";
                 break;
-            case "M": return "<b><font color=#F8AC32>@</font><font color=#00468c>mail</font><font color=#F8AC32>.ru</font></b>";
+            case "M":
+                return "<b><font color=#F8AC32>@</font><font color=#00468c>mail</font><font color=#F8AC32>.ru</font></b>";
                 break;
-            case "H": return "<b>Yahoo</b>";
+            case "H":
+                return "<b>Yahoo</b>";
                 break;
-            case "S": return "<b>MSN Bing</b>";
+            case "S":
+                return "<b>MSN Bing</b>";
                 break;
-            case "?": return "<b>?</b>";
+            case "?":
+                return "<b>?</b>";
                 break;
             default :
                 foreach ($this->se_n as $key => $val)
@@ -48,16 +57,18 @@ class StatsController extends \panix\engine\controllers\AdminController {
     public $rbdn;
     public $robo;
     public $se_n;
-    public $result = array();
+    public $result = [];
     public $hbdn;
     public $fx_m;
+    public $tableSurf;
 
-    public function fixo($s, $str) {
+    public function fixo($s, $str)
+    {
         // global $fx_m;
         foreach ($this->fx_m as $vl) {
             //  list($s1, $s2, $s3) = explode("|", $vl);
             $vl[2] = trim($vl[2]);
-            if (stristr($str, $vl[1]) and ! empty($vl[2]) and $s == $vl[0])
+            if (stristr($str, $vl[1]) and !empty($vl[2]) and $s == $vl[0])
                 return "<font color='#DE3163'><b>" . $vl[2] . " :</b></font><br>";
         }
         return;
@@ -74,7 +85,8 @@ class StatsController extends \panix\engine\controllers\AdminController {
       return;
       } */
 
-    protected function progressBarStack($width = array(), $value = array(), $class = array(), $num = 2) {
+    protected function progressBarStack($width = array(), $value = array(), $class = array(), $num = 2)
+    {
         $content = '<div class="progress">';
         for ($x = 0; $x <= $num - 1; $x++) {
             $content .= '<div class="progress-bar progress-bar-' . $class[$x] . '" style="width: ' . $width[$x] . '%">
@@ -84,29 +96,22 @@ class StatsController extends \panix\engine\controllers\AdminController {
         return $content;
     }
 
-    protected function progressBar($width, $value, $class = 'info') {
+    protected function progressBar($width, $value, $class = 'info')
+    {
         return '<div class="progress">
             <div class="progress-bar progress-bar-' . $class . '" role="progressbar" aria-valuenow="' . $width . '" aria-valuemin="0" aria-valuemax="100" style="width: ' . $width . '%;">
             ' . $value . '%</div></div>';
     }
 
-    public $tableSurf;
-    public function init() {
+
+    public function init()
+    {
         $this->tableSurf = StatsSurf::tableName();
         $this->query = new \yii\db\Query;
         $this->query->from($this->tableSurf);
         $this->query->select('*');
 
-         $this->db = Yii::$app->db;
-
-
-       /* $this->db = new \panix\engine\db\Connection([
-            'dsn' => 'mysql:host=localhost;dbname=yii2_test',
-            'username' => 'root',
-            'password' => '',
-            'charset' => 'utf8',
-            'tablePrefix' => 'cms_',
-        ]);*/
+        $this->db = Yii::$app->db;
 
 
 
@@ -118,6 +123,7 @@ class StatsController extends \panix\engine\controllers\AdminController {
         if (!preg_match("/^[0-9]{4}-([0-9]{2})-([0-9]{2})$/", $this->fdate) && !preg_match("/^[0-9]{4}-([0-9]{2})-([0-9]{2})$/", $this->sdate)) {
             throw new Exception('Не верный формат даты!');
         }
+        $robo = [];
         if ($robots = file(Yii::getAlias('@stats') . "/robots.dat")) {
             $i = 0;
             for ($i = 0; $i < count($robots); $i++)
@@ -131,6 +137,9 @@ class StatsController extends \panix\engine\controllers\AdminController {
                 $robo[] = $rb2;
             }
         }
+
+
+
         if ($hosts = file(Yii::getAlias('@stats') . "/hosts.dat")) {
             $i = 0;
             for ($i = 0; $i < count($hosts); $i++)
@@ -260,9 +269,10 @@ class StatsController extends \panix\engine\controllers\AdminController {
       return $command->queryRow(false);
       } */
 
-    public function Ref($ref) {
+    public function Ref($ref)
+    {
 
-        if (($ref != "") and ! (stristr($ref, "://" . $this->_site) and stripos($ref, "://" . $this->_site, 6) == 0) and ! (stristr($ref, "://www." . $this->_site) and stripos($ref, "://www." . $this->_site, 6) == 0)) {
+        if (($ref != "") and !(stristr($ref, "://" . $this->_site) and stripos($ref, "://" . $this->_site, 6) == 0) and !(stristr($ref, "://www." . $this->_site) and stripos($ref, "://www." . $this->_site, 6) == 0)) {
 
             $reff = str_replace("www.", "", $ref);
             if (!stristr($ref, "://")) {
@@ -272,39 +282,40 @@ class StatsController extends \panix\engine\controllers\AdminController {
             if (stristr($reff, "://yandex") or stristr($reff, "://search.yaca.yandex") or stristr($reff, "://images.yandex"))
                 return StatsHelper::se_yandex($ref);
             else
-            if (stristr($reff, "://google"))
-                return StatsHelper::se_google($ref);
-            else
-            if (stristr($reff, "://rambler") or stristr($reff, "://nova.rambler") or stristr($reff, "://search.rambler") or stristr($reff, "://ie4.rambler") or stristr($reff, "://ie5.rambler"))
-                return StatsHelper::se_rambler($ref);
-            else
-            if (stristr($reff, "://go.mail.ru") and stristr($reff, "words="))
-                return StatsHelper::se_mail1($ref);
-            else
-            if (stristr($reff, "://go.mail.ru") or stristr($reff, "://wap.go.mail.ru"))
-                return StatsHelper::se_mail2($ref);
-            else
-            if (stristr($reff, "://search.msn") or stristr($reff, "://search.live.com") or stristr($reff, "://ie.search.msn") or stristr($reff, "://bing"))
-                return StatsHelper::se_msn($ref);
-            else
-            if (stristr($reff, "://search.yahoo"))
-                return StatsHelper::se_yahoo($ref);
-            else
-            if (StatsHelper::se_sp($ref) <> -1)
-                return StatsHelper::se_sp($ref);
-            else
-            if (stristr($ref, "?q=") or stristr($ref, "&q="))
-                return se_other($ref, "q=");
-            else
-            if (stristr($ref, "query="))
-                return se_other($ref, "query=");
-            else
-                return $ref;
+                if (stristr($reff, "://google"))
+                    return StatsHelper::se_google($ref);
+                else
+                    if (stristr($reff, "://rambler") or stristr($reff, "://nova.rambler") or stristr($reff, "://search.rambler") or stristr($reff, "://ie4.rambler") or stristr($reff, "://ie5.rambler"))
+                        return StatsHelper::se_rambler($ref);
+                    else
+                        if (stristr($reff, "://go.mail.ru") and stristr($reff, "words="))
+                            return StatsHelper::se_mail1($ref);
+                        else
+                            if (stristr($reff, "://go.mail.ru") or stristr($reff, "://wap.go.mail.ru"))
+                                return StatsHelper::se_mail2($ref);
+                            else
+                                if (stristr($reff, "://search.msn") or stristr($reff, "://search.live.com") or stristr($reff, "://ie.search.msn") or stristr($reff, "://bing"))
+                                    return StatsHelper::se_msn($ref);
+                                else
+                                    if (stristr($reff, "://search.yahoo"))
+                                        return StatsHelper::se_yahoo($ref);
+                                    else
+                                        if (StatsHelper::se_sp($ref) <> -1)
+                                            return StatsHelper::se_sp($ref);
+                                        else
+                                            if (stristr($ref, "?q=") or stristr($ref, "&q="))
+                                                return se_other($ref, "q=");
+                                            else
+                                                if (stristr($ref, "query="))
+                                                    return se_other($ref, "query=");
+                                                else
+                                                    return $ref;
         } else
             return $ref;
     }
 
-    public function is_robot($check, $check2) {
+    public function is_robot($check, $check2)
+    {
 
         if (empty($check))
             return TRUE;
@@ -319,13 +330,13 @@ class StatsController extends \panix\engine\controllers\AdminController {
         return FALSE;
     }
 
-    public function timefilter($sort = true) {
+    public function timefilter($sort = true)
+    {
         //  global $s_date, $f_date, $u;
 
 
         $sql = "SELECT DISTINCT date FROM {$this->tableSurf} ORDER BY 1 DESC";
         $command = $this->db->createCommand($sql);
-
 
 
         //$res = mysql_query("SELECT DISTINCT dt FROM cms_surf ORDER BY 1 DESC");
@@ -381,33 +392,40 @@ class StatsController extends \panix\engine\controllers\AdminController {
         ));
     }
 
-    public function setSdate($date) {
+    public function setSdate($date)
+    {
         $this->sdate = $date;
     }
 
-    public function setFdate($date) {
+    public function setFdate($date)
+    {
         $this->fdate = $date;
     }
 
-    public function getSdate() {
+    public function getSdate()
+    {
         $sdate = Yii::$app->request->get('s_date');
         return ($sdate) ? $sdate : date('Y-m-d');
     }
 
-    public function getFdate() {
+    public function getFdate()
+    {
         $fdate = Yii::$app->request->get('f_date');
         return ($fdate) ? $fdate : date('Y-m-d');
     }
 
-    public function getBwr() {
+    public function getBwr()
+    {
         return Yii::$app->request->get('bwr');
     }
 
-    public function getSort() {
+    public function getSort()
+    {
         return Yii::$app->request->get('sort');
     }
 
-    public function getPos() {
+    public function getPos()
+    {
         return Yii::$app->request->get('pos');
     }
 
