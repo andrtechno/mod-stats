@@ -26,13 +26,13 @@ class BrowsersController extends StatsController
         $bmas = [];
         $ipmas = [];
         if ($this->sort == "hi") {
-            $sql = "SELECT user FROM {{%surf}} WHERE dt >= '$this->sdate' AND dt <= '$this->fdate' AND " . $this->_zp;
+            $sql = "SELECT user FROM {{%surf}} WHERE date >= '$this->sdate' AND date <= '$this->fdate' AND " . $this->_zp;
             $command = $this->db->createCommand($sql);
             foreach ($command->queryAll() as $row) {
                 $bmas[StatsHelper::getBrowser($row['user'])]++;
             }
         } else {
-            $sql = "SELECT user, ip FROM {{%surf}} WHERE dt >= '$this->sdate' AND dt <= '$this->fdate' AND " . $this->_zp . " GROUP BY ip, user";
+            $sql = "SELECT user, ip FROM {{%surf}} WHERE date >= '$this->sdate' AND date <= '$this->fdate' AND " . $this->_zp . " GROUP BY ip, user";
             $command = $this->db->createCommand($sql);
             $bcount = 1;
             foreach ($command->queryAll() as $row) {
@@ -125,14 +125,14 @@ class BrowsersController extends StatsController
         //$db = Yii::$app->db;
         if ($this->sort == "hi") {
             $sql = "SELECT user, COUNT(user) cnt FROM {{%surf}} WHERE";
-            $sql .= $this->_zp . " AND dt >= '$this->sdate' AND dt <= '$this->fdate' " . (isset($brw) ? StatsHelper::GetBrw($brw) : "") . " GROUP BY user ORDER BY 2 DESC";
+            $sql .= $this->_zp . " AND date >= '$this->sdate' AND date <= '$this->fdate' " . (isset($brw) ? StatsHelper::GetBrw($brw) : "") . " GROUP BY user ORDER BY 2 DESC";
             $res = $this->db->createCommand($sql);
             $full_sql = "SELECT SUM(t.cnt) AS cnt FROM (" . $sql . ") t";
             $r = $this->db->createCommand($full_sql);
         } else {
 
             $sql = "CREATE TEMPORARY TABLE {{%tmp_surf}} SELECT ip, user FROM {{%surf}} WHERE";
-            $sql .= $this->_zp . " AND dt >= '$this->sdate' AND dt <= '$this->fdate' " . (isset($brw) ? StatsHelper::GetBrw($brw) : "") . " GROUP BY ip" . (!isset($brw) ? ",user" : "");
+            $sql .= $this->_zp . " AND date >= '$this->sdate' AND date <= '$this->fdate' " . (isset($brw) ? StatsHelper::GetBrw($brw) : "") . " GROUP BY ip" . (!isset($brw) ? ",user" : "");
             $sql2 = "SELECT user, COUNT(user) cnt FROM {{%tmp_surf}} GROUP BY USER ORDER BY 2 DESC";
             $res = $this->db->createCommand($sql);
             $transaction = $this->db->beginTransaction();
@@ -191,7 +191,7 @@ class BrowsersController extends StatsController
             }
         }
 
-        return $this->render('view', array(
+        return $this->render('view', [
             'items' => $res->queryAll(),
             'cnt' => $cnt,
             'max' => $max,
@@ -199,13 +199,13 @@ class BrowsersController extends StatsController
             'vse' => $vse,
             'k' => $k,
             // 'pos' => $pos
-        ));
+        ]);
     }
 
     public function actionDetail()
     {
         $pz = 0;
-        $sql = "SELECT * FROM {{%surf}} WHERE dt >= '$this->sdate' AND dt <= '$this->fdate' " . StatsHelper::GetBrw(Yii::$app->request->get('brw')) . (($pz == 1) ? " AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY ip" : "") . " ORDER BY i DESC";
+        $sql = "SELECT * FROM {{%surf}} WHERE date >= '$this->sdate' AND date <= '$this->fdate' " . StatsHelper::GetBrw(Yii::$app->request->get('brw')) . (($pz == 1) ? " AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY ip" : "") . " ORDER BY i DESC";
         $cmd = $this->db->createCommand($sql);
 
         $items = $cmd->queryAll();
@@ -220,13 +220,13 @@ class BrowsersController extends StatsController
             }
 
             $this->result[] = array(
-                'date' => StatsHelper::$DAY[$row['day']] . ' ' . CMS::date(strtotime($row['dt'] . ' ' . $row['tm'])),
-                'time' => $row['tm'],
+                'date' => StatsHelper::$DAY[$row['day']] . ' ' . CMS::date(strtotime($row['date'] . ' ' . $row['time'])),
+                'time' => $row['time'],
                 'refer' => StatsHelper::renderReferer($row['refer']),
                 'ip' => $ip,
                 'host' => StatsHelper::getRowHost($row['ip'], $row['proxy'], $row['host'], $row['lang']),
                 'user_agent' => StatsHelper::getRowUserAgent($row['user'], $row['refer']),
-                'page' => Html::a($row['req'], $row['req'], array('target' => '_blank')),
+                'page' => Html::a($row['req'], $row['req'], ['target' => '_blank']),
             );
         }
         $dataProvider = new \yii\data\ArrayDataProvider([

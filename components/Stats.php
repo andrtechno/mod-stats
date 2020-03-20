@@ -2,10 +2,13 @@
 
 // change table name "surf" to "collector"
 namespace panix\mod\stats\components;
+
 use Yii;
 use panix\engine\CMS;
 use panix\mod\stats\models\StatsSurf;
-class Stats extends \yii\base\Component {
+
+class Stats extends \yii\base\Component
+{
 
     //  protected $fx;
     public $_zp;
@@ -15,11 +18,12 @@ class Stats extends \yii\base\Component {
     public $_cse_m;
     public $_cot_m = null;
     public $_zfx = '';
-   // public $_site;
+    // public $_site;
 
     // protected $today, $dt;
 
-    public function getFx() {
+    public function getFx()
+    {
         if (file_exists(Yii::getAlias('@stats') . "/fix.dat")) {
             return true;
         } else {
@@ -27,12 +31,14 @@ class Stats extends \yii\base\Component {
         }
     }
 
-    public function getSite() {
-      //  return str_replace("www.", "", $_SERVER["HTTP_HOST"]);
+    public function getSite()
+    {
+        //  return str_replace("www.", "", $_SERVER["HTTP_HOST"]);
         return str_replace("www.", "", Yii::$app->request->serverName); // FOR TEST
     }
 
-    public function getSe_n() {
+    public function getSe_n()
+    {
         if ($se_m = file(Yii::getAlias('@stats') . "/se.dat")) {
             for ($i = 0; $i < count($se_m); $i++)
                 $se_m[$i] = iconv("CP1251", "UTF-8", $se_m[$i]);
@@ -48,12 +54,14 @@ class Stats extends \yii\base\Component {
         );
     }
 
-    public function initFull() {
+    public function initFull()
+    {
         $s = $this->initRun();
         $this->_zp = $s['zp'];
     }
 
-    public function initRun() {
+    public function initRun()
+    {
         if ($robots = file(Yii::getAlias('@stats') . "/robots.dat")) {
             $i = 0;
             for ($i = 0; $i < count($robots); $i++)
@@ -84,10 +92,8 @@ class Stats extends \yii\base\Component {
         $this->robo = array_unique($robo);
 
 
-
-
         $zp2 = '';
-        $zp='';
+        $zp = '';
         foreach ($this->rbd as $val) {
             $zp .= " LOWER(user) NOT LIKE '%" . mb_strtolower($val) . "%' AND";
         }
@@ -156,7 +162,8 @@ class Stats extends \yii\base\Component {
         );
     }
 
-    public function getToday() {
+    public function getToday()
+    {
         foreach (StatsMainHistory::model()->findAll() as $rw) {
             $dt_i = $rwz["dt"][] = $rw->dt;
             $rwz["hosts"][$dt_i] = $rw->hosts;
@@ -280,7 +287,6 @@ class Stats extends \yii\base\Component {
         // $r->order('i');
 
 
-
         $i = 0;
         //$res1 = $r->queryRow();
         //  $fdate = $res1['dt'];
@@ -301,7 +307,8 @@ class Stats extends \yii\base\Component {
      * @param date $date date("Ymd")
      * @return array Hits & hosts
      */
-    public function visits($date) {
+    public function visits($date)
+    {
         $sql = Yii::$app->db;
         $sql->createCommand()->selectDistinct('day, dt');
         $sql->createCommand()->from("{$sql->tablePrefix}surf");
@@ -312,7 +319,7 @@ class Stats extends \yii\base\Component {
         $result = $sql->createCommand()->queryAll();
         if (count($result)) {
             foreach ($sql->createCommand()->queryAll() as $dtm) {
-                list($m_hosts[$dtm['dt']], $m_hits[$dtm['dt']]) = $this->countVisits($dtm['dt']);
+                list($m_hosts[$dtm['date']], $m_hits[$dtm['date']]) = $this->countVisits($dtm['date']);
             }
         } else {
             $m_hosts = array(0);
@@ -328,8 +335,9 @@ class Stats extends \yii\base\Component {
      * @param string $date Format date("Ymd")
      * @return array
      */
-    public function visitSystem($date, $fdate = false, $rwz = false) {
-               //$db = Yii::$app->db;
+    public function visitSystem($date, $fdate = false, $rwz = false)
+    {
+        //$db = Yii::$app->db;
         if ($date != $fdate && isset($rwz["search"][$date])) {
             $m_se[$date] = $rwz["search"][$date];
             $m_other[$date] = $rwz["other"][$date];
@@ -359,10 +367,11 @@ class Stats extends \yii\base\Component {
     public $ingoreRoutes = array(
         'admin',
         'admin/*',
-            // 'admin/stats/pagevisit'
+        // 'admin/stats/pagevisit'
     );
 
-    private function checkIgnoreRoute() {
+    private function checkIgnoreRoute()
+    {
         if (in_array(Yii::$app->getRequest()->getPathInfo(), $this->ingoreRoutes)) {
             return false;
         } else {
@@ -373,8 +382,9 @@ class Stats extends \yii\base\Component {
     /**
      * Initialize stats component
      */
-    public function record() {
-        if (!Yii::$app->request->isAjax) { // !$this->checkIgnoreRoute() //check is admin controller
+    public function record()
+    {
+        if (!Yii::$app->request->isAjax || !Yii::$app->request->isPjax) { // !$this->checkIgnoreRoute() //check is admin controller
 
 
             //$timezone = Yii::$app->settings->get('app','default_timezone');
@@ -382,29 +392,25 @@ class Stats extends \yii\base\Component {
             $offset = 0;
 
             $t = time() + 3600 * $offset;
-            
-                            $d = new \DateTime(date("D", $t));
-                $d->setTimezone(new \DateTimeZone($timezone));
-                $day = $d->format('D');
 
-                
-                         $date = new \DateTime(date("Y-m-d", $t));
-                $date->setTimezone(new \DateTimeZone($timezone));
-                $dt = $date->format('Y-m-d');
-            //$day = date("D", $t);
-           // $dt = date("Y-m-d", $t);
-          //  $tm = date("H:i", $t);
-                $time = new \DateTime(date("H:i", $t));
-                $time->setTimezone(new \DateTimeZone($timezone));
-                $tm = $time->format('H:i');
-            
-             
+
+
+
+
+            $dateTime = new \DateTime(date("Y-m-d H:i:s", $t));
+            $dateTime->setTimezone(new \DateTimeZone('UTC'));
+            $date = $dateTime->format('Y-m-d');
+            $time = $dateTime->format('H:i');
+            $day = $dateTime->format('D');
+
+
+
+
             $refer = Yii::$app->request->referrer;
             //$refer = $_SERVER['HTTP_REFERER'];
             $lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
-            $user = $_SERVER['HTTP_USER_AGENT'];
             $req = $_SERVER['REQUEST_URI'];
-            $httpxforward = (isset($_SERVER['HTTP_X_FORWARDED_FOR']))?$_SERVER['HTTP_X_FORWARDED_FOR']:false;
+            $httpxforward = (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : false;
             if ($ip = $httpxforward) {
                 if (!stristr($httpxforward, CMS::getIp()) and !empty($httpxforward))
                     $ip .= ", " . CMS::getIp();
@@ -413,10 +419,10 @@ class Stats extends \yii\base\Component {
                 $proxy = CMS::getIp();
             } else {
                 $ip = CMS::getIp();
-                $proxy = "";
+                $proxy = NULL;
             }
             if ($proxy == $ip)
-                $proxy = "";
+                $proxy = NULL;
             $a = explode(", ", $ip);
             $real_ip = $a[count($a) - 1];
             if (!empty($proxy))
@@ -429,36 +435,36 @@ class Stats extends \yii\base\Component {
                 $host = $ip;
 
 
-            $model = new StatsSurf();
-            $model->day = $day;
-            $model->dt = $dt;
-            $model->tm = $tm;
-            $model->refer = $refer;
-            $model->ip = $ip;
-            $model->proxy = $proxy;
-            $model->host = $host;
-            $model->lang = $lang;
-            $model->user = $user;
-            $model->req = $req;
-            if (!$model->save(false)) {
-                Yii::log('Error save stats', 'info', 'stats');
-            }
+            Yii::$app->db->createCommand()->insert(StatsSurf::tableName(), [
+                'day' => $day,
+                'date' => $date,
+                'time' => $time,
+                'refer' => $refer,
+                'ip' => $ip,
+                'proxy' => $proxy,
+                'host' => $host,
+                'lang' => $lang,
+                'user' => Yii::$app->request->getUserAgent(),
+                'req' => $req,
+            ])->execute();
+            Yii::info(Yii::$app->requestedRoute);
         }
     }
 
     /**
      * @param type $date Format date("Ymd")
-     * @param string $this->_zp Require
-     * @param string $this->_cot_m Require
+     * @param string $this ->_zp Require
+     * @param string $this ->_cot_m Require
      * @return array
      */
-    public function countOther($date) {
+    public function countOther($date)
+    {
 
         if ($this->_cot_m || $this->_zp) {
             $sql = "SELECT COUNT(refer) FROM {{%surf}} WHERE dt='" . $date . "' AND refer <> '' AND LOWER(refer) NOT REGEXP '^(ftp|http|https):\/\/(www.)*" . $this->site . "' AND (LOWER(refer) NOT LIKE '%yand%' AND LOWER(refer) NOT LIKE '%google.%' AND LOWER(refer) NOT LIKE '%go.mail.ru%' AND LOWER(refer) NOT LIKE '%rambler.%' AND LOWER(refer) NOT LIKE '%search.yahoo%' AND LOWER(refer) NOT LIKE '%search.msn%' AND LOWER(refer) NOT LIKE '%bing%' AND LOWER(refer) NOT LIKE '%search.live.com%' AND LOWER(refer) NOT LIKE '%?q=%' AND LOWER(refer) NOT LIKE '%&q=%' AND LOWER(refer) NOT LIKE '%query=%'" . $this->_cot_m . ") AND " . $this->_zp . "";
             //die($sql);
-           //$sql="SELECT COUNT(refer) FROM cms_surf WHERE dt='20150315' AND refer <> '' AND LOWER(refer) NOT REGEXP '^(ftp|http|https):\/\/(www.)*obuvayka.com' AND (LOWER(refer) NOT LIKE '%yand%' AND LOWER(refer) NOT LIKE '%google.%' AND LOWER(refer) NOT LIKE '%go.mail.ru%' AND LOWER(refer) NOT LIKE '%rambler.%' AND LOWER(refer) NOT LIKE '%search.yahoo%' AND LOWER(refer) NOT LIKE '%search.msn%' AND LOWER(refer) NOT LIKE '%bing%' AND LOWER(refer) NOT LIKE '%search.live.com%' AND LOWER(refer) NOT LIKE '%?q=%' AND LOWER(refer) NOT LIKE '%&q=%' AND LOWER(refer) NOT LIKE '%query=%' AND LOWER(refer) NOT LIKE '%webalta.ru%' AND LOWER(refer) NOT LIKE '%icq.com%' AND LOWER(refer) NOT LIKE '%meta.ua%' AND LOWER(refer) NOT LIKE '%all.by%' AND LOWER(refer) NOT LIKE '%nigma.ru%') AND LOWER(user) NOT LIKE '%yandex%' AND LOWER(user) NOT LIKE '%stackrambler%' AND LOWER(user) NOT LIKE '%mail.ru%' AND LOWER(user) NOT LIKE '%google%' AND LOWER(user) NOT LIKE '%msnbot%' AND LOWER(user) NOT LIKE '%bing%' AND LOWER(user) NOT LIKE '%slurp%' AND LOWER(user) NOT LIKE '%add%' AND LOWER(user) NOT LIKE '%crawler%' AND LOWER(user) NOT LIKE '%search%' AND LOWER(user) NOT LIKE '%spider%' AND LOWER(user) NOT LIKE '%libwww-perl%' AND LOWER(user) NOT LIKE '%wget%' AND LOWER(user) NOT LIKE '%java%' AND LOWER(user) NOT LIKE '%bot%' AND LOWER(user) NOT LIKE '%scanner%' AND LOWER(user) NOT LIKE '%ia_archiver%' AND LOWER(user) NOT LIKE '%checker%' AND LOWER(user) NOT LIKE '%link%' AND LOWER(user) NOT LIKE '%php%' AND LOWER(user) NOT LIKE '%rss%' AND LOWER(user) NOT LIKE '%url%' AND LOWER(user) NOT LIKE '%project%' AND LOWER(user) NOT LIKE '%xml%' AND LOWER(user) NOT LIKE '%lwp%' AND LOWER(user) NOT LIKE '%refer%' AND LOWER(user) NOT LIKE '%validator%' AND LOWER(user) NOT LIKE '%porn%' AND LOWER(user) NOT LIKE '%tnx%' AND LOWER(user) NOT LIKE '%xap spider%' AND LOWER(user) NOT LIKE '%www%' AND LOWER(user) NOT LIKE '%site%' AND LOWER(user) NOT LIKE '%http%' AND LOWER(host) NOT LIKE '%msnbot%' AND LOWER(host) NOT LIKE '%asrv130.qwarta.ru%' AND LOWER(host) NOT LIKE '%asrv145.qwarta.ru%' AND LOWER(host) NOT LIKE '%193.232.121.%' AND LOWER(host) NOT LIKE '%94.77.64.%' AND LOWER(user) NOT LIKE ''";
-          //  $sql="SELECT COUNT(refer) FROM cms_surf WHERE dt='20150315' AND refer <> '' AND LOWER(refer) NOT REGEXP '^(ftp|http|https):\/\/(www.)*obuvayka.com' AND (LOWER(refer) NOT LIKE '%yand%' AND LOWER(refer) NOT LIKE '%google.%' AND LOWER(refer) NOT LIKE '%go.mail.ru%' AND LOWER(refer) NOT LIKE '%rambler.%' AND LOWER(refer) NOT LIKE '%search.yahoo%' AND LOWER(refer) NOT LIKE '%search.msn%' AND LOWER(refer) NOT LIKE '%bing%' AND LOWER(refer) NOT LIKE '%search.live.com%' AND LOWER(refer) NOT LIKE '%?q=%' AND LOWER(refer) NOT LIKE '%&q=%' AND LOWER(refer) NOT LIKE '%query=%' AND LOWER(refer) NOT LIKE '%webalta.ru%' AND LOWER(refer) NOT LIKE '%icq.com%' AND LOWER(refer) NOT LIKE '%meta.ua%' AND LOWER(refer) NOT LIKE '%all.by%' AND LOWER(refer) NOT LIKE '%nigma.ru%') AND LOWER(user) NOT LIKE '%yandex%' AND LOWER(user) NOT LIKE '%stackrambler%' AND LOWER(user) NOT LIKE '%mail.ru%' AND LOWER(user) NOT LIKE '%google%' AND LOWER(user) NOT LIKE '%msnbot%' AND LOWER(user) NOT LIKE '%bing%' AND LOWER(user) NOT LIKE '%slurp%' AND LOWER(user) NOT LIKE '%add%' AND LOWER(user) NOT LIKE '%crawler%' AND LOWER(user) NOT LIKE '%search%' AND LOWER(user) NOT LIKE '%spider%' AND LOWER(user) NOT LIKE '%libwww-perl%' AND LOWER(user) NOT LIKE '%wget%' AND LOWER(user) NOT LIKE '%java%' AND LOWER(user) NOT LIKE '%bot%' AND LOWER(user) NOT LIKE '%scanner%' AND LOWER(user) NOT LIKE '%ia_archiver%' AND LOWER(user) NOT LIKE '%checker%' AND LOWER(user) NOT LIKE '%link%' AND LOWER(user) NOT LIKE '%php%' AND LOWER(user) NOT LIKE '%rss%' AND LOWER(user) NOT LIKE '%url%' AND LOWER(user) NOT LIKE '%project%' AND LOWER(user) NOT LIKE '%xml%' AND LOWER(user) NOT LIKE '%lwp%' AND LOWER(user) NOT LIKE '%refer%' AND LOWER(user) NOT LIKE '%validator%' AND LOWER(user) NOT LIKE '%porn%' AND LOWER(user) NOT LIKE '%tnx%' AND LOWER(user) NOT LIKE '%xap spider%' AND LOWER(user) NOT LIKE '%www%' AND LOWER(user) NOT LIKE '%site%' AND LOWER(user) NOT LIKE '%http%' AND LOWER(host) NOT LIKE '%msnbot%' AND LOWER(host) NOT LIKE '%asrv130.qwarta.ru%' AND LOWER(host) NOT LIKE '%asrv145.qwarta.ru%' AND LOWER(host) NOT LIKE '%193.232.121.%' AND LOWER(host) NOT LIKE '%94.77.64.%' AND LOWER(user) NOT LIKE ''";
+            //$sql="SELECT COUNT(refer) FROM cms_surf WHERE dt='20150315' AND refer <> '' AND LOWER(refer) NOT REGEXP '^(ftp|http|https):\/\/(www.)*obuvayka.com' AND (LOWER(refer) NOT LIKE '%yand%' AND LOWER(refer) NOT LIKE '%google.%' AND LOWER(refer) NOT LIKE '%go.mail.ru%' AND LOWER(refer) NOT LIKE '%rambler.%' AND LOWER(refer) NOT LIKE '%search.yahoo%' AND LOWER(refer) NOT LIKE '%search.msn%' AND LOWER(refer) NOT LIKE '%bing%' AND LOWER(refer) NOT LIKE '%search.live.com%' AND LOWER(refer) NOT LIKE '%?q=%' AND LOWER(refer) NOT LIKE '%&q=%' AND LOWER(refer) NOT LIKE '%query=%' AND LOWER(refer) NOT LIKE '%webalta.ru%' AND LOWER(refer) NOT LIKE '%icq.com%' AND LOWER(refer) NOT LIKE '%meta.ua%' AND LOWER(refer) NOT LIKE '%all.by%' AND LOWER(refer) NOT LIKE '%nigma.ru%') AND LOWER(user) NOT LIKE '%yandex%' AND LOWER(user) NOT LIKE '%stackrambler%' AND LOWER(user) NOT LIKE '%mail.ru%' AND LOWER(user) NOT LIKE '%google%' AND LOWER(user) NOT LIKE '%msnbot%' AND LOWER(user) NOT LIKE '%bing%' AND LOWER(user) NOT LIKE '%slurp%' AND LOWER(user) NOT LIKE '%add%' AND LOWER(user) NOT LIKE '%crawler%' AND LOWER(user) NOT LIKE '%search%' AND LOWER(user) NOT LIKE '%spider%' AND LOWER(user) NOT LIKE '%libwww-perl%' AND LOWER(user) NOT LIKE '%wget%' AND LOWER(user) NOT LIKE '%java%' AND LOWER(user) NOT LIKE '%bot%' AND LOWER(user) NOT LIKE '%scanner%' AND LOWER(user) NOT LIKE '%ia_archiver%' AND LOWER(user) NOT LIKE '%checker%' AND LOWER(user) NOT LIKE '%link%' AND LOWER(user) NOT LIKE '%php%' AND LOWER(user) NOT LIKE '%rss%' AND LOWER(user) NOT LIKE '%url%' AND LOWER(user) NOT LIKE '%project%' AND LOWER(user) NOT LIKE '%xml%' AND LOWER(user) NOT LIKE '%lwp%' AND LOWER(user) NOT LIKE '%refer%' AND LOWER(user) NOT LIKE '%validator%' AND LOWER(user) NOT LIKE '%porn%' AND LOWER(user) NOT LIKE '%tnx%' AND LOWER(user) NOT LIKE '%xap spider%' AND LOWER(user) NOT LIKE '%www%' AND LOWER(user) NOT LIKE '%site%' AND LOWER(user) NOT LIKE '%http%' AND LOWER(host) NOT LIKE '%msnbot%' AND LOWER(host) NOT LIKE '%asrv130.qwarta.ru%' AND LOWER(host) NOT LIKE '%asrv145.qwarta.ru%' AND LOWER(host) NOT LIKE '%193.232.121.%' AND LOWER(host) NOT LIKE '%94.77.64.%' AND LOWER(user) NOT LIKE ''";
+            //  $sql="SELECT COUNT(refer) FROM cms_surf WHERE dt='20150315' AND refer <> '' AND LOWER(refer) NOT REGEXP '^(ftp|http|https):\/\/(www.)*obuvayka.com' AND (LOWER(refer) NOT LIKE '%yand%' AND LOWER(refer) NOT LIKE '%google.%' AND LOWER(refer) NOT LIKE '%go.mail.ru%' AND LOWER(refer) NOT LIKE '%rambler.%' AND LOWER(refer) NOT LIKE '%search.yahoo%' AND LOWER(refer) NOT LIKE '%search.msn%' AND LOWER(refer) NOT LIKE '%bing%' AND LOWER(refer) NOT LIKE '%search.live.com%' AND LOWER(refer) NOT LIKE '%?q=%' AND LOWER(refer) NOT LIKE '%&q=%' AND LOWER(refer) NOT LIKE '%query=%' AND LOWER(refer) NOT LIKE '%webalta.ru%' AND LOWER(refer) NOT LIKE '%icq.com%' AND LOWER(refer) NOT LIKE '%meta.ua%' AND LOWER(refer) NOT LIKE '%all.by%' AND LOWER(refer) NOT LIKE '%nigma.ru%') AND LOWER(user) NOT LIKE '%yandex%' AND LOWER(user) NOT LIKE '%stackrambler%' AND LOWER(user) NOT LIKE '%mail.ru%' AND LOWER(user) NOT LIKE '%google%' AND LOWER(user) NOT LIKE '%msnbot%' AND LOWER(user) NOT LIKE '%bing%' AND LOWER(user) NOT LIKE '%slurp%' AND LOWER(user) NOT LIKE '%add%' AND LOWER(user) NOT LIKE '%crawler%' AND LOWER(user) NOT LIKE '%search%' AND LOWER(user) NOT LIKE '%spider%' AND LOWER(user) NOT LIKE '%libwww-perl%' AND LOWER(user) NOT LIKE '%wget%' AND LOWER(user) NOT LIKE '%java%' AND LOWER(user) NOT LIKE '%bot%' AND LOWER(user) NOT LIKE '%scanner%' AND LOWER(user) NOT LIKE '%ia_archiver%' AND LOWER(user) NOT LIKE '%checker%' AND LOWER(user) NOT LIKE '%link%' AND LOWER(user) NOT LIKE '%php%' AND LOWER(user) NOT LIKE '%rss%' AND LOWER(user) NOT LIKE '%url%' AND LOWER(user) NOT LIKE '%project%' AND LOWER(user) NOT LIKE '%xml%' AND LOWER(user) NOT LIKE '%lwp%' AND LOWER(user) NOT LIKE '%refer%' AND LOWER(user) NOT LIKE '%validator%' AND LOWER(user) NOT LIKE '%porn%' AND LOWER(user) NOT LIKE '%tnx%' AND LOWER(user) NOT LIKE '%xap spider%' AND LOWER(user) NOT LIKE '%www%' AND LOWER(user) NOT LIKE '%site%' AND LOWER(user) NOT LIKE '%http%' AND LOWER(host) NOT LIKE '%msnbot%' AND LOWER(host) NOT LIKE '%asrv130.qwarta.ru%' AND LOWER(host) NOT LIKE '%asrv145.qwarta.ru%' AND LOWER(host) NOT LIKE '%193.232.121.%' AND LOWER(host) NOT LIKE '%94.77.64.%' AND LOWER(user) NOT LIKE ''";
             $command = Yii::$app->db->createCommand($sql);
             $res = $command->queryOne(false);
 
@@ -470,10 +476,11 @@ class Stats extends \yii\base\Component {
 
     /**
      * @param type $date Format date("Ymd")
-     * @param string $this->_zfx Require
+     * @param string $this ->_zfx Require
      * @return array
      */
-    public function countFix($date) {
+    public function countFix($date)
+    {
         if (isset($this->_zfx)) {
             $sql = "SELECT COUNT(i) FROM {{%surf}} WHERE (" . $this->_zfx . ") AND dt='" . $date . "' AND " . $this->_zp . "";
             $command = Yii::$app->db->createCommand($sql);
@@ -486,11 +493,12 @@ class Stats extends \yii\base\Component {
 
     /**
      * @param type $date Format date("Ymd")
-     * @param string $this->_zfx Require
-     * @param string $this->_cse_m Require
+     * @param string $this ->_zfx Require
+     * @param string $this ->_cse_m Require
      * @return array
      */
-    public function countSearchEngine($date) {
+    public function countSearchEngine($date)
+    {
         if (isset($this->_cse_m) || isset($this->_zp)) {
             $sql = "SELECT COUNT(refer) FROM {{%surf}} WHERE dt='" . $date . "' AND (LOWER(refer) LIKE '%yand%' OR LOWER(refer) LIKE '%google.%' OR LOWER(refer) LIKE '%go.mail.ru%' OR LOWER(refer) LIKE '%rambler.%' OR LOWER(refer) LIKE '%search.yahoo%' OR LOWER(refer) LIKE '%search.msn%' OR LOWER(refer) LIKE '%bing%' OR LOWER(refer) LIKE '%search.live.com%'" . $this->_cse_m . ") AND LOWER(refer) NOT LIKE '%@%' AND " . $this->_zp . "";
             $command = Yii::$app->db->createCommand($sql);
@@ -503,10 +511,11 @@ class Stats extends \yii\base\Component {
 
     /**
      * @param type $date Format date("Ymd")
-     * @param string $this->_zp Require
+     * @param string $this ->_zp Require
      * @return array
      */
-    public function countVisits($date) {
+    public function countVisits($date)
+    {
 
         $s = $this->initRun();
         $zp = $s['zp'];

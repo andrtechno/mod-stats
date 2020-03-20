@@ -22,7 +22,7 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
 
         foreach (StatsMainHistory::find()->orderBy(['i' => SORT_ASC])->all() as $rw) {
 
-            $dt_i = $rwz["dt"][] = $rw->dt;
+            $dt_i = $rwz["date"][] = $rw->date;
             $rwz["hosts"][$dt_i] = $rw->hosts;
             $rwz["hits"][$dt_i] = $rw->hits;
             $rwz["search"][$dt_i] = $rw->search;
@@ -31,7 +31,7 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
         }
 
         foreach (StatsMainp::find()->all() as $rww) {
-            $dt_i = $rww["dt"] . $rww->god;
+            $dt_i = $rww["date"] . $rww->god;
             $rwzz[$dt_i]["hosts"] = $rww->hosts;
             $rwzz[$dt_i]["hits"] = $rww->hits;
             $rwzz[$dt_i]["search"] = $rww->search;
@@ -70,7 +70,7 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
         
         $query = new \yii\db\Query;
         $query->from('{{%surf}}');
-        $query->select(['day', 'dt']);
+        $query->select(['day', 'date']);
         $query->distinct();
         $query->orderBy(['i' => SORT_DESC])->createCommand(Yii::$app->db2);
         //$query->createCommand();
@@ -100,19 +100,19 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
         
         
         foreach ($query->createCommand($this->db)->queryAll() as $dtm) {
-            if (substr($sdate, 4, 2) <> substr($dtm['dt'], 4, 2) && $sdate <> 0)
+            if (substr($sdate, 4, 2) <> substr($dtm['date'], 4, 2) && $sdate <> 0)
                 $c++;
-            $sdate = $dtm['dt'];
-            if ($dtm['dt'] != $fdate && !empty($rwz["hits"][$dtm['dt']])) {
-                $m_uniqs[$dtm['dt']] = $rwz["hosts"][$dtm['dt']];
-                $m_hits[$dtm['dt']] = $rwz["hits"][$dtm['dt']];
+            $sdate = $dtm['date'];
+            if ($dtm['date'] != $fdate && !empty($rwz["hits"][$dtm['date']])) {
+                $m_uniqs[$dtm['date']] = $rwz["hosts"][$dtm['date']];
+                $m_hits[$dtm['date']] = $rwz["hits"][$dtm['date']];
             } else {
 
                 //die(print_r($this->c_uniqs_hits($dtm[1]['dt'])));
-                list($m_uniqs[$dtm['dt']], $m_hits[$dtm['dt']]) = $stats->countVisits($dtm['dt']);
+                list($m_uniqs[$dtm['date']], $m_hits[$dtm['date']]) = $stats->countVisits($dtm['date']);
             }
         }
-        $sdate = $res['dt'];
+        $sdate = $res['date'];
         $i = 0;
 //mysql_data_seek($r, 0);
 
@@ -122,7 +122,7 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
 
         foreach ($query->createCommand()->queryAll() as $row) {
 
-            $dt = $row['dt'];
+            $dt = $row['date'];
             if ($dt != $fdate && isset($rwz["search"][$dt])) {
                 $m_se[$dt] = $rwz["search"][$dt];
                 $m_other[$dt] = $rwz["other"][$dt];
@@ -139,12 +139,12 @@ class DefaultController extends \panix\mod\stats\components\StatsController {
 
                 if (isset($rwz)) {
 
-                    if ($dt != $fdate && !in_array($dt, $rwz["dt"])) {
+                    if ($dt != $fdate && !in_array($dt, $rwz["date"])) {
                         // die('save');
-                        $sql_insert = "INSERT INTO {{%main_history}}(dt,hosts,hits,search,other,fix) VALUES('" . $dt . "','" . $m_uniqs[$dt] . "','" . $m_hits[$dt] . "','" . $m_se[$dt] . "','" . $m_other[$dt] . "','" . $m_fix[$dt] . "')";
+                        $sql_insert = "INSERT INTO {{%main_history}}(date,hosts,hits,search,other,fix) VALUES('" . $dt . "','" . $m_uniqs[$dt] . "','" . $m_hits[$dt] . "','" . $m_se[$dt] . "','" . $m_other[$dt] . "','" . $m_fix[$dt] . "')";
                         $this->db->createCommand($sql_insert)->execute();
 
-                        $sql_del = "DELETE me FROM {{%main_history}} as me, {{%main_history}} as clone WHERE me.dt = clone.dt AND me.i > clone.i";
+                        $sql_del = "DELETE me FROM {{%main_history}} as me, {{%main_history}} as clone WHERE me.date = clone.date AND me.i > clone.i";
                         $this->db->createCommand($sql_del)->execute();
 
                         //mysql_query("DELETE me FROM mainh as me, mainh as clone WHERE me.dt = clone.dt AND me.i > clone.i");

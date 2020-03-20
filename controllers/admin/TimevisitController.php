@@ -22,28 +22,28 @@ class TimevisitController extends \panix\mod\stats\components\StatsController {
         $k = 0;
 
         if ($this->sort == "hi") {
-            $sql = "SELECT substr(tm,-5,2) as tm FROM {{%surf}} WHERE";
-            $sql .= $this->_zp . " AND dt >= '$this->sdate' AND dt <= '$this->fdate'";
+            $sql = "SELECT substr(time,-5,2) as time FROM {{%surf}} WHERE";
+            $sql .= $this->_zp . " AND date >= '$this->sdate' AND date <= '$this->fdate'";
             $res = $this->db->createCommand($sql);
         } else {
-            $sql = "SELECT substr(tm,-5,2) as tm,ip FROM {{%surf}} WHERE";
-            $sql .= $this->_zp . " AND dt >= '$this->sdate' AND dt <= '$this->fdate' GROUP BY 2,1";
+            $sql = "SELECT substr(time,-5,2) as time,ip FROM {{%surf}} WHERE";
+            $sql .= $this->_zp . " AND date >= '$this->sdate' AND date <= '$this->fdate' GROUP BY 2,1";
             $res = $this->db->createCommand($sql);
         }
         $tmas = [];
         $bcount = 1;
         foreach ($res->queryAll() as $row) {
-      $tmas[$row['tm']] = $bcount;
+      $tmas[$row['time']] = $bcount;
    
             $bcount++;
         }
 
-        $result = array();
+        $result = [];
         ksort($tmas);
         $mmx = max($tmas);
         $cnt = array_sum($tmas);
-        $times = array();
-        $visits = array();
+        $times = [];
+        $visits = [];
         foreach ($tmas as $tm => $val) {
 
             $vse += $val;
@@ -124,8 +124,8 @@ class TimevisitController extends \panix\mod\stats\components\StatsController {
                 $ip .= Html::a('через proxy', '?item=ip&qs=' . $row['proxy'], array('target' => '_blank'));
             }
             $this->result[] = array(
-                'date' => StatsHelper::$DAY[$row['day']] . ' ' . $row['dt'],
-                'time' => $row['tm'],
+                'date' => StatsHelper::$DAY[$row['day']] . ' ' . $row['date'],
+                'time' => $row['time'],
                 'refer' => StatsHelper::renderReferer($row['refer']),
                 'ip' => $ip,
                 'host' => StatsHelper::getRowHost($row['ip'], $row['proxy'], $row['host'], $row['lang']),

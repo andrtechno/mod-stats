@@ -20,7 +20,7 @@ class DetailController extends \panix\mod\stats\components\StatsController {
         $site = $stats['site'];
         $se_n = $stats['se_n'];
         $se_nn = $stats['se_nn'];
-        $sql = "SELECT i,refer,ip,proxy,host,lang,user,tm,req FROM {{%surf}} WHERE dt='" . $date . "' AND " . $this->_zp . " ORDER BY i ASC";
+        $sql = "SELECT i,refer,ip,proxy,host,lang,user,time,req FROM {{%surf}} WHERE date='" . $date . "' AND " . $this->_zp . " ORDER BY i ASC";
         $cmd = $this->db->createCommand($sql);
         $result = array();
 
@@ -93,7 +93,7 @@ class DetailController extends \panix\mod\stats\components\StatsController {
         $stats = Yii::$app->stats->initRun();
         // $zp = $stats['zp'];
         $site = $stats['site'];
-        $sql = "SELECT i,refer,ip,proxy,host,lang,user,tm,req FROM {{%surf}} WHERE dt='" . $date . "' AND " . $this->_zp . " ORDER BY i ASC";
+        $sql = "SELECT i,refer,ip,proxy,host,lang,user,time,req FROM {{%surf}} WHERE date='" . $date . "' AND " . $this->_zp . " ORDER BY i ASC";
         $cmd = $this->db->createCommand($sql);
         $result = array();
         $i1=[];
@@ -154,17 +154,17 @@ class DetailController extends \panix\mod\stats\components\StatsController {
           $this->pageName
           ); */
 
-        $sql = "SELECT i,refer,ip,proxy,host,lang,user,tm,req FROM {{%surf}} WHERE dt='" . $date . "' AND " . $this->_zp . " ORDER BY i ASC";
+        $sql = "SELECT i,refer,ip,proxy,host,lang,user,time,req FROM {{%surf}} WHERE dt='" . $date . "' AND " . $this->_zp . " ORDER BY i ASC";
         $cmd = $this->db->createCommand($sql);
         $result = array();
         foreach ($cmd->queryAll() as $row) {
             //TODO: need fix, bag @array_key_exists "array_key_exists() expects parameter 2 to be array, null given"
             if (@array_key_exists($row['proxy'], $i1_ip)) {
-                $i2[$i1_ip[$row['ip']]][] = array($row['tm'], $row['req']);
+                $i2[$i1_ip[$row['ip']]][] = array($row['time'], $row['req']);
             } else {
                 $i1[$row['i']] = array($row['refer'], $row['ip'], $row['proxy'], $row['host'], $row['lang'], $row['user']);
                 $i1_ip[$row['ip']] = $row['i'];
-                $i2[$i1_ip[$row['ip']]][] = array($row['tm'], $row['req']);
+                $i2[$i1_ip[$row['ip']]][] = array($row['time'], $row['req']);
             }
         }
         $i1 = array_reverse($i1, true);
@@ -210,7 +210,7 @@ class DetailController extends \panix\mod\stats\components\StatsController {
           $this->pageName
           ); */
 
-        $sql = "SELECT tm,refer,ip,proxy,host,lang,user,req from {{%surf}} WHERE dt='" . $date . "' AND " . $this->_zp . " GROUP BY ip ORDER BY i DESC";
+        $sql = "SELECT time,refer,ip,proxy,host,lang,user,req from {{%surf}} WHERE dt='" . $date . "' AND " . $this->_zp . " GROUP BY ip ORDER BY i DESC";
         $cmd = $this->db->createCommand($sql);
         foreach ($cmd->queryAll() as $row) {
 
@@ -222,7 +222,7 @@ class DetailController extends \panix\mod\stats\components\StatsController {
                 $refer1 = StatsHelper::checkIdna($row['refer']);
             }
             $this->result[] = array(
-                'time' => $row['tm'],
+                'time' => $row['time'],
                 'refer' => $refer1,
                 'ip' => StatsHelper::getRowIp($row['ip'], $row['proxy']),
                 'host' => StatsHelper::getRowHost($row['ip'], $row['proxy'], $row['host'], $row['lang']),
@@ -265,7 +265,7 @@ class DetailController extends \panix\mod\stats\components\StatsController {
             $this->pageName
         );
 
-        $sql = "SELECT tm,refer,ip,proxy,host,lang,user,req FROM {{%surf}} WHERE (" . $this->_zfx . ") AND dt='" . $_GET['date'] . "' AND" . $this->_zp . " ORDER BY i DESC";
+        $sql = "SELECT time,refer,ip,proxy,host,lang,user,req FROM {{%surf}} WHERE (" . $this->_zfx . ") AND dt='" . $_GET['date'] . "' AND" . $this->_zp . " ORDER BY i DESC";
         $cmd = Yii::$app->db->createCommand($sql);
 
         foreach ($cmd->queryAll(false) as $row) {

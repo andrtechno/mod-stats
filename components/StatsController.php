@@ -321,7 +321,7 @@ class StatsController extends \panix\engine\controllers\AdminController {
         //  global $s_date, $f_date, $u;
 
 
-        $sql = "SELECT DISTINCT dt FROM {{%surf}} ORDER BY 1 DESC";
+        $sql = "SELECT DISTINCT date FROM {{%surf}} ORDER BY 1 DESC";
         $command = $this->db->createCommand($sql);
 
 
@@ -331,12 +331,12 @@ class StatsController extends \panix\engine\controllers\AdminController {
             switch (Yii::$app->request->get('dy')) {
                 case 1:
                     $cmd = $command->queryColumn();
-                    $s_date = $cmd['dt'];
+                    $s_date = $cmd['date'];
                     $f_date = $s_date;
                     break;
                 case 2:
                     $cmd = $command->queryColumn();
-                    $s_date = $cmd['dt'];
+                    $s_date = $cmd['date'];
                     $f_date = $s_date;
                     break;
                 case 3:
@@ -345,15 +345,15 @@ class StatsController extends \panix\engine\controllers\AdminController {
                     break;
                 case 4:
                     $cmd = $command->queryColumn();
-                    $f_date = $cmd['dt'];
+                    $f_date = $cmd['date'];
                     //die($f_date);
                     //$f_date = mysql_result($res, 0);
                     $f_d = substr($f_date, 0, 4) . substr($f_date, 4, 2);
                     //while ($row = mysql_fetch_row($res)) {
                     foreach ($command->queryAll() as $row) {
-                        $s_d = substr($row['dt'], 0, 4) . substr($row['dt'], 4, 2);
+                        $s_d = substr($row['date'], 0, 4) . substr($row['date'], 4, 2);
                         if ($f_d <> $s_d) {
-                            $f_date = $row['dt'];
+                            $f_date = $row['date'];
                             break;
                         }
                     }

@@ -22,8 +22,8 @@ Yii::app()->tpl->openWidget(array(
 
         ?>
         <tr>
-            <td><?=StatsHelper::$DAY[$item['day']] . $item['dt']?></td>
-            <td><?= $item['tm'] ?></td>
+            <td><?=StatsHelper::$DAY[$item['day']] . $item['date']?></td>
+            <td><?= $item['time'] ?></td>
             <td><?=StatsHelper::Ref($item['refer'])?></td>
             <td width="20%"><?=CMS::ip($item['ip'])?></td>
             <td><?=StatsHelper::getRowHost($item['ip'],$item['proxy'],$item['host'],$item['lang']);?></td>

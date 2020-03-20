@@ -25,13 +25,13 @@ Yii::app()->tpl->openWidget(array(
                 
                echo "<tr>";
 
-                echo "<td nowrap title=" . StatsHelper::$MONTH[substr($ref['dt'], 4, 2)] . ">" . StatsHelper::$DAY[$ref['day']] . $ref['dt'] . "</td>";
+                echo "<td nowrap title=" . StatsHelper::$MONTH[substr($ref['date'], 4, 2)] . ">" . StatsHelper::$DAY[$ref['day']] . $ref['date'] . "</td>";
                 echo "<td align=center>";
                 echo $this->echo_se($engine);
                 if (empty($query))
                     $query = '<span class="text-muted">неизвестно</span>';
                 echo "</td><td align=left style='overflow: hidden;text-overflow: ellipsis;'><a target=_blank href=\"" . $ref['refer'] . "\">" . $query . "</a></td>";
-                echo "<td align=left style='overflow: hidden;text-overflow: ellipsis;' nowrap>" . $ref['tm'] . " <a target=_blank href=" . $ref['req'] . ">" . $ref['req'] . "</a></td></tr>";
+                echo "<td align=left style='overflow: hidden;text-overflow: ellipsis;' nowrap>" . $ref['time'] . " <a target=_blank href=" . $ref['req'] . ">" . $ref['req'] . "</a></td></tr>";
             }
         }
     ?>

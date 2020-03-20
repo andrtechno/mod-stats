@@ -19,9 +19,9 @@ class RobotsController extends \panix\mod\stats\components\StatsController {
         foreach ($this->robo as $val) {
  
                       
-            $this->query->select(['COUNT(i) as count', 'MAX(i) as count_max','dt']);
-            $this->query->andWhere(['>=', 'dt', $this->sdate]);
-            $this->query->andWhere(['<=', 'dt', $this->fdate]);
+            $this->query->select(['COUNT(i) as count', 'MAX(i) as count_max','date']);
+            $this->query->andWhere(['>=', 'date', $this->sdate]);
+            $this->query->andWhere(['<=', 'date', $this->fdate]);
             
             
             $zs = "";
@@ -68,14 +68,14 @@ class RobotsController extends \panix\mod\stats\components\StatsController {
                             $query = new \yii\db\Query;
             $query->from('{{%surf}}');
             $query->where(['i'=>$d]);
-            $query->select(['dt','tm']);
+            $query->select(['date','time']);
             
                // $z2 = "SELECT dt,tm FROM {{surf}} WHERE i = " . $d;
                // $cmd2 = $this->db->createCommand($z2);
                // $r2 = $cmd2->queryOne();
                 $r2= $query->createCommand()->queryOne();
          
-                 $ff_date[$val] = $r2['dt'] . " &nbsp;<font color='#de3163'>" . $r2['tm'] . "</font>";
+                 $ff_date[$val] = $r2['date'] . " &nbsp;<font color='#de3163'>" . $r2['time'] . "</font>";
             }else{
                  $ff_date[$val] = "0 &nbsp;<font color='#de3163'>0</font>";
             }

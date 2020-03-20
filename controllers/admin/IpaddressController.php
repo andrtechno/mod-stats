@@ -18,7 +18,7 @@ class IpaddressController extends \panix\mod\stats\components\StatsController {
         ];
 
         $sql = "SELECT ip, COUNT(ip) cnt FROM {{%surf}} WHERE";
-        $sql .= $this->_zp . " AND dt >= '$this->sdate' AND dt <= '$this->fdate' GROUP BY ip ORDER BY 2 DESC";
+        $sql .= $this->_zp . " AND date >= '$this->sdate' AND date <= '$this->fdate' GROUP BY ip ORDER BY 2 DESC";
 
         $res = $this->db->createCommand($sql)->queryAll(false);
 
@@ -103,14 +103,14 @@ $vse = 0;
             }
  
             $this->result[] = array(
-                'date' => StatsHelper::$DAY[$row['day']] . ' ' . CMS::date($row['dt'].' '.$row['tm']),
+                'date' => StatsHelper::$DAY[$row['day']] . ' ' . CMS::date($row['date'].' '.$row['time']),
                // 'date' => StatsHelper::$DAY[$row['day']] . ' ' . $row['dt'],
-                'time' => $row['tm'],
+                'time' => $row['time'],
                 'refer' => StatsHelper::renderReferer($row['refer']),
                 'ip' => $ip,
                 'host' => StatsHelper::getRowHost($row['ip'], $row['proxy'], $row['host'], $row['lang']),
                 'user_agent' => StatsHelper::getRowUserAgent($row['user'], $row['refer']),
-                'page' => Html::link($row['req'], $row['req'], array('target' => '_blank')),
+                'page' => Html::a($row['req'], $row['req'], ['target' => '_blank']),
             );
         }
 

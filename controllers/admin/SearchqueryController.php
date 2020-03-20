@@ -36,9 +36,9 @@ class SearchqueryController extends \panix\mod\stats\components\StatsController 
         } else
             $e = "LOWER(refer) LIKE '%yand%' OR LOWER(refer) LIKE '%google.%' OR LOWER(refer) LIKE '%go.mail.ru%' OR LOWER(refer) LIKE '%rambler.%' OR LOWER(refer) LIKE '%search.yahoo%' OR LOWER(refer) LIKE '%search.msn%' OR LOWER(refer) LIKE '%bing%' OR LOWER(refer) LIKE '%search.live.com%' OR LOWER(refer) LIKE '%?q=%' OR LOWER(refer) LIKE '%&q=%' OR LOWER(refer) LIKE '%query=%'" . $this->_cse_m;
         if ($this->sort == "hi") {
-            $sql = "SELECT refer,req FROM {{%surf}} WHERE dt >= '$this->sdate' AND dt <= '$this->fdate' AND ($e) AND LOWER(refer) NOT LIKE '%@%' AND" . $this->_zp;
+            $sql = "SELECT refer,req FROM {{%surf}} WHERE date >= '$this->sdate' AND date <= '$this->fdate' AND ($e) AND LOWER(refer) NOT LIKE '%@%' AND" . $this->_zp;
         } else {
-            $sql = "SELECT refer,req,ip FROM {{%surf}} WHERE dt >= '$this->sdate' AND dt <= '$this->fdate' AND ($e) AND LOWER(refer) NOT LIKE '%@%' AND" . $this->_zp . " GROUP BY ip,refer";
+            $sql = "SELECT refer,req,ip FROM {{%surf}} WHERE date >= '$this->sdate' AND date <= '$this->fdate' AND ($e) AND LOWER(refer) NOT LIKE '%@%' AND" . $this->_zp . " GROUP BY ip,refer";
         }
         $res = $this->db->createCommand($sql);
         $qmas = [];

@@ -22,8 +22,8 @@ class m180919_201626_stats_curf extends Migration
         $this->createTable(StatsSurf::tableName(), [
             'i' => $this->primaryKey(),
             'day' => $this->char(3)->null()->defaultValue(null),
-            'dt' => $this->date()->null()->defaultValue(null),
-            'tm' => $this->char(5)->null()->defaultValue(null),
+            'date' => $this->date()->null()->defaultValue(null),
+            'time' => $this->char(5)->null()->defaultValue(null),
             'refer' => $this->text()->null()->defaultValue(null),
             'ip' => $this->char(64)->null()->defaultValue(null),
             'proxy' => $this->char(64)->null()->defaultValue(null),

@@ -156,7 +156,7 @@ class Stats extends CApplicationComponent {
 
     public function getToday() {
         foreach (StatsMainHistory::model()->findAll() as $rw) {
-            $dt_i = $rwz["dt"][] = $rw->dt;
+            $dt_i = $rwz["date"][] = $rw->date;
             $rwz["hosts"][$dt_i] = $rw->hosts;
             $rwz["hits"][$dt_i] = $rw->hits;
             $rwz["search"][$dt_i] = $rw->search;
@@ -165,7 +165,7 @@ class Stats extends CApplicationComponent {
         }
 
         foreach (StatsMainp::model()->findAll() as $rww) {
-            $dt_i = $rww["dt"] . $rww->god;
+            $dt_i = $rww["date"] . $rww->god;
             $rwzz[$dt_i]["hosts"] = $rww->hosts;
             $rwzz[$dt_i]["hits"] = $rww->hits;
             $rwzz[$dt_i]["search"] = $rww->search;
@@ -310,7 +310,7 @@ class Stats extends CApplicationComponent {
         $result = $sql->createCommand()->queryAll();
         if (count($result)) {
             foreach ($sql->createCommand()->queryAll() as $dtm) {
-                list($m_hosts[$dtm['dt']], $m_hits[$dtm['dt']]) = $this->countVisits($dtm['dt']);
+                list($m_hosts[$dtm['date']], $m_hits[$dtm['date']]) = $this->countVisits($dtm['date']);
             }
         } else {
             $m_hosts = array(0);
@@ -413,8 +413,8 @@ class Stats extends CApplicationComponent {
 
             $model = new StatsSurf();
             $model->day = $day;
-            $model->dt = $dt;
-            $model->tm = $tm;
+            $model->date = $dt;
+            $model->time = $tm;
             $model->refer = $refer;
             $model->ip = $ip;
             $model->proxy = $proxy;
