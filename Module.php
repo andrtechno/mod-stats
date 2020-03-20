@@ -41,14 +41,14 @@ class Module extends WebModule {
                             ],
                             [
                                 'label' => Yii::t('stats/default', 'TIMEVISIT'),
-                                'url' => ['/admin/stats/timevisit'],
-                                'active' => ($c == 'admin/timevisit') ? true : false,
+                                'url' => ['/admin/stats/visit-time'],
+                                'active' => ($c == 'admin/visit-time') ? true : false,
                                 'icon' => Html::icon('icon-time')
                             ],
                             [
                                 'label' => Yii::t('stats/default', 'PAGEVISIT'),
-                                'url' => ['/admin/stats/pagevisit'],
-                                'active' => ($c == 'admin/pagevisit') ? true : false,
+                                'url' => ['/admin/stats/visit-page'],
+                                'active' => ($c == 'admin/visit-page') ? true : false,
                                 'icon' => Html::icon('icon-monitor-stats')
                             ],
                             [
@@ -65,8 +65,8 @@ class Module extends WebModule {
                             ],
                             [
                                 'label' => Yii::t('stats/default', 'IP_ADDRESS'),
-                                'url' => ['/admin/stats/ipaddress'],
-                                'active' => ($c == 'admin/ipaddress') ? true : false,
+                                'url' => ['/admin/stats/ip-address'],
+                                'active' => ($c == 'admin/ip-address') ? true : false,
                                 'icon' => Html::icon('icon-ip')
                             ],
                             [
