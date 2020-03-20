@@ -118,9 +118,7 @@ class RobotsController extends StatsController
                     'progressbar' => $this->progressBar(ceil(($co * 100) / $mmx), number_format((($co * 100) / $cn), 1, '.', '')),
                     'detail' => StatsHelper::linkDetail("robots/detail?s_date={$this->sdate}&f_date={$this->fdate}&qs={$val}")
                 ];
-                ?>
 
-                <?php
 
             }
         }
@@ -130,18 +128,7 @@ class RobotsController extends StatsController
                 'pageSize' => 10,
             ]
         ]);
-        /*  $dataProvider = new CArrayDataProvider($result, array(
-              'sort' => array(
-                  'attributes' => array(
-                      'bot',
-                      'visit',
-                      'count'
-                  ),
-              ),
-              'pagination' => array(
-                  'pageSize' => 10,
-              ),
-          ));*/
+
         return $this->render('index', [
             'dataProvider' => $dataProvider,
             'cnt' => $cnt,

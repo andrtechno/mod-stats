@@ -24,10 +24,48 @@ class RefdomainController extends StatsController
             $this->pageName
         ];
 
-        $sql = "SELECT refer,ip,req FROM {$this->tableSurf} WHERE date >= '$this->sdate' AND date <= '$this->fdate' AND refer <> '' AND LOWER(refer) NOT LIKE '%://" . $this->_site . "%' AND LOWER(refer) NOT LIKE '" . $this->_site . "%' AND LOWER(refer) NOT LIKE '%://www." . $this->_site . "%' AND (LOWER(refer) NOT LIKE '%yand%' AND LOWER(refer) NOT LIKE '%google.%' AND LOWER(refer) NOT LIKE '%go.mail.ru%' AND LOWER(refer) NOT LIKE '%rambler.%' AND LOWER(refer) NOT LIKE '%search.yahoo%' AND LOWER(refer) NOT LIKE '%search.msn%' AND LOWER(refer) NOT LIKE '%bing%' AND LOWER(refer) NOT LIKE '%search.live.com%' AND LOWER(refer) NOT LIKE '%?q=%' AND LOWER(refer) NOT LIKE '%&q=%' AND LOWER(refer) NOT LIKE '%query=%'" . $this->_cot_m . ") AND" . $this->_zp . (($this->sort == "ho" or empty($this->sort)) ? "GROUP BY ip,refer" : "");
-        // $res = mysql_query($z);
-        $res = $this->db->createCommand($sql)->queryAll(false);
 
+        /** @var \yii\db\Query $query */
+        $query = $this->query;
+        $query->select(['refer', 'ip', 'req']);
+        $query->where(['>=', 'date', $this->sdate]);
+        $query->andWhere(['<=', 'date', $this->sdate]);
+        $query->andWhere(['<>', 'refer', '']);
+
+        $query->andWhere(['not like', 'LOWER(refer)', [
+            '://' . $this->_site,
+            $this->_site,
+            '://www' . $this->_site,
+            'yand',
+            'google.',
+            'go.mail.ru',
+            'rambler.',
+            'search.yahoo',
+            'search.msn',
+            'bing',
+            'search.live.com',
+            '?q=',
+            '&q=',
+            'query='
+        ]]);
+        foreach ($this->_cot_m_queries as $q) {
+            $query->andWhere($q);
+        }
+        foreach ($this->_zp_queries as $q) {
+            $query->andWhere($q);
+        }
+        if ($this->sort == "ho" || empty($this->sort)) {
+            $query->groupBy(['ip', 'refer']);
+        }
+        $res = $query->createCommand()->queryAll(false);
+        //  echo $query->createCommand()->rawSql;
+        //     echo '<br><br><br><br>';
+
+        // $sql2 = " NOT LIKE '%query=%'" . $this->_cot_m . ") AND" . $this->_zp . (($this->sort == "ho" or empty($this->sort)) ? "GROUP BY ip,refer" : "");
+        // $sql = "SELECT refer,ip,req FROM {$this->tableSurf} WHERE date >= '$this->sdate' AND date <= '$this->fdate' AND refer <> '' AND LOWER(refer) NOT LIKE '%://" . $this->_site . "%' AND LOWER(refer) NOT LIKE '" . $this->_site . "%' AND LOWER(refer) NOT LIKE '%://www." . $this->_site . "%' AND (LOWER(refer) NOT LIKE '%yand%' AND LOWER(refer) NOT LIKE '%google.%' AND LOWER(refer) NOT LIKE '%go.mail.ru%' AND LOWER(refer) NOT LIKE '%rambler.%' AND LOWER(refer) NOT LIKE '%search.yahoo%' AND LOWER(refer) NOT LIKE '%search.msn%' AND LOWER(refer) NOT LIKE '%bing%' AND LOWER(refer) NOT LIKE '%search.live.com%' AND LOWER(refer) NOT LIKE '%?q=%' AND LOWER(refer) NOT LIKE '%&q=%' AND LOWER(refer) NOT LIKE '%query=%'" . $this->_cot_m . ") AND" . $this->_zp . (($this->sort == "ho" or empty($this->sort)) ? "GROUP BY ip,refer" : "");
+        // echo $sql;die;
+        // $res = $this->db->createCommand($sql)->queryAll(false);
+        $othmas = [];
         foreach ($res as $row) {
 
             //while ($row = mysql_fetch_row($res)) {
@@ -48,7 +86,11 @@ class RefdomainController extends StatsController
         //   if (!isset($othmas)) {
         //       echo "<center>Нет данных</center>";
         //  }
-        $newmas = array_count_values($othmas);
+        $newmas=[];
+        if($othmas)
+            $newmas = array_count_values($othmas);
+
+
         arsort($newmas);
         $mmx = max($newmas);
         $cnt = array_sum($newmas);

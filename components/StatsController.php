@@ -52,6 +52,7 @@ class StatsController extends \panix\engine\controllers\AdminController
     public $_zp2; //zp2
     public $_cse_m = ''; //$cse_m
     public $_cot_m = ''; //cot_m
+    public $_cot_m_queries = [];
     public $_site; //site
     public $_zfx; //$zfx
     public $rbd;
@@ -227,6 +228,7 @@ class StatsController extends \panix\engine\controllers\AdminController
         foreach ($se_nn as $val) {
             $this->_cse_m .= " OR LOWER(refer) LIKE '%$val%'";
             $this->_cot_m .= " AND LOWER(refer) NOT LIKE '%$val%'";
+            $this->_cot_m_queries[] = ['not like','LOWER(refer)','%'.$val.'%'];
         }
 
         /* $pages = $_GET['pages'];

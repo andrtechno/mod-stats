@@ -71,8 +71,8 @@ class Module extends WebModule {
                             ],
                             [
                                 'label' => Yii::t('stats/default', 'Поисковые запросы'),
-                                'url' => ['/admin/stats/searchquery'],
-                                'active' => ($c == 'admin/searchquery' && $a == 'index') ? true : false,
+                                'url' => ['/admin/stats/search-query'],
+                                'active' => ($c == 'admin/search-query' && $a == 'index') ? true : false,
                                 'icon' => Html::icon('icon-search')
                             ],
                             [
