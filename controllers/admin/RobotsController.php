@@ -6,6 +6,7 @@ use panix\engine\CMS;
 use panix\mod\stats\components\StatsHelper;
 use panix\mod\stats\components\StatsController;
 use Yii;
+use yii\db\Query;
 
 class RobotsController extends StatsController
 {
@@ -142,32 +143,48 @@ class RobotsController extends StatsController
     {
         $qs = $_GET['qs'];
         $this->pageName = Yii::t('stats/default', 'ROBOTS');
-        $this->breadcrumbs = array(
-            Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
-            $this->pageName => array('/admin/stats/robots'),
-            $qs
-        );
 
-
+        $this->breadcrumbs[]=[
+            'label'=>Yii::t('stats/default', 'MODULE_NAME'),
+            'url'=>['/admin/stats']
+        ];
+        $this->breadcrumbs[]=[
+            'label'=>$this->pageName,
+            'url'=>['/admin/stats/robots']
+        ];
+        $this->breadcrumbs[]=$qs;
         $zs = "";
         $pf = "";
+        /** @var Query $query */
+        $query = $this->query;
+        $query->select('*');
+        $query->where(['>=', 'date', $this->sdate]);
+        $query->andWhere(['<=', 'date', $this->sdate]);
         if (isset($this->rbdn[$qs]))
             foreach ($this->rbdn[$qs] as $vl) {
+                $query->andWhere(['LIKE', 'LOWER(user)', mb_strtolower($vl)]);
                 $zs .= $pf . "LOWER(user) LIKE '%" . mb_strtolower($vl) . "%'";
                 $pf = " OR ";
             }
         if (isset($this->hbdn[$qs]))
             foreach ($this->hbdn[$qs] as $vl) {
+                $query->andWhere(['LIKE', 'LOWER(host)', mb_strtolower($vl)]);
                 $zs .= $pf . "LOWER(host) LIKE '%" . mb_strtolower($vl) . "%'";
                 $pf = " OR ";
             }
+
+        $query->orderBy(['i'=>SORT_DESC]);
         // $res = mysql_query("SELECT day,dt,tm,refer,ip,proxy,host,lang,user,req FROM " . $tablePref . "surf WHERE (" . $zs . ") AND " . $zp2 . " dt >= '$s_date' AND dt <= '$f_date' ORDER BY i DESC");
         $sql = "SELECT day,date,time,refer,ip,proxy,host,lang,user,req FROM {$this->tableSurf} WHERE (" . $zs . ") AND " . $this->_zp2 . " date >= '$this->sdate' AND date <= '$this->fdate' ORDER BY i DESC";
         $cmd = $this->db->createCommand($sql);
+       // echo $cmd->rawSql;
+       // echo '<br><br><br>';
+       // echo $query->createCommand()->rawSql;
 
+       // die;
         $r = $cmd->queryAll();
-        $this->render('detail', [
-            'items' => $r,
+        return $this->render('detail', [
+            'items' => $query->createCommand()->queryAll(),
         ]);
     }
 

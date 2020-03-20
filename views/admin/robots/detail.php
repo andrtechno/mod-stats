@@ -1,8 +1,6 @@
 <?php
-$this->timefilter();
-Yii::app()->tpl->openWidget(array(
-    'title' => $this->pageName,
-));
+//$this->timefilter();
+use panix\mod\stats\components\StatsHelper;
 ?>
 <div class="table-responsive">
 <table class="table table-bordered">
@@ -22,10 +20,10 @@ Yii::app()->tpl->openWidget(array(
 
         ?>
         <tr>
-            <td><?=StatsHelper::$DAY[$item['day']] . $item['date']?></td>
+            <td><?=\panix\mod\stats\components\StatsHelper::$DAY[$item['day']] . $item['date']?></td>
             <td><?= $item['time'] ?></td>
             <td><?=StatsHelper::Ref($item['refer'])?></td>
-            <td width="20%"><?=CMS::ip($item['ip'])?></td>
+            <td width="20%"><?= $item['ip']; ?></td>
             <td><?=StatsHelper::getRowHost($item['ip'],$item['proxy'],$item['host'],$item['lang']);?></td>
             <td><?= $item['user'] ?></td>
             <td><?= $item['req'] ?></td>
@@ -35,6 +33,4 @@ Yii::app()->tpl->openWidget(array(
     ?>
 </table>
 </div>
-<?php
-Yii::app()->tpl->closeWidget();
-?>
+
