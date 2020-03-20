@@ -26,13 +26,13 @@ class BrowsersController extends StatsController
         $bmas = [];
         $ipmas = [];
         if ($this->sort == "hi") {
-            $sql = "SELECT user FROM {{%surf}} WHERE date >= '$this->sdate' AND date <= '$this->fdate' AND " . $this->_zp;
+            $sql = "SELECT user FROM {$this->tableSurf} WHERE date >= '$this->sdate' AND date <= '$this->fdate' AND " . $this->_zp;
             $command = $this->db->createCommand($sql);
             foreach ($command->queryAll() as $row) {
                 $bmas[StatsHelper::getBrowser($row['user'])]++;
             }
         } else {
-            $sql = "SELECT user, ip FROM {{%surf}} WHERE date >= '$this->sdate' AND date <= '$this->fdate' AND " . $this->_zp . " GROUP BY ip, user";
+            $sql = "SELECT user, ip FROM {$this->tableSurf} WHERE date >= '$this->sdate' AND date <= '$this->fdate' AND " . $this->_zp . " GROUP BY ip, user";
             $command = $this->db->createCommand($sql);
             $bcount = 1;
             foreach ($command->queryAll() as $row) {
@@ -124,14 +124,14 @@ class BrowsersController extends StatsController
         $k = 0;
         //$db = Yii::$app->db;
         if ($this->sort == "hi") {
-            $sql = "SELECT user, COUNT(user) cnt FROM {{%surf}} WHERE";
+            $sql = "SELECT user, COUNT(user) cnt FROM {$this->tableSurf} WHERE";
             $sql .= $this->_zp . " AND date >= '$this->sdate' AND date <= '$this->fdate' " . (isset($brw) ? StatsHelper::GetBrw($brw) : "") . " GROUP BY user ORDER BY 2 DESC";
             $res = $this->db->createCommand($sql);
             $full_sql = "SELECT SUM(t.cnt) AS cnt FROM (" . $sql . ") t";
             $r = $this->db->createCommand($full_sql);
         } else {
 
-            $sql = "CREATE TEMPORARY TABLE {{%tmp_surf}} SELECT ip, user FROM {{%surf}} WHERE";
+            $sql = "CREATE TEMPORARY TABLE {{%tmp_surf}} SELECT ip, user FROM {$this->tableSurf} WHERE";
             $sql .= $this->_zp . " AND date >= '$this->sdate' AND date <= '$this->fdate' " . (isset($brw) ? StatsHelper::GetBrw($brw) : "") . " GROUP BY ip" . (!isset($brw) ? ",user" : "");
             $sql2 = "SELECT user, COUNT(user) cnt FROM {{%tmp_surf}} GROUP BY USER ORDER BY 2 DESC";
             $res = $this->db->createCommand($sql);
@@ -205,7 +205,7 @@ class BrowsersController extends StatsController
     public function actionDetail()
     {
         $pz = 0;
-        $sql = "SELECT * FROM {{%surf}} WHERE date >= '$this->sdate' AND date <= '$this->fdate' " . StatsHelper::GetBrw(Yii::$app->request->get('brw')) . (($pz == 1) ? " AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY ip" : "") . " ORDER BY i DESC";
+        $sql = "SELECT * FROM {$this->tableSurf} WHERE date >= '$this->sdate' AND date <= '$this->fdate' " . StatsHelper::GetBrw(Yii::$app->request->get('brw')) . (($pz == 1) ? " AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY ip" : "") . " ORDER BY i DESC";
         $cmd = $this->db->createCommand($sql);
 
         $items = $cmd->queryAll();

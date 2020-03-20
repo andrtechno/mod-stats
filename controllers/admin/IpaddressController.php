@@ -1,6 +1,7 @@
 <?php
 namespace panix\mod\stats\controllers\admin;
 
+use panix\mod\stats\models\StatsSurf;
 use Yii;
 use panix\engine\CMS;
 use panix\engine\Html;
@@ -16,8 +17,8 @@ class IpaddressController extends \panix\mod\stats\components\StatsController {
             ],
             $this->pageName
         ];
-
-        $sql = "SELECT ip, COUNT(ip) cnt FROM {{%surf}} WHERE";
+        $tableSurf = StatsSurf::tableName();
+        $sql = "SELECT ip, COUNT(ip) cnt FROM {$tableSurf} WHERE";
         $sql .= $this->_zp . " AND date >= '$this->sdate' AND date <= '$this->fdate' GROUP BY ip ORDER BY 2 DESC";
 
         $res = $this->db->createCommand($sql)->queryAll(false);

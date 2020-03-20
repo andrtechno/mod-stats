@@ -22,11 +22,11 @@ class TimevisitController extends \panix\mod\stats\components\StatsController {
         $k = 0;
 
         if ($this->sort == "hi") {
-            $sql = "SELECT substr(time,-5,2) as time FROM {{%surf}} WHERE";
+            $sql = "SELECT substr(time,-5,2) as time FROM {$this->tableSurf} WHERE";
             $sql .= $this->_zp . " AND date >= '$this->sdate' AND date <= '$this->fdate'";
             $res = $this->db->createCommand($sql);
         } else {
-            $sql = "SELECT substr(time,-5,2) as time,ip FROM {{%surf}} WHERE";
+            $sql = "SELECT substr(time,-5,2) as time,ip FROM {$this->tableSurf} WHERE";
             $sql .= $this->_zp . " AND date >= '$this->sdate' AND date <= '$this->fdate' GROUP BY 2,1";
             $res = $this->db->createCommand($sql);
         }
@@ -98,7 +98,7 @@ class TimevisitController extends \panix\mod\stats\components\StatsController {
     public function actionDetail() {
         $qs = Yii::$app->request->get('qs');
         $tz = Yii::$app->request->get('tz');
-        $sql = "SELECT day,dt,tm,refer,ip,proxy,host,lang,user,req FROM {{%surf}} WHERE (tm LIKE '%" . addslashes($qs) . "%') AND dt >= '$this->sdate' AND dt <= '$this->fdate' " . ((Yii::$app->request->get('pz') == 1) ? "AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY " . (($tz == 7) ? "host" : "ip") : "") . " ORDER BY i DESC";
+        $sql = "SELECT day,dt,tm,refer,ip,proxy,host,lang,user,req FROM {$this->tableSurf} WHERE (tm LIKE '%" . addslashes($qs) . "%') AND dt >= '$this->sdate' AND dt <= '$this->fdate' " . ((Yii::$app->request->get('pz') == 1) ? "AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY " . (($tz == 7) ? "host" : "ip") : "") . " ORDER BY i DESC";
         $res = $this->db->createCommand($sql);
 
 

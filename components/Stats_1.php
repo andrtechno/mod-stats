@@ -155,7 +155,7 @@ class Stats extends CApplicationComponent {
     }
 
     public function getToday() {
-        foreach (StatsMainHistory::model()->findAll() as $rw) {
+        foreach (StatsHistory::model()->findAll() as $rw) {
             $dt_i = $rwz["date"][] = $rw->date;
             $rwz["hosts"][$dt_i] = $rw->hosts;
             $rwz["hits"][$dt_i] = $rw->hits;
@@ -164,7 +164,7 @@ class Stats extends CApplicationComponent {
             $rwz["fix"][$dt_i] = $rw->fix;
         }
 
-        foreach (StatsMainp::model()->findAll() as $rww) {
+        foreach (StatsMain::model()->findAll() as $rww) {
             $dt_i = $rww["date"] . $rww->god;
             $rwzz[$dt_i]["hosts"] = $rww->hosts;
             $rwzz[$dt_i]["hits"] = $rww->hits;

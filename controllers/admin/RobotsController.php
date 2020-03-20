@@ -1,38 +1,41 @@
 <?php
+
 namespace panix\mod\stats\controllers\admin;
+
 use Yii;
 
-class RobotsController extends \panix\mod\stats\components\StatsController {
+class RobotsController extends \panix\mod\stats\components\StatsController
+{
 
-    public function actionIndex() {
+    public function actionIndex()
+    {
         $this->pageName = Yii::t('stats/default', 'ROBOTS');
         $this->breadcrumbs = [
             [
-                'label'=>Yii::t('stats/default', 'MODULE_NAME'),
-                'url'=>['/stats']
+                'label' => Yii::t('stats/default', 'MODULE_NAME'),
+                'url' => ['/stats']
             ],
             $this->pageName
         ];
-        
 
-            
+
         foreach ($this->robo as $val) {
- 
-                      
-            $this->query->select(['COUNT(i) as count', 'MAX(i) as count_max','date']);
+
+
+            $this->query->select(['COUNT(i) as count', 'MAX(i) as count_max', 'date']);
             $this->query->andWhere(['>=', 'date', $this->sdate]);
             $this->query->andWhere(['<=', 'date', $this->fdate]);
-            
-            
+
+
             $zs = "";
             $pf = "";
             if (empty($val))
                 continue;
-            if (isset($this->rbdn[$val])){
+            if (isset($this->rbdn[$val])) {
                 foreach ($this->rbdn[$val] as $vl) {
-                   $zs .= $pf . "LOWER(user) LIKE '%" . mb_strtolower($vl) . "%'";
+                    $zs .= $pf . "LOWER(user) LIKE '%" . mb_strtolower($vl) . "%'";
                     $pf = " OR ";
-                   $this->query->andWhere(['like', 'LOWER(user)', mb_strtolower($vl)]);
+                    $this->query->andWhere(['like', 'LOWER(user)', mb_strtolower($vl)]);
                 }
             }
             if (isset($this->hbdn[$val]))
@@ -43,16 +46,16 @@ class RobotsController extends \panix\mod\stats\components\StatsController {
                 }
 
 
-                 //   $res = $this->query->createCommand()->queryOne();  
-               // print_r($res);die;
-         //   echo $this->query->createCommand()->rawSql;die;
-        
-                
-                //print_r($res);die;
-                
-                
-            //$sql = "SELECT COUNT(i), MAX(i) FROM {{%surf}} WHERE (" . $zs . ") AND " . $this->_zp2 . " dt >= '$this->sdate' AND dt <= '$this->fdate'";
-            
+            //   $res = $this->query->createCommand()->queryOne();
+            // print_r($res);die;
+            //   echo $this->query->createCommand()->rawSql;die;
+
+
+            //print_r($res);die;
+
+
+            //$sql = "SELECT COUNT(i), MAX(i) FROM {$this->tableSurf} WHERE (" . $zs . ") AND " . $this->_zp2 . " dt >= '$this->sdate' AND dt <= '$this->fdate'";
+
 
             //$cmd = $this->db->createCommand($sql);
 
@@ -65,31 +68,30 @@ class RobotsController extends \panix\mod\stats\components\StatsController {
 
             if ($cnt[$val] > 0) {
                 die('s');
-                            $query = new \yii\db\Query;
-            $query->from('{{%surf}}');
-            $query->where(['i'=>$d]);
-            $query->select(['date','time']);
-            
-               // $z2 = "SELECT dt,tm FROM {{surf}} WHERE i = " . $d;
-               // $cmd2 = $this->db->createCommand($z2);
-               // $r2 = $cmd2->queryOne();
-                $r2= $query->createCommand()->queryOne();
-         
-                 $ff_date[$val] = $r2['date'] . " &nbsp;<font color='#de3163'>" . $r2['time'] . "</font>";
-            }else{
-                 $ff_date[$val] = "0 &nbsp;<font color='#de3163'>0</font>";
+                $query = new \yii\db\Query;
+                $query->from($this->tableSurf);
+                $query->where(['i' => $d]);
+                $query->select(['date', 'time']);
+
+                // $z2 = "SELECT dt,tm FROM {{surf}} WHERE i = " . $d;
+                // $cmd2 = $this->db->createCommand($z2);
+                // $r2 = $cmd2->queryOne();
+                $r2 = $query->createCommand()->queryOne();
+
+                $ff_date[$val] = $r2['date'] . " &nbsp;<font color='#de3163'>" . $r2['time'] . "</font>";
+            } else {
+                $ff_date[$val] = "0 &nbsp;<font color='#de3163'>0</font>";
             }
-           
+
         }
         arsort($cnt);
         $mmx = max($cnt);
         $cn = array_sum($cnt);
         $result = array();
- $k=0;
+        $k = 0;
         foreach ($cnt as $val => $co) {
             if ($co <> 0) {
                 $k++;
-
 
 
                 $result[] = array(
@@ -106,24 +108,24 @@ class RobotsController extends \panix\mod\stats\components\StatsController {
 
             }
         }
-                 $dataProvider = new \yii\data\ArrayDataProvider([
-                'allModels' => $result,
-                'pagination' => [
+        $dataProvider = new \yii\data\ArrayDataProvider([
+            'allModels' => $result,
+            'pagination' => [
                 'pageSize' => 10,
             ]
-            ]);
-      /*  $dataProvider = new CArrayDataProvider($result, array(
-            'sort' => array(
-                'attributes' => array(
-                    'bot',
-                    'visit',
-                    'count'
-                ),
-            ),
-            'pagination' => array(
-                'pageSize' => 10,
-            ),
-        ));*/
+        ]);
+        /*  $dataProvider = new CArrayDataProvider($result, array(
+              'sort' => array(
+                  'attributes' => array(
+                      'bot',
+                      'visit',
+                      'count'
+                  ),
+              ),
+              'pagination' => array(
+                  'pageSize' => 10,
+              ),
+          ));*/
         return $this->render('index', array(
             'dataProvider' => $dataProvider,
             'cnt' => $cnt,
@@ -133,7 +135,8 @@ class RobotsController extends \panix\mod\stats\components\StatsController {
         ));
     }
 
-    public function actionDetail() {
+    public function actionDetail()
+    {
         $qs = $_GET['qs'];
         $this->pageName = Yii::t('stats/default', 'ROBOTS');
         $this->breadcrumbs = array(
@@ -141,7 +144,6 @@ class RobotsController extends \panix\mod\stats\components\StatsController {
             $this->pageName => array('/admin/stats/robots'),
             $qs
         );
-
 
 
         $zs = "";

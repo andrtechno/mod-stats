@@ -23,14 +23,14 @@ class PagevisitController extends \panix\mod\stats\components\StatsController {
         $zp = $stats['zp'];
 
         if ($this->sort == "hi") {
-            $z = "SELECT req, COUNT(req) cnt FROM {{%surf}} WHERE";
+            $z = "SELECT req, COUNT(req) cnt FROM {$this->tableSurf} WHERE";
             $z .= $zp . " AND date >= '$this->sdate' AND date <= '$this->fdate' GROUP BY req ORDER BY 2 DESC";
             $res = $this->db->createCommand($z)->queryAll();
 
             $z2 = "SELECT SUM(t.cnt) as cnt FROM (" . $z . ") t";
             $r = $this->db->createCommand($z2)->queryOne();
         } else {
-            $z = "CREATE TEMPORARY TABLE IF NOT EXISTS {{%tmp_surf}} SELECT ip, req FROM {{%surf}} WHERE";
+            $z = "CREATE TEMPORARY TABLE IF NOT EXISTS {{%tmp_surf}} SELECT ip, req FROM {$this->tableSurf} WHERE";
             $z .= $zp . " AND date >= '$this->sdate' AND dt <= '$this->fdate' GROUP BY ip, req";
             $z2 = "SELECT req, COUNT(req) cnt FROM {{%tmp_surf}} GROUP BY req ORDER BY 2 DESC";
 

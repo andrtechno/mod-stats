@@ -2,6 +2,7 @@
 
 namespace panix\mod\stats\components;
 
+use panix\mod\stats\models\StatsSurf;
 use Yii;
 
 class StatsController extends \panix\engine\controllers\AdminController {
@@ -89,10 +90,11 @@ class StatsController extends \panix\engine\controllers\AdminController {
             ' . $value . '%</div></div>';
     }
 
+    public $tableSurf;
     public function init() {
-
+        $this->tableSurf = StatsSurf::tableName();
         $this->query = new \yii\db\Query;
-        $this->query->from('{{%surf}}');
+        $this->query->from($this->tableSurf);
         $this->query->select('*');
 
          $this->db = Yii::$app->db;
@@ -321,7 +323,7 @@ class StatsController extends \panix\engine\controllers\AdminController {
         //  global $s_date, $f_date, $u;
 
 
-        $sql = "SELECT DISTINCT date FROM {{%surf}} ORDER BY 1 DESC";
+        $sql = "SELECT DISTINCT date FROM {$this->tableSurf} ORDER BY 1 DESC";
         $command = $this->db->createCommand($sql);
 
 

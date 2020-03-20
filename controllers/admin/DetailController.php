@@ -2,10 +2,11 @@
 
 namespace panix\mod\stats\controllers\admin;
 
+use panix\mod\stats\models\StatsSurf;
 use Yii;
 use panix\engine\Html;
-use panix\mod\stats\models\StatsMainHistory;
-use panix\mod\stats\models\StatsMainp;
+use panix\mod\stats\models\StatsHistory;
+use panix\mod\stats\models\StatsMain;
 use panix\mod\stats\components\StatsHelper;
 
 class DetailController extends \panix\mod\stats\components\StatsController {
@@ -20,7 +21,7 @@ class DetailController extends \panix\mod\stats\components\StatsController {
         $site = $stats['site'];
         $se_n = $stats['se_n'];
         $se_nn = $stats['se_nn'];
-        $sql = "SELECT i,refer,ip,proxy,host,lang,user,time,req FROM {{%surf}} WHERE date='" . $date . "' AND " . $this->_zp . " ORDER BY i ASC";
+        $sql = "SELECT i,refer,ip,proxy,host,lang,user,time,req FROM {$this->tableSurf} WHERE date='" . $date . "' AND " . $this->_zp . " ORDER BY i ASC";
         $cmd = $this->db->createCommand($sql);
         $result = array();
 
@@ -93,7 +94,7 @@ class DetailController extends \panix\mod\stats\components\StatsController {
         $stats = Yii::$app->stats->initRun();
         // $zp = $stats['zp'];
         $site = $stats['site'];
-        $sql = "SELECT i,refer,ip,proxy,host,lang,user,time,req FROM {{%surf}} WHERE date='" . $date . "' AND " . $this->_zp . " ORDER BY i ASC";
+        $sql = "SELECT i,refer,ip,proxy,host,lang,user,time,req FROM {$this->tableSurf} WHERE date='" . $date . "' AND " . $this->_zp . " ORDER BY i ASC";
         $cmd = $this->db->createCommand($sql);
         $result = array();
         $i1=[];
@@ -154,7 +155,7 @@ class DetailController extends \panix\mod\stats\components\StatsController {
           $this->pageName
           ); */
 
-        $sql = "SELECT i,refer,ip,proxy,host,lang,user,time,req FROM {{%surf}} WHERE dt='" . $date . "' AND " . $this->_zp . " ORDER BY i ASC";
+        $sql = "SELECT i,refer,ip,proxy,host,lang,user,time,req FROM {$this->tableSurf} WHERE dt='" . $date . "' AND " . $this->_zp . " ORDER BY i ASC";
         $cmd = $this->db->createCommand($sql);
         $result = array();
         foreach ($cmd->queryAll() as $row) {
@@ -210,7 +211,7 @@ class DetailController extends \panix\mod\stats\components\StatsController {
           $this->pageName
           ); */
 
-        $sql = "SELECT time,refer,ip,proxy,host,lang,user,req from {{%surf}} WHERE dt='" . $date . "' AND " . $this->_zp . " GROUP BY ip ORDER BY i DESC";
+        $sql = "SELECT time,refer,ip,proxy,host,lang,user,req from {$this->tableSurf} WHERE dt='" . $date . "' AND " . $this->_zp . " GROUP BY ip ORDER BY i DESC";
         $cmd = $this->db->createCommand($sql);
         foreach ($cmd->queryAll() as $row) {
 
@@ -265,7 +266,7 @@ class DetailController extends \panix\mod\stats\components\StatsController {
             $this->pageName
         );
 
-        $sql = "SELECT time,refer,ip,proxy,host,lang,user,req FROM {{%surf}} WHERE (" . $this->_zfx . ") AND dt='" . $_GET['date'] . "' AND" . $this->_zp . " ORDER BY i DESC";
+        $sql = "SELECT time,refer,ip,proxy,host,lang,user,req FROM {$this->tableSurf} WHERE (" . $this->_zfx . ") AND dt='" . $_GET['date'] . "' AND" . $this->_zp . " ORDER BY i DESC";
         $cmd = Yii::$app->db->createCommand($sql);
 
         foreach ($cmd->queryAll(false) as $row) {

@@ -12,7 +12,7 @@ echo \yii\helpers\StringHelper::truncate('$stringfasd fasd fas dfasd fasd fasd f
             <div class="panel-body">
                 <?php
                 
-                echo panix\engine\widgets\highcharts\Highcharts::widget([
+                echo \panix\ext\highcharts\Highcharts::widget([
 'options' => array(
                         'chart' => array(
                             'height' => 250,

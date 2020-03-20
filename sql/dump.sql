@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `{prefix}main_history` (
+CREATE TABLE IF NOT EXISTS `{prefix}stats_history` (
   `i` int(11) NOT NULL AUTO_INCREMENT,
   `date` char(10) DEFAULT NULL,
   `hosts` int(11) DEFAULT NULL,

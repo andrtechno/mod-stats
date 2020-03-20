@@ -13,7 +13,7 @@ class StatsSurf extends ActiveRecord {
      * @return string the associated database table name
      */
     public static function tableName() {
-        return '{{%surf}}';
+        return '{{%stats__surf}}';
     }
 
     /*
