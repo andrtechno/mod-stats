@@ -6,8 +6,9 @@ use Yii;
 use panix\engine\Html;
 use panix\engine\CMS;
 use panix\mod\stats\components\StatsHelper;
+use panix\mod\stats\components\StatsController;
 
-class VisitTimeController extends \panix\mod\stats\components\StatsController {
+class VisitTimeController extends StatsController {
 
     public function actionIndex() {
         $this->pageName = Yii::t('stats/default', 'TIMEVISIT');

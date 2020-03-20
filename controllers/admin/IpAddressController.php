@@ -45,13 +45,13 @@ $vse = 0;
             //  else
             //      $ipz = "неизвестно";
 
-            $this->result[] = array(
+            $this->result[] =[
                 'num' => $k,
                 'ip' => CMS::ip($row[0]), //$ipz,
                 'val' => $row[1],
                 'progressbar' => $this->progressBar(ceil(($row[1] * 100) / $max), number_format((($row[1] * 100) / $total[0]), 1, ',', '')),
                 'detail' => StatsHelper::linkDetail("/admin/stats/ipaddress/detail/?tz=1&pz=1&s_date=" . $this->sdate . "&f_date=" . $this->fdate . "&qs=" . $row[0])
-            );
+            ];
         }
 
 
@@ -72,7 +72,7 @@ $vse = 0;
             ),
             'pagination' => array('pageSize' => 10)
         ));*/
-       return $this->render('index', array('dataProvider' => $dataProvider));
+       return $this->render('index', ['dataProvider' => $dataProvider]);
     }
 
     public function actionDetail() {
@@ -80,12 +80,12 @@ $vse = 0;
         $qs = $_GET['qs'];
         $country = CMS::getCountryNameByIp($qs);
         $this->pageName = $qs . ' ' . $country;
-        $title .= CMS::ip($qs, 1);
+        $title = CMS::ip($qs, 1);
         $title .= ' (' . $country . ')';
 
         $this->breadcrumbs = array(
-            Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
-            Yii::t('stats/default', 'IP_ADDRESS') => array('/admin/stats/ipaddress'),
+            Yii::t('stats/default', 'MODULE_NAME') => ['/admin/stats'],
+            Yii::t('stats/default', 'IP_ADDRESS') => ['/admin/stats/ip-address'],
             $qs
         );
 
@@ -93,7 +93,7 @@ $vse = 0;
         $item = 'ip';
         $tz = $_GET['tz'];
 
-        $sql = "SELECT * FROM {{surf}} WHERE (" . $item . " LIKE '" . (($tz == 1) ? "" : "%") . addslashes($qs) . (($tz == 1 or $tz == 7) ? "" : "%") . "') AND dt >= '$this->sdate' AND dt <= '$this->fdate' " . (($pz == 1) ? "AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY " . (($tz == 7) ? "host" : "ip") : "") . " ORDER BY i DESC";
+        $sql = "SELECT * FROM {$this->tableSurf} WHERE (" . $item . " LIKE '" . (($tz == 1) ? "" : "%") . addslashes($qs) . (($tz == 1 or $tz == 7) ? "" : "%") . "') AND dt >= '$this->sdate' AND dt <= '$this->fdate' " . (($pz == 1) ? "AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY " . (($tz == 7) ? "host" : "ip") : "") . " ORDER BY i DESC";
         $res = $this->db->createCommand($sql);
         foreach ($res->queryAll() as $row) {
 
@@ -102,7 +102,7 @@ $vse = 0;
 
             if ($row['proxy'] != "") {
                 $ip.= '<br>';
-                $ip.= Html::link('через proxy', '?item=ip&qs=' . $row['proxy'], array('target' => '_blank'));
+                $ip.= Html::a('через proxy', '?item=ip&qs=' . $row['proxy'], ['target' => '_blank']);
             }
  
             $this->result[] = array(
@@ -129,10 +129,10 @@ $vse = 0;
             ),
             'pagination' => array('pageSize' => 10)
         ));
-        $this->render('detail', array(
+        $this->render('detail', [
             'dataProvider' => $dataProvider,
             'title' => $title
-        ));
+        ]);
     }
 
 }
