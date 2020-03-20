@@ -6,16 +6,20 @@ use Yii;
 use panix\engine\Html;
 use panix\engine\components\Browser;
 use yii\helpers\StringHelper;
-class StatsHelper {
+
+class StatsHelper
+{
 
     public $sdata;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->sdata = Yii::$app->request->get('s_date');
         //  $this->sdata = Yii::$app->request->get('s_date');
     }
 
-    public static function getRowUserAgent($user_agent, $refer) {
+    public static function getRowUserAgent($user_agent, $refer)
+    {
 
         $browser = new Browser();
         $browser->setUserAgent($user_agent);
@@ -24,15 +28,15 @@ class StatsHelper {
             $brw = self::getBrowser($user_agent);
             if ($brw != "")
                 $content .= Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/browsers/' . $brw, array(
-                            //'title' => $user_agent,
-                            'alt' => $user_agent,
-                            'title' => Yii::t('stats/default', 'BROWSER', array(
-                                '{name}' => $browser->getBrowser(), //.' '.$user_agent,
-                                '{v}' => $browser->getVersion()
-                            )),
-                            'class' => 'img-thumbnail',
-                            'data-toggle' => "tooltip",
-                            'data-placement' => "top",
+                    //'title' => $user_agent,
+                    'alt' => $user_agent,
+                    'title' => Yii::t('stats/default', 'BROWSER', array(
+                        '{name}' => $browser->getBrowser(), //.' '.$user_agent,
+                        '{v}' => $browser->getVersion()
+                    )),
+                    'class' => 'img-thumbnail',
+                    'data-toggle' => "tooltip",
+                    'data-placement' => "top",
                 ));
         }
         $content .= self::getPlatformByImage($user_agent);
@@ -42,7 +46,8 @@ class StatsHelper {
         return $content;
     }
 
-    public static function getMobileByImage($user_agent) {
+    public static function getMobileByImage($user_agent)
+    {
 
         $browser = new Browser();
         $browser->setUserAgent($user_agent);
@@ -58,51 +63,61 @@ class StatsHelper {
             $img = self::getPlatformByImage($user_agent, false);
         }
         return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/' . $img, array(
-                    'data-toggle' => "tooltip",
-                    'data-placement' => "top",
-                    'class' => 'img-thumbnail',
-                    'title' => $name,
-                    'alt' => $name
+            'data-toggle' => "tooltip",
+            'data-placement' => "top",
+            'class' => 'img-thumbnail',
+            'title' => $name,
+            'alt' => $name
         ));
     }
 
-    public static function getPlatformByImage($user_agent, $render = true) {
+    public static function getPlatformByImage($user_agent, $render = true)
+    {
 
         $browser = new Browser();
         $browser->setUserAgent($user_agent);
         // return $browser->getPlatform();
         if ($browser->isRobot()) {
             return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/robot.png', array(
-                        'data-toggle' => "tooltip",
-                        'data-placement' => "top",
-                        'title' => 'Робот',
-                        'class' => 'img-thumbnail',
-                        'alt' => $browser->getPlatform(),
+                'data-toggle' => "tooltip",
+                'data-placement' => "top",
+                'title' => 'Робот',
+                'class' => 'img-thumbnail',
+                'alt' => $browser->getPlatform(),
             ));
         }
 
 
-
         switch ($browser->getPlatform()) {
-            case Browser::PLATFORM_ANDROID: $img = "android.png";
+            case Browser::PLATFORM_ANDROID:
+                $img = "android.png";
                 break;
-            case Browser::PLATFORM_WINDOWS: $img = "windows.png";
+            case Browser::PLATFORM_WINDOWS:
+                $img = "windows.png";
                 break;
-            case Browser::PLATFORM_WINDOWS_7: $img = "windows.png";
+            case Browser::PLATFORM_WINDOWS_7:
+                $img = "windows.png";
                 break;
-            case Browser::PLATFORM_WINDOWS_8: $img = "windows_8.png";
+            case Browser::PLATFORM_WINDOWS_8:
+                $img = "windows_8.png";
                 break;
-            case Browser::PLATFORM_WINDOWS_10: $img = "windows_8.png";
+            case Browser::PLATFORM_WINDOWS_10:
+                $img = "windows_8.png";
                 break;
-            case Browser::PLATFORM_FREEBSD: $img = "freebsd.png";
+            case Browser::PLATFORM_FREEBSD:
+                $img = "freebsd.png";
                 break;
-            case Browser::PLATFORM_LINUX: $img = "linux.png";
+            case Browser::PLATFORM_LINUX:
+                $img = "linux.png";
                 break;
-            case Browser::PLATFORM_IPHONE: $img = "apple.png";
+            case Browser::PLATFORM_IPHONE:
+                $img = "apple.png";
                 break;
-            case Browser::PLATFORM_APPLE: $img = "apple.png";
+            case Browser::PLATFORM_APPLE:
+                $img = "apple.png";
                 break;
-            case Browser::PLATFORM_IPAD: $img = "apple.png";
+            case Browser::PLATFORM_IPAD:
+                $img = "apple.png";
                 break;
             default :
                 return $browser->getPlatform();
@@ -111,22 +126,24 @@ class StatsHelper {
         if ($render) {
 
             return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/' . $img, [
-                        'data-toggle' => "tooltip",
-                        'data-placement' => "top",
-                        'class' => 'platform img-thumbnail',
-                        'alt' => $browser->getPlatform(),
-                        'title' => Yii::t('stats/default', 'PLATFORM', ['name' => $browser->getPlatform()])
+                'data-toggle' => "tooltip",
+                'data-placement' => "top",
+                'class' => 'platform img-thumbnail',
+                'alt' => $browser->getPlatform(),
+                'title' => Yii::t('stats/default', 'PLATFORM', ['name' => $browser->getPlatform()])
             ]);
         } else {
             return $img;
         }
     }
 
-    public static function linkDetail($link) {
+    public static function linkDetail($link)
+    {
         return Html::a(Yii::t('stats/default', 'DETAIL'), $link, ['target' => '_blank', 'class' => 'btn btn-sm btn-info']);
     }
 
-    public static function getRowHost($ip, $proxy, $host, $lang) {
+    public static function getRowHost($ip, $proxy, $host, $lang)
+    {
         $content = '';
         $p = ($lang) ? self::$LANG[mb_strtoupper($lang)] : '';
         if ($ip == "") {
@@ -143,25 +160,35 @@ class StatsHelper {
         return $content;
     }
 
-    public function browserName($brw) {
+    public function browserName($brw)
+    {
         switch ($brw) {
-            case "ie.png": $name = "MS Internet Explorer";
+            case "ie.png":
+                $name = "MS Internet Explorer";
                 break;
-            case "opera.png": $name = "Opera";
+            case "opera.png":
+                $name = "Opera";
                 break;
-            case "firefox.png": $name = "Firefox";
+            case "firefox.png":
+                $name = "Firefox";
                 break;
-            case "chrome.png": $name = "Google Chrome";
+            case "chrome.png":
+                $name = "Google Chrome";
                 break;
-            case "mozilla.png": $name = "Mozilla";
+            case "mozilla.png":
+                $name = "Mozilla";
                 break;
-            case "safari.png": $name = "Apple Safari";
+            case "safari.png":
+                $name = "Apple Safari";
                 break;
-            case "mac.png": $name = "Macintosh";
+            case "mac.png":
+                $name = "Macintosh";
                 break;
-            case "maxthon.png": $name = "Maxthon (MyIE)";
+            case "maxthon.png":
+                $name = "Maxthon (MyIE)";
                 break;
-            default: $name = "другие";
+            default:
+                $name = "другие";
                 break;
         }
         if (!empty($brw)) {
@@ -178,7 +205,8 @@ class StatsHelper {
         return $content;
     }
 
-    public static function getRowIp($refer, $ip) {
+    public static function getRowIp($refer, $ip)
+    {
 
         if ($refer != "unknown") {
             //return CMS::ip($refer,1);
@@ -197,9 +225,10 @@ class StatsHelper {
         return $content;
     }
 
-    public static function checkSearchEngine($refer, $engine, $query) {
+    public static function checkSearchEngine($refer, $engine, $query)
+    {
         $content = '';
-        if ($engine == "G" and ! empty($query) and stristr($refer, "/url?"))
+        if ($engine == "G" and !empty($query) and stristr($refer, "/url?"))
             $refer = str_replace("/url?", "/search?", $refer);
         $content .= Yii::$app->controller->echo_se($engine);
         if (empty($query))
@@ -208,12 +237,13 @@ class StatsHelper {
         return $content;
     }
 
-    public static function renderReferer($ref) {
+    public static function renderReferer($ref)
+    {
         $text = '';
         $refer = self::Ref($ref);
         if (is_array($refer)) {
             list($engine, $query) = $refer;
-            if ($engine == "G" and ! empty($query) and stristr($ref, "/url?"))
+            if ($engine == "G" and !empty($query) and stristr($ref, "/url?"))
                 $ref = str_replace("/url?", "/search?", $ref);
             $text .= Yii::$app->controller->echo_se($engine);
             if (empty($query))
@@ -233,7 +263,8 @@ class StatsHelper {
         return $text;
     }
 
-    public static function timeLink($array, $key) {
+    public static function timeLink($array, $key)
+    {
         $tu = "";
         foreach ($array[$key] as $rw) {
             $tu .= $rw[0] . " <a target=_blank href=" . $rw[1] . ">" . StringHelper::truncate($rw[1], 20) . "</a><br>";
@@ -241,7 +272,8 @@ class StatsHelper {
         return $tu;
     }
 
-    public static function checkIdna($ref) {
+    public static function checkIdna($ref)
+    {
 
         $content = '';
         if ($ref == "")
@@ -476,7 +508,8 @@ class StatsHelper {
         "ZU" => "Zulu"
     );
 
-    public static function getBrowser($UA) {
+    public static function getBrowser($UA)
+    {
         if (stristr($UA, "Maxthon") or stristr($UA, "Myie"))
             return "maxthon.png";
         if (stristr($UA, "Opera") or stristr($UA, "OPR/"))
@@ -486,7 +519,7 @@ class StatsHelper {
         if (stristr($UA, "Firefox"))
             return "firefox.png";
         if (stristr($UA, "Chrome") or stristr($UA, "Android"))
-        //if (stristr($UA, "Chrome"))
+            //if (stristr($UA, "Chrome"))
             return "chrome.png";
         if (stristr($UA, "Safari"))
             return "safari.png";
@@ -498,7 +531,8 @@ class StatsHelper {
             return "";
     }
 
-    public static function get_encoding($str) {
+    public static function get_encoding($str)
+    {
         $cp_list = array('utf-8', 'cp1251');
         foreach ($cp_list as $k => $codepage) {
             if (md5($str) === md5(iconv($codepage, $codepage, $str))) {
@@ -508,7 +542,8 @@ class StatsHelper {
         return null;
     }
 
-    public static function se_google($ref) {
+    public static function se_google($ref)
+    {
         $sw = "q=";
         $sw2 = "as_q=";
         $engine = "G";
@@ -534,44 +569,106 @@ class StatsHelper {
             return array($engine, $match1[1]);
     }
 
-    public static function GetBrw($brw) {
+    public static function GetBrw($brw)
+    {
         switch ($brw) {
-            case "maxthon.png": return "AND (LOWER(user) LIKE '%maxthon%' OR LOWER(user) LIKE '%myie%')";
+            case "maxthon.png":
+                return "AND (LOWER(user) LIKE '%maxthon%' OR LOWER(user) LIKE '%myie%')";
                 break;
-            case "opera.png": return "AND (LOWER(user) LIKE '%opera%' OR LOWER(user) LIKE '%opr/%')";
+            case "opera.png":
+                return "AND (LOWER(user) LIKE '%opera%' OR LOWER(user) LIKE '%opr/%')";
                 break;
-            case "ie.png": return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%opera%' AND (LOWER(user) LIKE '%msie%' OR LOWER(user) LIKE '%trident%')";
+            case "ie.png":
+                return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%opera%' AND (LOWER(user) LIKE '%msie%' OR LOWER(user) LIKE '%trident%')";
                 break;
-            case "firefox.png": return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) LIKE '%firefox%'";
+            case "firefox.png":
+                return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) LIKE '%firefox%'";
                 break;
-            case "chrome.png": return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) NOT LIKE '%opr/%' AND LOWER(user) NOT LIKE '%firefox%' AND (LOWER(user) LIKE '%chrome%' OR LOWER(user) LIKE '%android%')";
+            case "chrome.png":
+                return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) NOT LIKE '%opr/%' AND LOWER(user) NOT LIKE '%firefox%' AND (LOWER(user) LIKE '%chrome%' OR LOWER(user) LIKE '%android%')";
                 break;
-            case "safari.png": return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) NOT LIKE '%firefox%' AND LOWER(user) NOT LIKE '%chrome%' AND LOWER(user) NOT LIKE '%android%' AND LOWER(user) LIKE '%safari%'";
+            case "safari.png":
+                return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) NOT LIKE '%firefox%' AND LOWER(user) NOT LIKE '%chrome%' AND LOWER(user) NOT LIKE '%android%' AND LOWER(user) LIKE '%safari%'";
                 break;
-            case "mac.png": return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) NOT LIKE '%firefox%' AND LOWER(user) NOT LIKE '%chrome%' AND LOWER(user) NOT LIKE '%safari%' AND LOWER(user) LIKE '%mac%'";
+            case "mac.png":
+                return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) NOT LIKE '%firefox%' AND LOWER(user) NOT LIKE '%chrome%' AND LOWER(user) NOT LIKE '%safari%' AND LOWER(user) LIKE '%mac%'";
                 break;
-            case "mozilla.png": return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) NOT LIKE '%firefox%' AND LOWER(user) NOT LIKE '%chrome%' AND LOWER(user) NOT LIKE '%safari%' AND LOWER(user) NOT LIKE '%trident%' AND LOWER(user) NOT LIKE '%mac%' AND LOWER(user) LIKE '%mozilla%'";
+            case "mozilla.png":
+                return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) NOT LIKE '%firefox%' AND LOWER(user) NOT LIKE '%chrome%' AND LOWER(user) NOT LIKE '%safari%' AND LOWER(user) NOT LIKE '%trident%' AND LOWER(user) NOT LIKE '%mac%' AND LOWER(user) LIKE '%mozilla%'";
                 break;
-            default: return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%trident%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) NOT LIKE '%opr/%' AND LOWER(user) NOT LIKE '%android%' AND LOWER(user) NOT LIKE '%firefox%' AND LOWER(user) NOT LIKE '%chrome%' AND LOWER(user) NOT LIKE '%safari%' AND LOWER(user) NOT LIKE '%mac%' AND LOWER(user) NOT LIKE '%mozilla%'";
+            default:
+                return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%trident%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) NOT LIKE '%opr/%' AND LOWER(user) NOT LIKE '%android%' AND LOWER(user) NOT LIKE '%firefox%' AND LOWER(user) NOT LIKE '%chrome%' AND LOWER(user) NOT LIKE '%safari%' AND LOWER(user) NOT LIKE '%mac%' AND LOWER(user) NOT LIKE '%mozilla%'";
                 break;
         }
     }
 
-    public static function echo_se($engine) {
+
+    public static function GetBrwNew($brw)
+    {
+        $queries = [];
+        switch ($brw) {
+            case "maxthon.png":
+                return "AND (LOWER(user) LIKE '%maxthon%' OR LOWER(user) LIKE '%myie%')";
+                break;
+            case "opera.png":
+                return "AND (LOWER(user) LIKE '%opera%' OR LOWER(user) LIKE '%opr/%')";
+                break;
+            case "ie.png":
+                return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%opera%' AND (LOWER(user) LIKE '%msie%' OR LOWER(user) LIKE '%trident%')";
+                break;
+            case "firefox.png":
+
+                $queries[] = ['not like', 'LOWER(user)', ['maxthon', 'myie', 'msie', 'opera']];
+                $queries[] = ['like', 'LOWER(user)', 'firefox'];
+                return $queries;
+
+
+             //   return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) LIKE '%firefox%'";
+                break;
+            case "chrome.png":
+                $queries[] = ['not like', 'LOWER(user)', ['maxthon', 'myie', 'msie', 'opera', 'opr/', 'firefox']];
+                $queries[] = ['like', 'LOWER(user)', ['chrome', 'android']];
+                return $queries;
+               // return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) NOT LIKE '%opr/%' AND LOWER(user) NOT LIKE '%firefox%' AND (LOWER(user) LIKE '%chrome%' OR LOWER(user) LIKE '%android%')";
+                break;
+            case "safari.png":
+                return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) NOT LIKE '%firefox%' AND LOWER(user) NOT LIKE '%chrome%' AND LOWER(user) NOT LIKE '%android%' AND LOWER(user) LIKE '%safari%'";
+                break;
+            case "mac.png":
+                return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) NOT LIKE '%firefox%' AND LOWER(user) NOT LIKE '%chrome%' AND LOWER(user) NOT LIKE '%safari%' AND LOWER(user) LIKE '%mac%'";
+                break;
+            case "mozilla.png":
+                return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) NOT LIKE '%firefox%' AND LOWER(user) NOT LIKE '%chrome%' AND LOWER(user) NOT LIKE '%safari%' AND LOWER(user) NOT LIKE '%trident%' AND LOWER(user) NOT LIKE '%mac%' AND LOWER(user) LIKE '%mozilla%'";
+                break;
+            default:
+                return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%trident%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) NOT LIKE '%opr/%' AND LOWER(user) NOT LIKE '%android%' AND LOWER(user) NOT LIKE '%firefox%' AND LOWER(user) NOT LIKE '%chrome%' AND LOWER(user) NOT LIKE '%safari%' AND LOWER(user) NOT LIKE '%mac%' AND LOWER(user) NOT LIKE '%mozilla%'";
+                break;
+        }
+    }
+
+    public static function echo_se($engine)
+    {
         switch ($engine) {
-            case "Y": return "<b><font color=#FF0000>Я</font>ndex</b>";
+            case "Y":
+                return "<b><font color=#FF0000>Я</font>ndex</b>";
                 break;
-            case "R": return "<b><font color=#0000FF>R</font>ambler</b>";
+            case "R":
+                return "<b><font color=#0000FF>R</font>ambler</b>";
                 break;
-            case "G": return "<b><font color=#2159D6>G</font><font color=#C61800>o</font><font color=#D6AE00>o</font><font color=#2159D6>g</font><font color=#18A221>l</font><font color=#C61800>e</font></b>";
+            case "G":
+                return "<b><font color=#2159D6>G</font><font color=#C61800>o</font><font color=#D6AE00>o</font><font color=#2159D6>g</font><font color=#18A221>l</font><font color=#C61800>e</font></b>";
                 break;
-            case "M": return "<b><font color=#F8AC32>@</font><font color=#00468c>mail</font><font color=#F8AC32>.ru</font></b>";
+            case "M":
+                return "<b><font color=#F8AC32>@</font><font color=#00468c>mail</font><font color=#F8AC32>.ru</font></b>";
                 break;
-            case "H": return "<b>Yahoo</b>";
+            case "H":
+                return "<b>Yahoo</b>";
                 break;
-            case "S": return "<b>MSN Bing</b>";
+            case "S":
+                return "<b>MSN Bing</b>";
                 break;
-            case "?": return "<b>?</b>";
+            case "?":
+                return "<b>?</b>";
                 break;
             default :
                 foreach ($se_n as $key => $val)
@@ -583,7 +680,8 @@ class StatsHelper {
         }
     }
 
-    public static function se_mail1($ref) {
+    public static function se_mail1($ref)
+    {
         $sw = "words=";
         $engine = "M";
         $url = urldecode($ref);
@@ -596,7 +694,8 @@ class StatsHelper {
         return array($engine, $match1[1]);
     }
 
-    public static function se_mail2($ref) {
+    public static function se_mail2($ref)
+    {
         $sw = "q=";
         $sw2 = "as_q=";
         $engine = "M";
@@ -617,7 +716,8 @@ class StatsHelper {
             return array($engine, $match1[1]);
     }
 
-    public static function se_rambler($ref) {
+    public static function se_rambler($ref)
+    {
         $sw = "words=";
         $sw1 = "query=";
         $sw2 = "old_q=";
@@ -640,7 +740,8 @@ class StatsHelper {
             return array($engine, $match1[1]);
     }
 
-    public static function se_yahoo($ref) {
+    public static function se_yahoo($ref)
+    {
         $sw = "p=";
         $engine = "H";
         $url = urldecode($ref);
@@ -653,7 +754,8 @@ class StatsHelper {
         return array($engine, $match1[1]);
     }
 
-    public static function se_msn($ref) {
+    public static function se_msn($ref)
+    {
         $sw = "q=";
         $engine = "S";
         $url = urldecode($ref);
@@ -666,7 +768,8 @@ class StatsHelper {
         return array($engine, $match1[1]);
     }
 
-    public static function is_robot($check, $check2) {
+    public static function is_robot($check, $check2)
+    {
         $app = Yii::$app->stats;
         $rbd = $app->rbd;
         $hbd = $app->hbd;
@@ -684,7 +787,8 @@ class StatsHelper {
         return FALSE;
     }
 
-    public static function se_other($ref, $sw) {
+    public static function se_other($ref, $sw)
+    {
         $engine = "?";
         $url = urldecode($ref);
         $url = stripslashes($url);
@@ -696,29 +800,31 @@ class StatsHelper {
         return array($engine, $match1[1]);
     }
 
-    public static function se_sp($ref) {
+    public static function se_sp($ref)
+    {
         $app = Yii::$app->stats->se_n;
-        $se_nn= [];
+        $se_nn = [];
         foreach ($app['se_n'] as $key => $val) {
-            if(isset($se_nn[$key])){
-            if (stristr($ref, $se_nn[$key])) {
-                $engine = $key;
-                $sw = $val;
-                $url = urldecode($ref);
-                $url = stripslashes($url);
-                $url = strip_tags($url);
-                if (self::get_encoding($url) == "cp1251")
-                    $url = iconv("CP1251", "UTF-8", $url);
-                preg_match("/[?&]+" . $sw . "([^&]*)/i", $url . "&", $match1);
-                $match1[1] = trim($match1[1]);
-                return array($engine, $match1[1]);
+            if (isset($se_nn[$key])) {
+                if (stristr($ref, $se_nn[$key])) {
+                    $engine = $key;
+                    $sw = $val;
+                    $url = urldecode($ref);
+                    $url = stripslashes($url);
+                    $url = strip_tags($url);
+                    if (self::get_encoding($url) == "cp1251")
+                        $url = iconv("CP1251", "UTF-8", $url);
+                    preg_match("/[?&]+" . $sw . "([^&]*)/i", $url . "&", $match1);
+                    $match1[1] = trim($match1[1]);
+                    return array($engine, $match1[1]);
+                }
             }
-        }
         }
         return -1;
     }
 
-    public static function utf8RawUrlDecode($source) {
+    public static function utf8RawUrlDecode($source)
+    {
         $decodedStr = '';
         $pos = 0;
         $len = strlen($source);
@@ -747,7 +853,8 @@ class StatsHelper {
         return $decodedStr;
     }
 
-    public static function se_yandex($ref) {
+    public static function se_yandex($ref)
+    {
         $sw = "text=";
         $sw2 = "holdreq=";
         $engine = "Y";
@@ -790,9 +897,10 @@ class StatsHelper {
             return array($engine, $match1[1]);
     }
 
-    public static function Ref($ref) {
+    public static function Ref($ref)
+    {
         $site = Yii::$app->stats->getSite();
-        if (($ref != "") and ! (stristr($ref, "://" . $site) and stripos($ref, "://" . $site, 6) == 0) and ! (stristr($ref, "://www." . $site) and stripos($ref, "://www." . $site, 6) == 0)) {
+        if (($ref != "") and !(stristr($ref, "://" . $site) and stripos($ref, "://" . $site, 6) == 0) and !(stristr($ref, "://www." . $site) and stripos($ref, "://www." . $site, 6) == 0)) {
 
             $reff = str_replace("www.", "", $ref);
             if (!stristr($ref, "://")) {
@@ -802,34 +910,34 @@ class StatsHelper {
             if (stristr($reff, "://yandex") or stristr($reff, "://search.yaca.yandex") or stristr($reff, "://images.yandex"))
                 return self::se_yandex($ref);
             else
-            if (stristr($reff, "://google"))
-                return self::se_google($ref);
-            else
-            if (stristr($reff, "://rambler") or stristr($reff, "://nova.rambler") or stristr($reff, "://search.rambler") or stristr($reff, "://ie4.rambler") or stristr($reff, "://ie5.rambler"))
-                return self::se_rambler($ref);
-            else
-            if (stristr($reff, "://go.mail.ru") and stristr($reff, "words="))
-                return self::se_mail1($ref);
-            else
-            if (stristr($reff, "://go.mail.ru") or stristr($reff, "://wap.go.mail.ru"))
-                return self::se_mail2($ref);
-            else
-            if (stristr($reff, "://search.msn") or stristr($reff, "://search.live.com") or stristr($reff, "://ie.search.msn") or stristr($reff, "://bing"))
-                return self::se_msn($ref);
-            else
-            if (stristr($reff, "://search.yahoo"))
-                return self::se_yahoo($ref);
-            else
-            if (self::se_sp($ref) <> -1)
-                return self::se_sp($ref);
-            else
-            if (stristr($ref, "?q=") or stristr($ref, "&q="))
-                return self::se_other($ref, "q=");
-            else
-            if (stristr($ref, "query="))
-                return self::se_other($ref, "query=");
-            else
-                return $ref;
+                if (stristr($reff, "://google"))
+                    return self::se_google($ref);
+                else
+                    if (stristr($reff, "://rambler") or stristr($reff, "://nova.rambler") or stristr($reff, "://search.rambler") or stristr($reff, "://ie4.rambler") or stristr($reff, "://ie5.rambler"))
+                        return self::se_rambler($ref);
+                    else
+                        if (stristr($reff, "://go.mail.ru") and stristr($reff, "words="))
+                            return self::se_mail1($ref);
+                        else
+                            if (stristr($reff, "://go.mail.ru") or stristr($reff, "://wap.go.mail.ru"))
+                                return self::se_mail2($ref);
+                            else
+                                if (stristr($reff, "://search.msn") or stristr($reff, "://search.live.com") or stristr($reff, "://ie.search.msn") or stristr($reff, "://bing"))
+                                    return self::se_msn($ref);
+                                else
+                                    if (stristr($reff, "://search.yahoo"))
+                                        return self::se_yahoo($ref);
+                                    else
+                                        if (self::se_sp($ref) <> -1)
+                                            return self::se_sp($ref);
+                                        else
+                                            if (stristr($ref, "?q=") or stristr($ref, "&q="))
+                                                return self::se_other($ref, "q=");
+                                            else
+                                                if (stristr($ref, "query="))
+                                                    return self::se_other($ref, "query=");
+                                                else
+                                                    return $ref;
         } else
             return $ref;
     }

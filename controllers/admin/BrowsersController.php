@@ -7,6 +7,7 @@ use panix\engine\CMS;
 use panix\engine\Html;
 use panix\mod\stats\components\StatsHelper;
 use panix\mod\stats\components\StatsController;
+use yii\db\Query;
 
 class BrowsersController extends StatsController
 {
@@ -22,46 +23,51 @@ class BrowsersController extends StatsController
             $this->pageName
         ];
 
-
-        $bmas = [];
-        $ipmas = [];
+        /** @var Query $query */
+        $query = $this->query;
+        $query->select(['user', 'ip']);
+        $query->where(['>=', 'date', $this->sdate]);
+        $query->andWhere(['<=', 'date', $this->sdate]);
+        foreach ($this->_zp_queries as $q) {
+            $query->andWhere($q);
+        }
+        $browserList = [];
+        $ipList = [];
+        $browserCount = 1;
         if ($this->sort == "hi") {
-            $sql = "SELECT user FROM {$this->tableSurf} WHERE date >= '$this->sdate' AND date <= '$this->fdate' AND " . $this->_zp;
-            $command = $this->db->createCommand($sql);
-            foreach ($command->queryAll() as $row) {
-                $bmas[StatsHelper::getBrowser($row['user'])]++;
-            }
-        } else {
-            $sql = "SELECT user, ip FROM {$this->tableSurf} WHERE date >= '$this->sdate' AND date <= '$this->fdate' AND " . $this->_zp . " GROUP BY ip, user";
-            $command = $this->db->createCommand($sql);
-            $bcount = 1;
+            $command = $query->createCommand();
             foreach ($command->queryAll() as $row) {
                 $gb = StatsHelper::getBrowser($row['user']);
-                $bmas[$gb] = [];//NEW
+                $browserList[$gb] = $browserCount;
+                $browserCount++;
+            }
+        } else {
+            $query->groupBy(['ip', 'user']);
+            $command = $query->createCommand();
+            foreach ($command->queryAll() as $row) {
+                $gb = StatsHelper::getBrowser($row['user']);
+                $browserList[$gb] = [];
                 if (!isset($ipmas[$row['ip']][$gb])) {
-
-                    //$bmas[$gb] ++;
-                    $bmas[$gb] = $bcount;
-                    //$bmas[] = $gb;
-                    $ipmas[$row['ip']][$gb] = 1;
+                    $browserList[$gb] = $browserCount;
+                    $ipList[$row['ip']][$gb] = 1;
                 }
-                $bcount++;
+                $browserCount++;
             }
         }
 
 
         $vse = 0;
         $k = 0;
-        arsort($bmas);
-        $mmx = max($bmas);
-        $cnt = array_sum($bmas);
-        $pie = array();
+        arsort($browserList);
+        $mmx = max($browserList);
+        $cnt = array_sum($browserList);
+        $pie = [];
         $helper = new StatsHelper;
 
         // print_r($bmas);
         //die();
 
-        foreach ($bmas as $brw => $val) {
+        foreach ($browserList as $brw => $val) {
 
             $k++;
             $vse += $val;
@@ -81,20 +87,6 @@ class BrowsersController extends StatsController
             ];
         }
 
-
-        /*
-                $dataProvider = new CArrayDataProvider($this->result, array(
-                    'sort' => array(
-                        // 'defaultOrder'=>'id ASC',
-                        'attributes' => array(
-                            'browser',
-                            'val'
-                        ),
-                    ),
-                    'pagination' => array(
-                        'pageSize' => 10,
-                    ),
-                ));*/
         $dataProvider = new \yii\data\ArrayDataProvider([
             'allModels' => $this->result,
             'pagination' => [
@@ -104,7 +96,7 @@ class BrowsersController extends StatsController
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
-            'bmas' => $bmas,
+            'bmas' => $browserList,
             'cnt' => $cnt,
             'vse' => $vse,
             'pie' => $pie,
@@ -135,6 +127,7 @@ class BrowsersController extends StatsController
             $sql .= $this->_zp . " AND date >= '$this->sdate' AND date <= '$this->fdate' " . (isset($brw) ? StatsHelper::GetBrw($brw) : "") . " GROUP BY ip" . (!isset($brw) ? ",user" : "");
             $sql2 = "SELECT user, COUNT(user) cnt FROM {{%tmp_surf}} GROUP BY USER ORDER BY 2 DESC";
             $res = $this->db->createCommand($sql);
+
             $transaction = $this->db->beginTransaction();
             try {
                 $this->db->createCommand($sql2)->execute();
@@ -204,15 +197,47 @@ class BrowsersController extends StatsController
 
     public function actionDetail()
     {
+        $brw=StatsHelper::GetBrwNew(Yii::$app->request->get('brw'));
+
         $pz = 0;
         $sql = "SELECT * FROM {$this->tableSurf} WHERE date >= '$this->sdate' AND date <= '$this->fdate' " . StatsHelper::GetBrw(Yii::$app->request->get('brw')) . (($pz == 1) ? " AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY ip" : "") . " ORDER BY i DESC";
         $cmd = $this->db->createCommand($sql);
 
-        $items = $cmd->queryAll();
+        /** @var Query $query */
+        $query = $this->query;
+        $query->select('*');
+        $query->where(['>=', 'date', $this->sdate]);
+        $query->andWhere(['<=', 'date', $this->sdate]);
+        if($brw){
+            foreach ($this->_zp_queries as $q) {
+                $query->andWhere($q);
+            }
+            foreach ($brw as $q) {
+                if($q[0]=='not like'){
+                    $query->andWhere($q);
+                }else{
+                    $query->orWhere($q);
+                }
+            }
+        }
+        if ($this->sort == 'ho')
+            $query->groupBy('ip');
+
+        $query->orderBy(['i' => SORT_DESC]);
+
+     //   echo $cmd->rawSql;
+       // echo '<br><br><br><bR>';
+//echo StatsHelper::GetBrw(Yii::$app->request->get('brw')) . (($pz == 1) ? " AND" . $this->_zp : "");
+      //  echo '<br><br><br><bR>';
+
+       // echo $query->createCommand()->rawSql;
+       //  die;
+        $items = $query->createCommand()->queryAll();
 
 
         foreach ($items as $row) { //StatsHelper::$MONTH[substr($row['dt'], 4, 2)]
-            $ip = CMS::ip($row['ip']);
+            //$ip = CMS::ip($row['ip']);
+            $ip = $row['ip'];
 
             if ($row['proxy'] != "") {
                 $ip .= '<br>';

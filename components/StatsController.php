@@ -48,6 +48,7 @@ class StatsController extends \panix\engine\controllers\AdminController
 
     public $topButtons = false;
     public $_zp; //zp
+    public $_zp_queries; //zp
     public $_zp2; //zp2
     public $_cse_m = ''; //$cse_m
     public $_cot_m = ''; //cot_m
@@ -109,11 +110,9 @@ class StatsController extends \panix\engine\controllers\AdminController
         $this->tableSurf = StatsSurf::tableName();
         $this->query = new \yii\db\Query;
         $this->query->from($this->tableSurf);
-        $this->query->select('*');
+        //$this->query->select('*');
 
         $this->db = Yii::$app->db;
-
-
 
 
         //   list($s_date, $f_date) = str_replace("+", "", array($this->sdate, $this->fdate));
@@ -139,7 +138,6 @@ class StatsController extends \panix\engine\controllers\AdminController
         }
 
 
-
         if ($hosts = file(Yii::getAlias('@stats') . "/hosts.dat")) {
             $i = 0;
             for ($i = 0; $i < count($hosts); $i++)
@@ -155,17 +153,23 @@ class StatsController extends \panix\engine\controllers\AdminController
         }
         $this->robo = array_unique($robo);
 
-        foreach ($this->rbd as $val)
+        foreach ($this->rbd as $val) {
             $this->_zp .= " LOWER(user) NOT LIKE '%" . mb_strtolower($val) . "%' AND";
+            $this->_zp_queries[] = ['not like', 'LOWER(user)', mb_strtolower($val)];
+        }
         if (filesize(Yii::getAlias('@stats') . "/hosts.dat"))
-            foreach ($hbd as $val)
+            foreach ($hbd as $val){
+                $this->_zp_queries[] = ['not like', 'LOWER(host)', mb_strtolower($val)];
                 $this->_zp .= " LOWER(host) NOT LIKE '%" . mb_strtolower($val) . "%' AND";
+            }
+        //$this->_zp_queries[] = ['not like', 'LOWER(user)', ''];
         $this->_zp .= " LOWER(user) NOT LIKE '' AND";
         if (file_exists(Yii::getAlias('@stats') . "/skip.dat")) {
             if ($skip = file(Yii::getAlias('@stats') . "/skip.dat")) {
                 foreach ($skip as $vl) {
                     list($s1, $s2) = explode("|", $vl);
                     $this->_zp2 .= " $s1 NOT LIKE '%" . rtrim($s2) . "%' AND";
+
                 }
             }
         }

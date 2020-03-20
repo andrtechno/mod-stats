@@ -1,4 +1,5 @@
 <?php
+
 namespace panix\mod\stats\controllers\admin;
 
 use panix\mod\stats\models\StatsSurf;
@@ -8,14 +9,16 @@ use panix\engine\Html;
 use panix\mod\stats\components\StatsHelper;
 use panix\mod\stats\components\StatsController;
 
-class IpAddressController extends StatsController {
+class IpAddressController extends StatsController
+{
 
-    public function actionIndex() {
+    public function actionIndex()
+    {
         $this->pageName = Yii::t('stats/default', 'IP_ADDRESS');
         $this->breadcrumbs = [
             [
-                'label'=>Yii::t('stats/default', 'MODULE_NAME'),
-                'url'=>['/admin/stats']
+                'label' => Yii::t('stats/default', 'MODULE_NAME'),
+                'url' => ['/admin/stats']
             ],
             $this->pageName
         ];
@@ -25,15 +28,15 @@ class IpAddressController extends StatsController {
 
         $res = $this->db->createCommand($sql)->queryAll(false);
 
-        $sql2 = "SELECT SUM(t.cnt) as count FROM (" . $sql . ") t";
+        $sql2 = "SELECT SUM(t.cnt) AS count FROM (" . $sql . ") t";
 
 
         $total_cmd = $this->db->createCommand($sql2);
         $total = $total_cmd->queryColumn(false);
 
 //echo $total[0];
-$k = 0;
-$vse = 0;
+        $k = 0;
+        $vse = 0;
         foreach ($res as $row) {
 
             if ($k == 0)
@@ -45,7 +48,7 @@ $vse = 0;
             //  else
             //      $ipz = "неизвестно";
 
-            $this->result[] =[
+            $this->result[] = [
                 'num' => $k,
                 'ip' => CMS::ip($row[0]), //$ipz,
                 'val' => $row[1],
@@ -55,12 +58,12 @@ $vse = 0;
         }
 
 
-            $dataProvider = new \yii\data\ArrayDataProvider([
-                'allModels' => $this->result,
-                'pagination' => [
+        $dataProvider = new \yii\data\ArrayDataProvider([
+            'allModels' => $this->result,
+            'pagination' => [
                 'pageSize' => 10,
             ]
-            ]);
+        ]);
 
         /*$dataProvider = new CArrayDataProvider($this->result, array(
             'sort' => array(
@@ -72,10 +75,11 @@ $vse = 0;
             ),
             'pagination' => array('pageSize' => 10)
         ));*/
-       return $this->render('index', ['dataProvider' => $dataProvider]);
+        return $this->render('index', ['dataProvider' => $dataProvider]);
     }
 
-    public function actionDetail() {
+    public function actionDetail()
+    {
 
         $qs = $_GET['qs'];
         $country = CMS::getCountryNameByIp($qs);
@@ -101,13 +105,13 @@ $vse = 0;
             $ip = CMS::ip($row['ip']);
 
             if ($row['proxy'] != "") {
-                $ip.= '<br>';
-                $ip.= Html::a('через proxy', '?item=ip&qs=' . $row['proxy'], ['target' => '_blank']);
+                $ip .= '<br>';
+                $ip .= Html::a('через proxy', '?item=ip&qs=' . $row['proxy'], ['target' => '_blank']);
             }
- 
+
             $this->result[] = array(
-                'date' => StatsHelper::$DAY[$row['day']] . ' ' . CMS::date($row['date'].' '.$row['time']),
-               // 'date' => StatsHelper::$DAY[$row['day']] . ' ' . $row['dt'],
+                'date' => StatsHelper::$DAY[$row['day']] . ' ' . CMS::date($row['date'] . ' ' . $row['time']),
+                // 'date' => StatsHelper::$DAY[$row['day']] . ' ' . $row['dt'],
                 'time' => $row['time'],
                 'refer' => StatsHelper::renderReferer($row['refer']),
                 'ip' => $ip,

@@ -175,13 +175,13 @@ class RobotsController extends StatsController
                 $pf = " OR ";
             }
         // $res = mysql_query("SELECT day,dt,tm,refer,ip,proxy,host,lang,user,req FROM " . $tablePref . "surf WHERE (" . $zs . ") AND " . $zp2 . " dt >= '$s_date' AND dt <= '$f_date' ORDER BY i DESC");
-        $sql = "SELECT day,dt,tm,refer,ip,proxy,host,lang,user,req FROM {{surf}} WHERE (" . $zs . ") AND " . $this->_zp2 . " dt >= '$this->sdate' AND dt <= '$this->fdate' ORDER BY i DESC";
+        $sql = "SELECT day,date,time,refer,ip,proxy,host,lang,user,req FROM {$this->tableSurf} WHERE (" . $zs . ") AND " . $this->_zp2 . " date >= '$this->sdate' AND date <= '$this->fdate' ORDER BY i DESC";
         $cmd = $this->db->createCommand($sql);
 
         $r = $cmd->queryAll();
-        $this->render('detail', array(
+        $this->render('detail', [
             'items' => $r,
-        ));
+        ]);
     }
 
 }
