@@ -530,6 +530,7 @@ class Stats extends \yii\base\Component
             }
             $sql = "SELECT COUNT(DISTINCT ip) as hosts, COUNT(i) as hits FROM {$this->tableSurf} WHERE date='" . $date . "' AND " . $zp;
             $command = Yii::$app->db->createCommand($sql);
+
             return $command->queryOne();
         } else {
             throw new Exception(Yii::t('yii', 'Error in {fn} not found param "_zp"', ['{fn}' => __FUNCTION__]));

@@ -58,15 +58,6 @@ class DefaultController extends StatsController
         // $r->order('i DESC');
         // $res = $r->queryRow(false);
 
-        Yii::$app->set('db2', [
-            'class' => 'panix\engine\db\Connection',
-            'dsn' => 'mysql:host=localhost;dbname=yii2_test',
-            'username' => 'root',
-            'password' => '',
-            'charset' => 'utf8',
-            'tablePrefix' => 'cms_',
-
-        ]);
 
         $query = new \yii\db\Query;
         $query->from($this->tableSurf);
@@ -160,16 +151,16 @@ class DefaultController extends StatsController
                 ), array('success', 'warning'));
 
 
-            $result[] = array(
+            $result[] = [
                 'date' => StatsHelper::$DAY[$row['day']] . $dt,
                 'graphic' => $graphic,
                 //'hosts' => Html::a($m_uniqs[$dt], '/admin/stats/detail/hosts?date=' . $dt),
-                'hosts' => Html::a($m_uniqs[$dt], array('/admin/stats/detail/hosts', 'date' => $dt)),
-                'hits' => Html::a($m_hits[$dt], array('/admin/stats/detail/hits', 'date' => $dt)),
-                'search' => Html::a($m_se[$dt], array('/admin/stats/detail/search', 'date' => $dt)),
-                'sites' => Html::a($m_other[$dt], array('/admin/stats/detail/other', 'date' => $dt)),
-                'fix' => Html::a($m_fix[$dt], array('/admin/stats/detail/fix', 'date' => $dt))
-            );
+                'hosts' => Html::a($m_uniqs[$dt], ['/admin/stats/detail/hosts', 'date' => $dt]),
+                'hits' => Html::a($m_hits[$dt], ['/admin/stats/detail/hits', 'date' => $dt]),
+                'search' => Html::a($m_se[$dt], ['/admin/stats/detail/search', 'date' => $dt]),
+                'sites' => Html::a($m_other[$dt], ['/admin/stats/detail/other', 'date' => $dt]),
+                'fix' => Html::a($m_fix[$dt], ['/admin/stats/detail/fix', 'date' => $dt])
+            ];
         }
 
 
