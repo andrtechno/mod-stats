@@ -77,8 +77,8 @@ class Module extends WebModule {
                             ],
                             [
                                 'label' => Yii::t('stats/default', 'Поисковые системы'),
-                                'url' => ['/admin/stats/searchquery/system'],
-                                'active' => ($c == 'admin/searchquery' && $a == 'system') ? true : false,
+                                'url' => ['/admin/stats/search-query/system'],
+                                'active' => ($c == 'admin/search-query' && $a == 'system') ? true : false,
                                 'icon' => Html::icon('icon-search')
                             ],
                         ]

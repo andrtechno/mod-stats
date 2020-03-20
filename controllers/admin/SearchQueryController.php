@@ -16,32 +16,49 @@ class SearchQueryController extends StatsController
         $pages = Yii::$app->request->get('pages');
         // $db = Yii::$app->db;
         //  if (isset($engin) or $top == 1) {
+        /** @var \yii\db\Query $query */
+        $query = $this->query;
+        $query->select('*');
+        $query->where(['>=', 'date', $this->sdate]);
+        $query->andWhere(['<=', 'date', $this->sdate]);
         if (isset($engin)) {
             switch ($engin) {
                 case "Y":
+                    $query->andWhere(['like','LOWER(refer)','yand']);
                     $e = "LOWER(refer) LIKE '%yand%'";
                     break;
                 case "R":
+                    $query->andWhere(['like','LOWER(refer)','rambler.']);
                     $e = "LOWER(refer) LIKE '%rambler.%'";
                     break;
                 case "G":
+                    $query->andWhere(['like','LOWER(refer)','google.']);
                     $e = "LOWER(refer) LIKE '%google.%'";
                     break;
                 case "M":
+                    $query->andWhere(['like','LOWER(refer)','go.mail.ru']);
                     $e = "LOWER(refer) LIKE '%go.mail.ru%'";
                     break;
                 case "H":
+                    $query->andWhere(['like','LOWER(refer)','search.yahoo']);
                     $e = "LOWER(refer) LIKE '%search.yahoo%'";
                     break;
                 case "S":
+                    $query->andWhere(['like','LOWER(refer)','search.msn']);
+                    $query->orWhere(['like','LOWER(refer)','bing']);
+                    $query->orWhere(['like','LOWER(refer)','search.live.com']);
                     $e = "LOWER(refer) LIKE '%search.msn%' OR LOWER(refer) LIKE '%bing%' OR LOWER(refer) LIKE '%search.live.com%'";
                     break;
                 case "?":
+                    $query->andWhere(['like','LOWER(refer)','?q=']);
+                    $query->orWhere(['like','LOWER(refer)','&q=']);
+                    $query->orWhere(['like','LOWER(refer)','?query=']);
                     $e = "LOWER(refer) LIKE '%?q=%' OR LOWER(refer) LIKE '%&q=%' OR LOWER(refer) LIKE '%query=%'";
                     break;
                 default :
                     foreach ($se_nn as $key => $val)
                         if (stristr(strip_tags($key), strip_tags($engin))) {
+                            $query->andWhere(['like','LOWER(refer)',$val]);
                             $e = "LOWER(refer) LIKE '%$val%'";
                             break;
                         }
@@ -49,19 +66,40 @@ class SearchQueryController extends StatsController
             }
         } else
             $e = "LOWER(refer) LIKE '%yand%' OR LOWER(refer) LIKE '%google.%' OR LOWER(refer) LIKE '%go.mail.ru%' OR LOWER(refer) LIKE '%rambler.%' OR LOWER(refer) LIKE '%search.yahoo%' OR LOWER(refer) LIKE '%search.msn%' OR LOWER(refer) LIKE '%bing%' OR LOWER(refer) LIKE '%search.live.com%' OR LOWER(refer) LIKE '%?q=%' OR LOWER(refer) LIKE '%&q=%' OR LOWER(refer) LIKE '%query=%'" . $this->_cse_m;
+
+
+        foreach ($this->_zp_queries as $q) {
+            $query->andWhere($q);
+        }
+
+        $query->andWhere(['not like','LOWER(refer)','@']);
         if ($this->sort == "hi") {
+
             $sql = "SELECT refer,req FROM {$this->tableSurf} WHERE date >= '$this->sdate' AND date <= '$this->fdate' AND ($e) AND LOWER(refer) NOT LIKE '%@%' AND" . $this->_zp;
         } else {
+            $query->groupBy(['ip','refer']);
             $sql = "SELECT refer,req,ip FROM {$this->tableSurf} WHERE date >= '$this->sdate' AND date <= '$this->fdate' AND ($e) AND LOWER(refer) NOT LIKE '%@%' AND" . $this->_zp . " GROUP BY ip,refer";
         }
-        $res = $this->db->createCommand($sql);
+
+
+        $command = $query->createCommand();
+       // echo $command;
+       // echo '<br><br><br><br>';
+
+        //$res = $this->db->createCommand($sql);
+       // echo $res->rawSql;die;
         $qmas = [];
         $pmas = [];
-        $results = $res->queryAll();
-        // while ($row = $res->queryAll()) {
+        $results = $command->queryAll();
+        $newmas=[];
+        $k=0;
+        $vse=0;
+        $mmx=0;
+        $cnt=0;
         if ($results) {
-            foreach ($res->queryAll() as $row) {
-                $refer = StatsHelper::Ref($row[0]);
+            foreach ($results as $row) {
+              //  print_r($row);die;
+                $refer = StatsHelper::Ref($row['refer']);
                 if (is_array($refer)) {
                     list($engine, $query) = $refer;
                     //   if ((strip_tags($engine) == $engin and $top == 4) or ( $top == 1))
@@ -71,37 +109,35 @@ class SearchQueryController extends StatsController
                                 $query = '<span class="text-muted">неизвестно</span>';
                             $qmas[] = mb_strtolower($query, 'UTF-8');
                             if ($pages == 1)
-                                $pmas[mb_strtolower($query, 'UTF-8')][] = $row[1];
+                                $pmas[mb_strtolower($query, 'UTF-8')][] = $row['req'];
                         }
                     } else {
                         if (empty($query))
                             $query = '<span class="text-muted">неизвестно</span>';
                         $qmas[] = mb_strtolower($query, 'UTF-8');
                         if ($pages == 1)
-                            $pmas[mb_strtolower($query, 'UTF-8')][] = $row[1];
+                            $pmas[mb_strtolower($query, 'UTF-8')][] = $row['req'];
                     }
                 }
             }
-            //if (!isset($qmas)) {
-            // Yii::$app->tpl->alert('info','sad');
-            //echo "<center>Нет данных2</center>";
-            // die;
-            //  }
+
             $newmas = array_count_values($qmas);
             arsort($newmas);
-            $mmx = max($newmas);
-            $cnt = array_sum($newmas);
+            if($newmas)
+                $mmx = max($newmas);
+            if($newmas)
+                $cnt = array_sum($newmas);
             if ($pages == 1)
                 foreach ($pmas as $key => $value) {
                     $pmas[$key] = array_count_values($pmas[$key]);
                     arsort($pmas[$key]);
                 }
             //     echo "<table id=table align=center width=750 cellpadding=5 cellspacing=1 border=0><tr class=h><td width=40>№</td><td" . (($pages <> 1) ? " width=500" : " width=50%") . ">Поисковый запрос";
-            if ($top == 4) {
-                echo "&nbsp;<span style='background-color:#dcdcdc;'>&nbsp;&nbsp;";
-                echo_se($engin);
-                echo "&nbsp;&nbsp;</span>";
-            }
+            //if ($top == 4) {
+            //    echo "&nbsp;<span style='background-color:#dcdcdc;'>&nbsp;&nbsp;";
+            //    echo_se($engin);
+           //     echo "&nbsp;&nbsp;</span>";
+           // }
             // echo (($pages <> 1) ? " <a class=e href=\"?" . str_replace(stristr($_SERVER['QUERY_STRING'], '&pages'), "", $_SERVER['QUERY_STRING']) . "&pages=1\">+</a>" : "") . "</td>" . (($pages <> 1) ? "" : "<td width=50%>Страницы <a class=e href=\"?" . str_replace(stristr($_SERVER['QUERY_STRING'], '&pages'), "", $_SERVER['QUERY_STRING']) . "&pages=0\">&ndash;</a></td>") . "<td width=50>" . (($this->sort == "hi") ? "Хиты" : "Хосты") . "</td><td width=100>График</td><td width=50>%</td></tr>";
             while (list($query, $val) = each($newmas)) {
 
@@ -120,12 +156,12 @@ class SearchQueryController extends StatsController
                 //    echo "<td><img align=left src=px" . (($this->sort == "hi") ? "h" : "u") . ".gif width=" . ceil(($val * 100) / $mmx) . " height=11 border=0></td>";
                 //  echo "<td>" . (number_format((($val * 100) / $cnt), 1, ',', '')) . "</td></tr>";
 
-                $this->result[] = array(
+                $this->result[] = [
                     'num' => $k,
                     'query' => $queryData,
                     'val' => $val,
                     'progressbar' => $this->progressBar(ceil(($val * 100) / $mmx), number_format((($val * 100) / $cnt), 1, ',', ''), (($this->sort == "hi") ? "success" : "warning")),
-                );
+                ];
             }
             // echo "<tr class=h><td></td><td align=left><b>Всего:</b></td>" . (($pages <> 1) ? "" : "<td></td>") . "<td><b>$vse</b></td><td align=left>из $cnt</td><td></td></tr></table>";
 
@@ -138,9 +174,9 @@ class SearchQueryController extends StatsController
         ]);
 
 
-        return $this->render('index', array(
+        return $this->render('index', [
             'dataProvider' => $dataProvider,
-        ));
+        ]);
     }
 
     public function actionSystem()
