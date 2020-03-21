@@ -24,8 +24,11 @@ class RobotsController extends StatsController
         /** @var \yii\db\Query $query */
         $query = $this->query;
         $query->select(['COUNT(i) as count', 'MAX(i) as count_max', 'date']);
-        $query->andWhere(['>=', 'date', $this->sdate]);
-        $query->andWhere(['<=', 'date', $this->fdate]);
+        if(Yii::$app->request->get('s_date'))
+            $query->andWhere(['>=', 'date', $this->sdate]);
+        if(Yii::$app->request->get('f_date'))
+            $query->andWhere(['<=', 'date', $this->fdate]);
+
         foreach ($this->robo as $val) {
 
 
@@ -141,15 +144,15 @@ class RobotsController extends StatsController
 
     public function actionDetail()
     {
-        $qs = $_GET['qs'];
-        $this->pageName = Yii::t('stats/default', 'ROBOTS');
+        $qs = Yii::$app->request->get('qs');
+        $this->pageName = $qs;
 
         $this->breadcrumbs[]=[
             'label'=>Yii::t('stats/default', 'MODULE_NAME'),
             'url'=>['/admin/stats']
         ];
         $this->breadcrumbs[]=[
-            'label'=>$this->pageName,
+            'label'=>Yii::t('stats/default', 'ROBOTS'),
             'url'=>['/admin/stats/robots']
         ];
         $this->breadcrumbs[]=$qs;
@@ -158,8 +161,10 @@ class RobotsController extends StatsController
         /** @var Query $query */
         $query = $this->query;
         $query->select('*');
-        $query->where(['>=', 'date', $this->sdate]);
-        $query->andWhere(['<=', 'date', $this->sdate]);
+        if(Yii::$app->request->get('s_date'))
+            $query->andWhere(['>=', 'date', $this->sdate]);
+        if(Yii::$app->request->get('f_date'))
+            $query->andWhere(['<=', 'date', $this->fdate]);
         if (isset($this->rbdn[$qs]))
             foreach ($this->rbdn[$qs] as $vl) {
                 $query->andWhere(['LIKE', 'LOWER(user)', mb_strtolower($vl)]);
@@ -174,17 +179,33 @@ class RobotsController extends StatsController
             }
 
         $query->orderBy(['i'=>SORT_DESC]);
-        // $res = mysql_query("SELECT day,dt,tm,refer,ip,proxy,host,lang,user,req FROM " . $tablePref . "surf WHERE (" . $zs . ") AND " . $zp2 . " dt >= '$s_date' AND dt <= '$f_date' ORDER BY i DESC");
-        $sql = "SELECT day,date,time,refer,ip,proxy,host,lang,user,req FROM {$this->tableSurf} WHERE (" . $zs . ") AND " . $this->_zp2 . " date >= '$this->sdate' AND date <= '$this->fdate' ORDER BY i DESC";
-        $cmd = $this->db->createCommand($sql);
-       // echo $cmd->rawSql;
-       // echo '<br><br><br>';
-       // echo $query->createCommand()->rawSql;
+        $command = $query->createCommand();
+        $result=[];
+        foreach ($command->queryAll() as $data) {
+                $result[] = [
+                    'date' => StatsHelper::$DAY[$data['day']] . $data['date'],
+                    'time' =>  $data['time'],
+                    'refer' => StatsHelper::Ref($data['refer']),
+                    'ip' => $data['ip'],
+                    'host' => StatsHelper::getRowHost($data['ip'],$data['proxy'],$data['host'],$data['lang']),
+                    'user' => $data['user'],
+                    'req' => $data['req'],
+                ];
 
-       // die;
-        $r = $cmd->queryAll();
+        }
+        $dataProvider = new \yii\data\ArrayDataProvider([
+            'allModels' => $result,
+            'pagination' => [
+                'pageSize' => 10,
+            ]
+        ]);
+
+
+        // $res = mysql_query("SELECT day,dt,tm,refer,ip,proxy,host,lang,user,req FROM " . $tablePref . "surf WHERE (" . $zs . ") AND " . $zp2 . " dt >= '$s_date' AND dt <= '$f_date' ORDER BY i DESC");
+        //$sql = "SELECT day,date,time,refer,ip,proxy,host,lang,user,req FROM {$this->tableSurf} WHERE (" . $zs . ") AND " . $this->_zp2 . " date >= '$this->sdate' AND date <= '$this->fdate' ORDER BY i DESC";
+
         return $this->render('detail', [
-            'items' => $query->createCommand()->queryAll(),
+            'dataProvider' => $dataProvider,
         ]);
     }
 

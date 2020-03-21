@@ -27,7 +27,7 @@ class BrowsersController extends StatsController
         $query = $this->query;
         $query->select(['user', 'ip']);
         $query->where(['>=', 'date', $this->sdate]);
-        $query->andWhere(['<=', 'date', $this->sdate]);
+        $query->andWhere(['<=', 'date', $this->fdate]);
         foreach ($this->_zp_queries as $q) {
             $query->andWhere($q);
         }
@@ -58,9 +58,13 @@ class BrowsersController extends StatsController
 
         $vse = 0;
         $k = 0;
-        arsort($browserList);
-        $mmx = max($browserList);
-        $cnt = array_sum($browserList);
+        $mmx = 0;
+        $cnt = 0;
+        if ($browserList) {
+            arsort($browserList);
+            $mmx = max($browserList);
+            $cnt = array_sum($browserList);
+        }
         $pie = [];
         $helper = new StatsHelper;
 
@@ -96,13 +100,6 @@ class BrowsersController extends StatsController
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
-            'bmas' => $browserList,
-            'cnt' => $cnt,
-            'vse' => $vse,
-            'pie' => $pie,
-            'mmx' => $mmx,
-            'brw' => $brw,
-            'k' => $k,
         ]);
     }
 
@@ -197,7 +194,7 @@ class BrowsersController extends StatsController
 
     public function actionDetail()
     {
-        $brw=StatsHelper::GetBrwNew(Yii::$app->request->get('brw'));
+        $brw = StatsHelper::GetBrwNew(Yii::$app->request->get('brw'));
 
         $pz = 0;
         $sql = "SELECT * FROM {$this->tableSurf} WHERE date >= '$this->sdate' AND date <= '$this->fdate' " . StatsHelper::GetBrw(Yii::$app->request->get('brw')) . (($pz == 1) ? " AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY ip" : "") . " ORDER BY i DESC";
@@ -208,14 +205,14 @@ class BrowsersController extends StatsController
         $query->select('*');
         $query->where(['>=', 'date', $this->sdate]);
         $query->andWhere(['<=', 'date', $this->sdate]);
-        if($brw){
+        if ($brw) {
             foreach ($this->_zp_queries as $q) {
                 $query->andWhere($q);
             }
             foreach ($brw as $q) {
-                if($q[0]=='not like'){
+                if ($q[0] == 'not like') {
                     $query->andWhere($q);
-                }else{
+                } else {
                     $query->orWhere($q);
                 }
             }
@@ -225,13 +222,13 @@ class BrowsersController extends StatsController
 
         $query->orderBy(['i' => SORT_DESC]);
 
-     //   echo $cmd->rawSql;
-       // echo '<br><br><br><bR>';
+        //   echo $cmd->rawSql;
+        // echo '<br><br><br><bR>';
 //echo StatsHelper::GetBrw(Yii::$app->request->get('brw')) . (($pz == 1) ? " AND" . $this->_zp : "");
-      //  echo '<br><br><br><bR>';
+        //  echo '<br><br><br><bR>';
 
-       // echo $query->createCommand()->rawSql;
-       //  die;
+        // echo $query->createCommand()->rawSql;
+        //  die;
         $items = $query->createCommand()->queryAll();
 
 

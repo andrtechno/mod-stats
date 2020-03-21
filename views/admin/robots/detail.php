@@ -1,36 +1,56 @@
-<?php
-//$this->timefilter();
-use panix\mod\stats\components\StatsHelper;
-?>
-<div class="table-responsive">
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Дата</th>
-            <th>Время</th>
-            <th>Referer</th>
-            <th>IP-адрес</th>
-            <th>Хост</th>
-            <th width="30%">User Agent</th>
-            <th>Страница</th>
-        </tr>
-    </thead>
-    <?php
-    foreach ($items as $val => $item) {
 
-        ?>
-        <tr>
-            <td><?=\panix\mod\stats\components\StatsHelper::$DAY[$item['day']] . $item['date']?></td>
-            <td><?= $item['time'] ?></td>
-            <td><?=StatsHelper::Ref($item['refer'])?></td>
-            <td width="20%"><?= $item['ip']; ?></td>
-            <td><?=StatsHelper::getRowHost($item['ip'],$item['proxy'],$item['host'],$item['lang']);?></td>
-            <td><?= $item['user'] ?></td>
-            <td><?= $item['req'] ?></td>
-        </tr>
-        <?php
-    }
-    ?>
-</table>
-</div>
+<?php
+use panix\engine\grid\GridView;
+
+echo GridView::widget([
+    'tableOptions' => ['class' => 'table table-striped'],
+    'dataProvider' => $dataProvider,
+    //'filterModel' => $searchModel,
+    'layoutOptions' => ['title' => $this->context->pageName],
+    'columns' => [
+        [
+            'attribute' => 'date',
+            'header' => Yii::t('app/default', 'date'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-left'],
+        ],
+        [
+            'attribute' => 'time',
+            'header' => Yii::t('app/default', 'time'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'refer',
+            'header' => Yii::t('app/default', 'refer'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'ip',
+            'header' => Yii::t('stats/default', 'IP_ADDRESS'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'host',
+            'header' => Yii::t('stats/default', 'HOSTS'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'user_agent',
+            'header' => Yii::t('stats/default', 'USER_AGENT'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+        [
+            'attribute' => 'page',
+            'header' => Yii::t('stats/default', 'HOSTS'),
+            'format' => 'raw',
+            'contentOptions' => ['class' => 'text-center'],
+        ],
+    ]
+]);
+
 
