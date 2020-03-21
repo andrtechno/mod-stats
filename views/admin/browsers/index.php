@@ -26,7 +26,7 @@ use panix\engine\grid\GridView;
                 ],
                 [
                     'attribute' => 'val',
-                    'header' => Yii::t('app/default', 'hosts'),
+                    'header' => Yii::t('stats/default', 'HOSTS'),
                     'format' => 'raw',
                     'contentOptions' => ['class' => 'text-center'],
                 ],

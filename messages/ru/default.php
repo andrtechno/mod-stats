@@ -14,4 +14,5 @@ return [
     'DETAIL' => 'Подробней',
     'PLATFORM' => 'Платформа: {name}',
     'BROWSER' => 'Браузер: {name} {v}',
+    'USER_AGENT' => 'User-агент'
 ];

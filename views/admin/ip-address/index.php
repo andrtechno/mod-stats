@@ -20,13 +20,13 @@ use panix\engine\grid\GridView;
                 ],
                 [
                     'attribute' => 'ip',
-                    'header' => Yii::t('app/default', 'ip'),
+                    'header' => Yii::t('stats/default', 'IP_ADDRESS'),
                     'format' => 'raw',
                     'contentOptions' => ['class' => 'text-center'],
                 ],
                 [
                     'attribute' => 'val',
-                    'header' => Yii::t('app/default', 'hits'),
+                    'header' => Yii::t('stats/default', 'HITS'),
                     'format' => 'raw',
                     'contentOptions' => ['class' => 'text-center'],
                 ],

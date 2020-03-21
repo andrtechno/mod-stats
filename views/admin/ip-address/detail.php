@@ -39,13 +39,13 @@ $this->widget('ext.adminList.GridView', array(//ext.adminList.GridView
         ),*/
         array(
             'name' => 'host',
-            'header' => 'Хост',
+            'header' => Yii::t('stats/default', 'HOSTS'),
             'type' => 'raw',
             'htmlOptions' => array('class' => 'text-center', 'width' => '10%')
         ),
         array(
             'name' => 'user_agent',
-            'header' => 'User-agent',
+            'header' =>Yii::t('stats/default', 'USER_AGENT'),
             'type' => 'raw',
             'htmlOptions' => array('class' => 'text-center', 'width' => '10%')
         ),

@@ -2,20 +2,19 @@
 
 namespace panix\mod\stats\controllers\admin;
 
-use panix\mod\stats\models\StatsSurf;
+use panix\engine\CMS;
 use Yii;
 use panix\engine\Html;
-use panix\mod\stats\models\StatsHistory;
-use panix\mod\stats\models\StatsMain;
 use panix\mod\stats\components\StatsHelper;
+use yii\data\ArrayDataProvider;
+use panix\mod\stats\components\StatsController;
 
-class DetailController extends \panix\mod\stats\components\StatsController {
+class DetailController extends StatsController
+{
 
-    public function actionIndex($date) {
-        
-    }
 
-    public function actionOther($date) {
+    public function actionOther($date)
+    {
         $stats = Yii::$app->stats->initRun();
         // $zp = $stats['zp'];
         $site = $stats['site'];
@@ -41,12 +40,12 @@ class DetailController extends \panix\mod\stats\components\StatsController {
                 $skip = 1;
 
             if (@array_key_exists($row[2], $i1_ip)) {
-                if ((is_array($refer) or ( ($refer != "") and ! (stristr($refer, "://" . $site) and stripos($refer, "://" . $site, 6) == 0) and ! (stristr($refer, "://www." . $site) and stripos($refer, "://www." . $site, 6) == 0)) or $skip == 1))
+                if ((is_array($refer) or (($refer != "") and !(stristr($refer, "://" . $site) and stripos($refer, "://" . $site, 6) == 0) and !(stristr($refer, "://www." . $site) and stripos($refer, "://www." . $site, 6) == 0)) or $skip == 1))
                     ;
                 else
                     $i2[$i1_ip[$row[2]]][] = array($row[7], $row[8]);
             }
-            if (is_string($refer) and $refer != "" and ! (stristr($refer, "://" . $site) and stripos($refer, "://" . $site, 6) == 0) and ! (stristr($refer, "://www." . $site) and stripos($refer, "://www." . $site, 6) == 0) and $skip == 0) {
+            if (is_string($refer) and $refer != "" and !(stristr($refer, "://" . $site) and stripos($refer, "://" . $site, 6) == 0) and !(stristr($refer, "://www." . $site) and stripos($refer, "://www." . $site, 6) == 0) and $skip == 0) {
                 $i1[$row[0]] = array($row[1], $row[2], $row[3], $row[4], $row[5], $row[6]);
                 $i1_ip[$row[2]] = $row[0];
                 $i2[$i1_ip[$row[2]]][] = array($row[7], $row[8]);
@@ -65,7 +64,7 @@ class DetailController extends \panix\mod\stats\components\StatsController {
             );
         }
 
-        $dataProvider = new \yii\data\ArrayDataProvider([
+        $dataProvider = new ArrayDataProvider([
             'allModels' => $result,
             'pagination' => [
                 'pageSize' => 10,
@@ -85,25 +84,37 @@ class DetailController extends \panix\mod\stats\components\StatsController {
           )); */
 
         return $this->render('other', array(
-                    'dataProvider' => $dataProvider
+            'dataProvider' => $dataProvider
         ));
     }
 
-    public function actionSearch($date) {
+    public function actionSearch($date)
+    {
         $this->pageName = 'search';
         $stats = Yii::$app->stats->initRun();
         // $zp = $stats['zp'];
         $site = $stats['site'];
-        $sql = "SELECT i,refer,ip,proxy,host,lang,user,time,req FROM {$this->tableSurf} WHERE date='" . $date . "' AND " . $this->_zp . " ORDER BY i ASC";
-        $cmd = $this->db->createCommand($sql);
-        $result = array();
-        $i1=[];
-        $i1_ip=[];
-        $i2=[];
+
+
+        /** @var \yii\db\Query $query */
+        $query = $this->query;
+        $query->where(['date' => $date]);
+        foreach ($this->_zp_queries as $q) {
+            $query->andWhere($q);
+        }
+        $query->orderBy(['i' => SORT_ASC]);
+
+
+        //$sql = "SELECT i,refer,ip,proxy,host,lang,user,time,req FROM {$this->tableSurf} WHERE date='" . $date . "' AND " . $this->_zp . " ORDER BY i ASC";
+        $cmd = $query->createCommand();
+        $result = [];
+        $i1 = [];
+        $i1_ip = [];
+        $i2 = [];
         foreach ($cmd->queryAll(false) as $row) {
             $refer = StatsHelper::Ref($row[1]);
             if (@array_key_exists($row[2], $i1_ip)) {
-                if ((is_array($refer) or ( ($row[1] != "") and ! stristr($row[1], "://" . $site) and ! stristr($row[1], "://www." . $site))))
+                if ((is_array($refer) or (($row[1] != "") and !stristr($row[1], "://" . $site) and !stristr($row[1], "://www." . $site))))
                     ;
                 else
                     $i2[$i1_ip[$row[2]]][] = array($row[7], $row[8]);
@@ -133,7 +144,7 @@ class DetailController extends \panix\mod\stats\components\StatsController {
             );
         }
 
-        $dataProvider = new \yii\data\ArrayDataProvider([
+        $dataProvider = new ArrayDataProvider([
             'allModels' => $result,
             'pagination' => [
                 'pageSize' => 10,
@@ -142,11 +153,12 @@ class DetailController extends \panix\mod\stats\components\StatsController {
 
 
         return $this->render('search', array(
-                    'dataProvider' => $dataProvider
+            'dataProvider' => $dataProvider
         ));
     }
 
-    public function actionHits($date) {
+    public function actionHits($date)
+    {
 
         $this->pageName = Yii::t('stats/default', 'HITS_FOR', array('{date}' => $date));
 
@@ -154,10 +166,16 @@ class DetailController extends \panix\mod\stats\components\StatsController {
           Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
           $this->pageName
           ); */
-
-        $sql = "SELECT i,refer,ip,proxy,host,lang,user,time,req FROM {$this->tableSurf} WHERE dt='" . $date . "' AND " . $this->_zp . " ORDER BY i ASC";
-        $cmd = $this->db->createCommand($sql);
-        $result = array();
+        /** @var \yii\db\Query $query */
+        $query = $this->query;
+        $query->where(['date' => $date]);
+        foreach ($this->_zp_queries as $q) {
+            $query->andWhere($q);
+        }
+        $query->orderBy(['i' => SORT_ASC]);
+        // $sql = "SELECT i,refer,ip,proxy,host,lang,user,time,req FROM {$this->tableSurf} WHERE date='" . $date . "' AND " . $this->_zp . " ORDER BY i ASC";
+        $cmd = $query->createCommand();
+        $result = [];
         foreach ($cmd->queryAll() as $row) {
             //TODO: need fix, bag @array_key_exists "array_key_exists() expects parameter 2 to be array, null given"
             if (@array_key_exists($row['proxy'], $i1_ip)) {
@@ -178,41 +196,45 @@ class DetailController extends \panix\mod\stats\components\StatsController {
             } else {
                 $refer1 = StatsHelper::checkIdna($row2[0]);
             }
-            $result[] = array(
+            $result[] = [
                 'refer' => $refer1,
                 'ip' => StatsHelper::getRowIp($row2[1], $row2[2]),
                 'host' => StatsHelper::getRowHost($row2[1], $row2[2], $row2[3], $row2[4]),
                 'user_agent' => StatsHelper::getRowUserAgent($row2[5], $row2[1]),
                 'timelink' => StatsHelper::timeLink($i2, $id),
-            );
+            ];
         }
-        $dataProvider = new CArrayDataProvider($result, array(
-            'sort' => array(
-                'attributes' => array(
-                    'ip',
-                    'refer',
-                ),
-            ),
-            'pagination' => array(
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $result,
+            'pagination' => [
                 'pageSize' => 10,
-            ),
-        ));
+            ]
+        ]);
 
-        return $this->render('hits', array(
-                    'dataProvider' => $dataProvider
-        ));
+        return $this->render('hits', [
+            'dataProvider' => $dataProvider
+        ]);
     }
 
-    public function actionHosts($date) {
-        $this->pageName = Yii::t('stats/default', 'HOSTS_FOR', array('{date}' => $date));
+    public function actionHosts($date)
+    {
+        $this->pageName = Yii::t('stats/default', 'HOSTS_FOR', ['date' => $date]);
 
         /*  $this->breadcrumbs = array(
           Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
           $this->pageName
           ); */
-
-        $sql = "SELECT time,refer,ip,proxy,host,lang,user,req from {$this->tableSurf} WHERE dt='" . $date . "' AND " . $this->_zp . " GROUP BY ip ORDER BY i DESC";
-        $cmd = $this->db->createCommand($sql);
+        /** @var \yii\db\Query $query */
+        $query = $this->query;
+        $query->where(['date' => $date]);
+        foreach ($this->_zp_queries as $q) {
+            $query->andWhere($q);
+        }
+        $query->orderBy(['i' => SORT_DESC]);
+        $query->groupBy(['ip']);
+        //GROUP BY ip ORDER BY i DESC
+        // $sql = "SELECT time,refer,ip,proxy,host,lang,user,req from {$this->tableSurf} WHERE date='" . $date . "' AND " . $this->_zp . " GROUP BY ip ORDER BY i DESC";
+        $cmd = $query->createCommand();
         foreach ($cmd->queryAll() as $row) {
 
             $refer = StatsHelper::Ref($row['refer']);
@@ -222,18 +244,18 @@ class DetailController extends \panix\mod\stats\components\StatsController {
             } else {
                 $refer1 = StatsHelper::checkIdna($row['refer']);
             }
-            $this->result[] = array(
+            $this->result[] = [
                 'time' => $row['time'],
                 'refer' => $refer1,
                 'ip' => StatsHelper::getRowIp($row['ip'], $row['proxy']),
                 'host' => StatsHelper::getRowHost($row['ip'], $row['proxy'], $row['host'], $row['lang']),
                 'user_agent' => StatsHelper::getRowUserAgent($row['user'], $row['refer']),
                 'timelink' => Html::a($row['req'], $row['req']),
-            );
+            ];
         }
 
 
-        $dataProvider = new \yii\data\ArrayDataProvider([
+        $dataProvider = new ArrayDataProvider([
             'allModels' => $this->result,
             'pagination' => [
                 'pageSize' => 10,
@@ -253,32 +275,42 @@ class DetailController extends \panix\mod\stats\components\StatsController {
           ),
           ));
          */
-        return $this->render('hosts', array(
-                    'dataProvider' => $dataProvider
-        ));
+        return $this->render('hosts', [
+            'dataProvider' => $dataProvider
+        ]);
     }
 
-    public function actionFix() {
+    public function actionFix()
+    {
         $this->pageName = 'fix';
 
-        $this->breadcrumbs = array(
-            Yii::t('stats/default', 'MODULE_NAME') => array('/admin/stats'),
-            $this->pageName
-        );
+        $this->breadcrumbs[] = [
+            'label' => Yii::t('stats/default', 'MODULE_NAME'),
+            'url' => ['/sd']
+        ];
+        $this->breadcrumbs[] = $this->pageName;
 
-        $sql = "SELECT time,refer,ip,proxy,host,lang,user,req FROM {$this->tableSurf} WHERE (" . $this->_zfx . ") AND dt='" . $_GET['date'] . "' AND" . $this->_zp . " ORDER BY i DESC";
-        $cmd = Yii::$app->db->createCommand($sql);
+
+        /** @var \yii\db\Query $query */
+        $query = $this->query;
+        $query->where(['date' => $_GET['date']]);
+        foreach ($this->_zp_queries as $q) {
+            $query->andWhere($q);
+        }
+        foreach ($this->_zfx_queries as $q) {
+            $query->andWhere($q);
+        }
+        $query->orderBy(['i' => SORT_DESC]);
+
+        // $sql = "SELECT time,refer,ip,proxy,host,lang,user,req FROM {$this->tableSurf} WHERE (" . $this->_zfx . ") AND date='" . $_GET['date'] . "' AND" . $this->_zp . " ORDER BY i DESC";
+        $cmd = $query->createCommand();
 
         foreach ($cmd->queryAll(false) as $row) {
-
-
             $ip = CMS::ip($row[2]);
-
             if ($row[3] != "") {
                 $ip .= '<br>';
-                $ip .= Html::a('через proxy', '?item=ip&qs=' . $row[3], array('target' => '_blank'));
+                $ip .= Html::a('через proxy', '?item=ip&qs=' . $row[3], ['target' => '_blank']);
             }
-
 
             $this->result[] = array(
                 'time' => $row[0],
@@ -291,23 +323,16 @@ class DetailController extends \panix\mod\stats\components\StatsController {
         }
 
 
-
-
-
-        $dataProvider = new CArrayDataProvider($this->result, array(
-            'sort' => array(
-                'attributes' => array(
-                    'refer',
-                    'req',
-                ),
-            ),
-            'pagination' => array(
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $this->result,
+            'pagination' => [
                 'pageSize' => 10,
-            ),
-        ));
+            ]
+        ]);
+
 
         //mysql_data_seek($r, 0);
-        $n = array();
+        $n = [];
         foreach ($cmd->queryAll(false) as $row) {
             $n[] = strip_tags($this->fixo("refer", $row[1]));
             $n[] = strip_tags($this->fixo("ip", $row[2]));
@@ -320,10 +345,10 @@ class DetailController extends \panix\mod\stats\components\StatsController {
         unset($nn[""]);
 
 
-        $this->render('fix', array(
+        return $this->render('fix', [
             'dataProvider' => $dataProvider,
             'count' => $nn
-        ));
+        ]);
     }
 
 }

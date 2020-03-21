@@ -55,6 +55,7 @@ class StatsController extends \panix\engine\controllers\AdminController
     public $_cot_m_queries = [];
     public $_site; //site
     public $_zfx; //$zfx
+    public $_zfx_queries = [];
     public $rbd;
     public $rbdn;
     public $robo;
@@ -200,6 +201,7 @@ class StatsController extends \panix\engine\controllers\AdminController
             }
             foreach ($this->fx_m as $obj) {
                 $this->_zfx .= $pf . "LOWER(" . $obj[0] . ") LIKE '%" . mb_strtolower($obj[1]) . "%'";
+                $this->_zfx_queries[]=['like','LOWER('.$obj[0].')',mb_strtolower($obj[1])];
                 $pf = " OR ";
                 $obj[2] = rtrim($obj[2]);
                 if (!empty($obj[2]))

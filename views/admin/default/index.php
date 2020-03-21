@@ -235,13 +235,13 @@ echo GridView::widget([
         ],
         [
             'attribute' => 'hosts',
-            'header' => Yii::t('app/default', 'hosts'),
+            'header' => Yii::t('stats/default', 'HOSTS'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],
         [
             'attribute' => 'hits',
-            'header' => Yii::t('app/default', 'hits'),
+            'header' => Yii::t('stats/default', 'HITS'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],

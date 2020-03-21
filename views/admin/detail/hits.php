@@ -16,20 +16,20 @@ echo GridView::widget([
         ],
         [
             'attribute' => 'ip',
-            'header' => Yii::t('app/default', 'ip'),
+            'header' => Yii::t('stats/default', 'IP_ADDRESS'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],
         [
             'attribute' => 'host',
-            'header' => Yii::t('app/default', 'host'),
+            'header' => Yii::t('stats/default', 'HOSTS'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],
 
         [
             'attribute' => 'user_agent',
-            'header' => Yii::t('app/default', 'user_agent'),
+            'header' => Yii::t('stats/default', 'USER_AGENT'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],

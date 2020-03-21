@@ -83,7 +83,7 @@ class DefaultController extends StatsController
 
         $m_hits = [];
 
-        foreach ($query->createCommand($this->db)->queryAll() as $dtm) {
+        foreach ($query->createCommand()->queryAll() as $dtm) {
             if (substr($sdate, 4, 2) <> substr($dtm['date'], 4, 2) && $sdate <> 0)
                 $c++;
             $sdate = $dtm['date'];
@@ -93,7 +93,10 @@ class DefaultController extends StatsController
             } else {
 
                 //die(print_r($this->c_uniqs_hits($dtm[1]['dt'])));
-                list($m_uniqs[$dtm['date']], $m_hits[$dtm['date']]) = $stats->countVisits($dtm['date']);
+                $s = $stats->countVisits($dtm['date']);
+                $m_uniqs[$dtm['date']] = $s['hosts'];
+                $m_hits[$dtm['date']] = $s['hits'];
+
             }
         }
 
@@ -126,7 +129,7 @@ class DefaultController extends StatsController
 
                     if ($dt != $fdate && !in_array($dt, $rwz["date"])) {
                         // die('save');
-                        $sql_insert = "INSERT INTO {{%stats_history}}(DATE,HOSTS,hits,search,other,fix) VALUES('" . $dt . "','" . $m_uniqs[$dt] . "','" . $m_hits[$dt] . "','" . $m_se[$dt] . "','" . $m_other[$dt] . "','" . $m_fix[$dt] . "')";
+                        $sql_insert = "INSERT INTO {{%stats_history}}(date,hosts,hits,search,other,fix) VALUES('" . $dt . "','" . $m_uniqs[$dt] . "','" . $m_hits[$dt] . "','" . $m_se[$dt] . "','" . $m_other[$dt] . "','" . $m_fix[$dt] . "')";
                         $this->db->createCommand($sql_insert)->execute();
 
                         $sql_del = "DELETE me FROM {{%stats_history}} AS me, {{%stats_history}} AS clone WHERE me.date = clone.date AND me.i > clone.i";
@@ -142,13 +145,13 @@ class DefaultController extends StatsController
                 $graphic = $this->progressBar(ceil((372 * $m_uniqs[$dt]) / $max_hits), ceil((372 * $m_uniqs[$dt]) / $max_hits));
             else
                 $graphic = $this->progressBarStack(
-                    array(
+                    [
                         round((100 * $m_uniqs[$dt]) / $max_hits),
                         ceil((100 * $m_hits[$dt]) / $max_hits) - ceil((100 * $m_uniqs[$dt]) / $max_hits) - 1
-                    ), array(
+                    ], [
                     $m_uniqs[$dt],
                     $m_hits[$dt]
-                ), array('success', 'warning'));
+                ], ['success', 'warning']);
 
 
             $result[] = [
@@ -169,12 +172,12 @@ class DefaultController extends StatsController
         //     $total = explode("|", $total[0]);
         // }
 
-          $uniq_total = $this->db->createCommand("SELECT COUNT(DISTINCT ip) as total FROM {$this->tableSurf} WHERE " . $this->_zp);
+        $uniq_total = $this->db->createCommand("SELECT COUNT(DISTINCT ip) as total FROM {$this->tableSurf} WHERE " . $this->_zp);
 
-          $all_uniqs = $uniq_total->queryOne();
+        $all_uniqs = $uniq_total->queryOne();
 
 
-        $dday = array(0 => "ВС", 1 => "ПН", 2 => "ВТ", 3 => "СР", 4 => "ЧТ", 5 => "ПТ", 6 => "СБ");
+        $dday = [0 => "ВС", 1 => "ПН", 2 => "ВТ", 3 => "СР", 4 => "ЧТ", 5 => "ПТ", 6 => "СБ"];
 
 
         $dataProvider = new \yii\data\ArrayDataProvider([
@@ -186,10 +189,10 @@ class DefaultController extends StatsController
 
 
         $m_date = array_keys($m_hits);
-        $mmx=false;
-        $m_other=false;
-        if($m_hits)
-        $mmx = max($m_hits);
+        $mmx = false;
+        $m_other = false;
+        if ($m_hits)
+            $mmx = max($m_hits);
         $weekResult = array();
 
         //$weekResult=  array_slice($weekResult['hits'],7);
