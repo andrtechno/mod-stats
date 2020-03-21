@@ -7,7 +7,6 @@ use panix\engine\CMS;
 use panix\engine\Html;
 use panix\mod\stats\components\StatsHelper;
 use panix\mod\stats\components\StatsController;
-use yii\db\Query;
 
 class BrowsersController extends StatsController
 {
@@ -23,7 +22,7 @@ class BrowsersController extends StatsController
             $this->pageName
         ];
 
-        /** @var Query $query */
+        /** @var \panix\mod\stats\components\Query $query */
         $query = $this->query;
         $query->select(['user', 'ip']);
         $query->where(['>=', 'date', $this->sdate]);
@@ -194,29 +193,24 @@ class BrowsersController extends StatsController
 
     public function actionDetail()
     {
-        $brw = StatsHelper::GetBrwNew(Yii::$app->request->get('brw'));
+
 
         $pz = 0;
-        $sql = "SELECT * FROM {$this->tableSurf} WHERE date >= '$this->sdate' AND date <= '$this->fdate' " . StatsHelper::GetBrw(Yii::$app->request->get('brw')) . (($pz == 1) ? " AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY ip" : "") . " ORDER BY i DESC";
-        $cmd = $this->db->createCommand($sql);
+       // $sql = "SELECT * FROM {$this->tableSurf} WHERE date >= '$this->sdate' AND date <= '$this->fdate' " . StatsHelper::GetBrw(Yii::$app->request->get('brw')) . (($pz == 1) ? " AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY ip" : "") . " ORDER BY i DESC";
+       // $cmd = $this->db->createCommand($sql);
 
-        /** @var Query $query */
+        /** @var \panix\mod\stats\components\Query $query */
         $query = $this->query;
         $query->select('*');
         $query->where(['>=', 'date', $this->sdate]);
         $query->andWhere(['<=', 'date', $this->sdate]);
-        if ($brw) {
+        $query->browser(Yii::$app->request->get('brw'));
+       // echo $query->createCommand()->rawSql;die;
+       // if ($brw) {
             foreach ($this->_zp_queries as $q) {
                 $query->andWhere($q);
             }
-            foreach ($brw as $q) {
-                if ($q[0] == 'not like') {
-                    $query->andWhere($q);
-                } else {
-                    $query->orWhere($q);
-                }
-            }
-        }
+      //  }
         if ($this->sort == 'ho')
             $query->groupBy('ip');
 

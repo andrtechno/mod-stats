@@ -4,8 +4,9 @@ namespace panix\mod\stats\components;
 
 use panix\mod\stats\models\StatsSurf;
 use Yii;
+use panix\engine\controllers\AdminController;
 
-class StatsController extends \panix\engine\controllers\AdminController
+class StatsController extends AdminController
 {
 
     public $db;
@@ -110,7 +111,7 @@ class StatsController extends \panix\engine\controllers\AdminController
     public function init()
     {
         $this->tableSurf = StatsSurf::tableName();
-        $this->query = new \yii\db\Query;
+        $this->query = new Query();
         $this->query->from($this->tableSurf);
         //$this->query->select('*');
 

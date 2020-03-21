@@ -602,34 +602,50 @@ class StatsHelper
         }
     }
 
-
-    public static function GetBrwNew($brw)
+    /**
+     * @param $brw
+     * @param \yii\db\Query $query
+     * @return array|string
+     */
+    public static function GetBrwNew($brw, \yii\db\Query $query)
     {
         $queries = [];
         switch ($brw) {
             case "maxthon.png":
-                return "AND (LOWER(user) LIKE '%maxthon%' OR LOWER(user) LIKE '%myie%')";
+                $query->andWhere(['like', 'LOWER(user)', 'maxthon']);
+                $query->orWhere(['like', 'LOWER(user)', 'myie']);
+                return $query;
+               // return "AND (LOWER(user) LIKE '%maxthon%' OR LOWER(user) LIKE '%myie%')";
                 break;
             case "opera.png":
+                $queries[] = ['like', 'LOWER(user)', 'opera'];
+                $queries[] = ['like', 'LOWER(user)', 'myie'];
                 return "AND (LOWER(user) LIKE '%opera%' OR LOWER(user) LIKE '%opr/%')";
                 break;
             case "ie.png":
                 return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%opera%' AND (LOWER(user) LIKE '%msie%' OR LOWER(user) LIKE '%trident%')";
                 break;
             case "firefox.png":
+                $query->andWhere(['not like', 'LOWER(user)', ['maxthon', 'myie', 'msie', 'opera']]);
+                $query->andWhere(['like', 'LOWER(user)', 'firefox']);
 
-                $queries[] = ['not like', 'LOWER(user)', ['maxthon', 'myie', 'msie', 'opera']];
-                $queries[] = ['like', 'LOWER(user)', 'firefox'];
-                return $queries;
+               // $queries[] = ['not like', 'LOWER(user)', ['maxthon', 'myie', 'msie', 'opera']];
+              //  $queries[] = ['like', 'LOWER(user)', 'firefox'];
+                return $query;
 
 
-             //   return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) LIKE '%firefox%'";
+                //   return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) LIKE '%firefox%'";
                 break;
             case "chrome.png":
-                $queries[] = ['not like', 'LOWER(user)', ['maxthon', 'myie', 'msie', 'opera', 'opr/', 'firefox']];
-                $queries[] = ['like', 'LOWER(user)', ['chrome', 'android']];
-                return $queries;
-               // return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) NOT LIKE '%opr/%' AND LOWER(user) NOT LIKE '%firefox%' AND (LOWER(user) LIKE '%chrome%' OR LOWER(user) LIKE '%android%')";
+                $query->andWhere(['not like', 'LOWER(user)', ['maxthon', 'myie', 'msie', 'opera', 'opr/', 'firefox']]);
+                $query->orWhere(['like', 'LOWER(user)', 'chrome']);
+                $query->orWhere(['like', 'LOWER(user)', 'android']);
+                return $query;
+
+                //$queries[] = ['not like', 'LOWER(user)', ['maxthon', 'myie', 'msie', 'opera', 'opr/', 'firefox']];
+                //$queries[] = ['like', 'LOWER(user)', ['chrome', 'android']];
+                //return $queries;
+                // return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) NOT LIKE '%opr/%' AND LOWER(user) NOT LIKE '%firefox%' AND (LOWER(user) LIKE '%chrome%' OR LOWER(user) LIKE '%android%')";
                 break;
             case "safari.png":
                 return "AND LOWER(user) NOT LIKE '%maxthon%' AND LOWER(user) NOT LIKE '%myie%' AND LOWER(user) NOT LIKE '%msie%' AND LOWER(user) NOT LIKE '%opera%' AND LOWER(user) NOT LIKE '%firefox%' AND LOWER(user) NOT LIKE '%chrome%' AND LOWER(user) NOT LIKE '%android%' AND LOWER(user) LIKE '%safari%'";
@@ -650,7 +666,7 @@ class StatsHelper
     {
         switch ($engine) {
             case "Y":
-                return "<b><font color=#FF0000>Я</font>ndex</b>";
+                return "<b><span style='color:#FF0000;'>Я</span>ndex</b>";
                 break;
             case "R":
                 return "<b><font color=#0000FF>R</font>ambler</b>";
@@ -765,7 +781,7 @@ class StatsHelper
             $url = iconv("CP1251", "UTF-8", $url);
         preg_match("/[?&]+" . $sw . "([^&]*)/i", $url . "&", $match1);
         $match1[1] = trim($match1[1]);
-        return array($engine, $match1[1]);
+        return [$engine, $match1[1]];
     }
 
     public static function is_robot($check, $check2)
@@ -797,7 +813,7 @@ class StatsHelper
             $url = iconv("CP1251", "UTF-8", $url);
         preg_match("/[?&]+" . $sw . "([^&]*)/i", $url . "&", $match1);
         $match1[1] = trim($match1[1]);
-        return array($engine, $match1[1]);
+        return [$engine, $match1[1]];
     }
 
     public static function se_sp($ref)
