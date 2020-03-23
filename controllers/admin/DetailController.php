@@ -314,7 +314,7 @@ class DetailController extends StatsController
 
             $this->result[] = array(
                 'time' => $row[0],
-                'refer' => StatsHelper::renderReferer($row[1]),
+                'refer' => StatsHelper::renderReferrer($row[1]),
                 'ip' => $this->fixo("ip", $row[2]) . '' . $ip,
                 'host' => $this->fixo("host", $row[4]) . '' . StatsHelper::getRowHost($row[2], $row[3], $row[4], $row[5]),
                 'user_agent' => $this->fixo("user", $row[6]) . '' . StatsHelper::getRowUserAgent($row[6], $row[4]),

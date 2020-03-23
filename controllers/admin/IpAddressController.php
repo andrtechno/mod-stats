@@ -2,12 +2,14 @@
 
 namespace panix\mod\stats\controllers\admin;
 
+use panix\mod\stats\components\Query;
 use panix\mod\stats\models\StatsSurf;
 use Yii;
 use panix\engine\CMS;
 use panix\engine\Html;
 use panix\mod\stats\components\StatsHelper;
 use panix\mod\stats\components\StatsController;
+use yii\data\ArrayDataProvider;
 
 class IpAddressController extends StatsController
 {
@@ -22,23 +24,30 @@ class IpAddressController extends StatsController
             ],
             $this->pageName
         ];
+        /** @var \panix\mod\stats\components\Query $query */
+        $query = $this->query;
+        $query->select(['ip','COUNT(ip) cnt']);
+        $query->where(['>=', 'date', $this->sdate]);
+        $query->andWhere(['<=', 'date', $this->fdate]);
+        foreach ($this->_zp_queries as $q) {
+            $query->andWhere($q);
+        }
+        $query->groupBy(['ip']);
+
         $tableSurf = StatsSurf::tableName();
-        $sql = "SELECT ip, COUNT(ip) cnt FROM {$tableSurf} WHERE";
-        $sql .= $this->_zp . " AND date >= '$this->sdate' AND date <= '$this->fdate' GROUP BY ip ORDER BY 2 DESC";
 
-        $res = $this->db->createCommand($sql)->queryAll(false);
-
-        $sql2 = "SELECT SUM(t.cnt) AS count FROM (" . $sql . ") t";
+        $res = $query->createCommand()->queryAll(false);
+        $queryTotal = (new Query())->select(["SUM({$tableSurf}.cnt) AS count"])->from([$tableSurf=>$query]);
+        $total = $queryTotal->createCommand()->queryColumn();
 
 
-        $total_cmd = $this->db->createCommand($sql2);
-        $total = $total_cmd->queryColumn(false);
 
+       // print_r($total);die;
 //echo $total[0];
         $k = 0;
         $vse = 0;
+      //  die;
         foreach ($res as $row) {
-
             if ($k == 0)
                 $max = $row[1];
             $k++;
@@ -50,56 +59,72 @@ class IpAddressController extends StatsController
 
             $this->result[] = [
                 'num' => $k,
-                'ip' => CMS::ip($row[0]), //$ipz,
+                'ip' => CMS::ip($row[0]),
                 'val' => $row[1],
                 'progressbar' => $this->progressBar(ceil(($row[1] * 100) / $max), number_format((($row[1] * 100) / $total[0]), 1, ',', '')),
-                'detail' => StatsHelper::linkDetail("/admin/stats/ipaddress/detail/?tz=1&pz=1&s_date=" . $this->sdate . "&f_date=" . $this->fdate . "&qs=" . $row[0])
+                'detail' => StatsHelper::linkDetail(['detail', 's_date' => $this->sdate, 'f_date' => $this->fdate, 'qs' => $row[0], 'tz' => 1, 'pz' => 1])
             ];
         }
 
 
-        $dataProvider = new \yii\data\ArrayDataProvider([
+        $dataProvider = new ArrayDataProvider([
             'allModels' => $this->result,
             'pagination' => [
                 'pageSize' => 10,
             ]
         ]);
 
-        /*$dataProvider = new CArrayDataProvider($this->result, array(
-            'sort' => array(
-                // 'defaultOrder'=>'ip ASC',
-                'attributes' => array(
-                    'ip',
-                    'val'
-                ),
-            ),
-            'pagination' => array('pageSize' => 10)
-        ));*/
         return $this->render('index', ['dataProvider' => $dataProvider]);
     }
 
     public function actionDetail()
     {
 
-        $qs = $_GET['qs'];
-        $country = CMS::getCountryNameByIp($qs);
-        $this->pageName = $qs . ' ' . $country;
-        $title = CMS::ip($qs, 1);
-        $title .= ' (' . $country . ')';
+        $qs = Yii::$app->request->get('qs');
 
-        $this->breadcrumbs = array(
-            Yii::t('stats/default', 'MODULE_NAME') => ['/admin/stats'],
-            Yii::t('stats/default', 'IP_ADDRESS') => ['/admin/stats/ip-address'],
-            $qs
-        );
+        $this->pageName = $qs;
+        $title = CMS::ip($qs);
 
-
+        $this->breadcrumbs[]=[
+            'label'=>Yii::t('stats/default', 'MODULE_NAME'),
+            'url'=>['/admin/stats']
+        ];
+        $this->breadcrumbs[]=[
+            'label'=>Yii::t('stats/default', 'IP_ADDRESS'),
+            'url'=>['/admin/stats/ip-address']
+        ];
+        $this->breadcrumbs[]=$this->pageName;
         $item = 'ip';
-        $tz = $_GET['tz'];
+        $tz = Yii::$app->request->get('tz');
+        $pz = Yii::$app->request->get('pz');
 
-        $sql = "SELECT * FROM {$this->tableSurf} WHERE (" . $item . " LIKE '" . (($tz == 1) ? "" : "%") . addslashes($qs) . (($tz == 1 or $tz == 7) ? "" : "%") . "') AND dt >= '$this->sdate' AND dt <= '$this->fdate' " . (($pz == 1) ? "AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY " . (($tz == 7) ? "host" : "ip") : "") . " ORDER BY i DESC";
-        $res = $this->db->createCommand($sql);
-        foreach ($res->queryAll() as $row) {
+
+        /** @var \panix\mod\stats\components\Query $query */
+        $query = $this->query;
+        $query->select('*');
+        $query->where(['ip'=>$qs]);
+        $query->andWhere(['>=', 'date', $this->sdate]);
+        $query->andWhere(['<=', 'date', $this->fdate]);
+        $query->orderBy(['i'=>SORT_DESC]);
+        if($this->sort=='ho'){
+            $query->groupBy(['ip']);
+            if($tz==7){
+                $query->groupBy(['host']);
+            }
+
+        }
+        if($pz==1) {
+            foreach ($this->_zp_queries as $q) {
+                $query->andWhere($q);
+            }
+        }
+        $command  = $query->createCommand();
+       // echo $query->createCommand()->rawSql;
+       // echo '<br><br><br><br><br>';
+        $sql = "SELECT * FROM {$this->tableSurf} WHERE (" . $item . " LIKE '" . (($tz == 1) ? "" : "%") . addslashes($qs) . (($tz == 1 or $tz == 7) ? "" : "%") . "') AND date >= '$this->sdate' AND date <= '$this->fdate' " . (($pz == 1) ? "AND" . $this->_zp : "") . " " . (($this->sort == "ho") ? "GROUP BY " . (($tz == 7) ? "host" : "ip") : "") . " ORDER BY i DESC";
+       // $res = $this->db->createCommand($sql);
+        //echo $sql;die;
+        foreach ($command->queryAll() as $row) {
 
 
             $ip = CMS::ip($row['ip']);
@@ -110,10 +135,8 @@ class IpAddressController extends StatsController
             }
 
             $this->result[] = array(
-                'date' => StatsHelper::$DAY[$row['day']] . ' ' . CMS::date($row['date'] . ' ' . $row['time']),
-                // 'date' => StatsHelper::$DAY[$row['day']] . ' ' . $row['dt'],
-                'time' => $row['time'],
-                'refer' => StatsHelper::renderReferer($row['refer']),
+                'date' => StatsHelper::$DAY[$row['day']] . ' ' . CMS::date(strtotime($row['date'] . ' ' . $row['time'])),
+                'refer' => StatsHelper::renderReferrer($row['refer']),
                 'ip' => $ip,
                 'host' => StatsHelper::getRowHost($row['ip'], $row['proxy'], $row['host'], $row['lang']),
                 'user_agent' => StatsHelper::getRowUserAgent($row['user'], $row['refer']),
@@ -121,19 +144,15 @@ class IpAddressController extends StatsController
             );
         }
 
-        $dataProvider = new CArrayDataProvider($this->result, array(
-            'sort' => array(
-                // 'defaultOrder'=>'ip ASC',
-                'attributes' => array(
-                    'date',
-                    'time',
-                    'refer',
-                    'page'
-                ),
-            ),
-            'pagination' => array('pageSize' => 10)
-        ));
-        $this->render('detail', [
+
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $this->result,
+            'pagination' => [
+                'pageSize' => 10,
+            ]
+        ]);
+
+        return $this->render('detail', [
             'dataProvider' => $dataProvider,
             'title' => $title
         ]);

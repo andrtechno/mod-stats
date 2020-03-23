@@ -240,7 +240,7 @@ class BrowsersController extends StatsController
             $this->result[] = array(
                 'date' => StatsHelper::$DAY[$row['day']] . ' ' . CMS::date(strtotime($row['date']),false) .' '.$row['time'],
                 'time' => $row['time'],
-                'refer' => StatsHelper::renderReferer($row['refer']),
+                'refer' => StatsHelper::renderReferrer($row['refer']),
                 'ip' => $ip,
                 'host' => StatsHelper::getRowHost($row['ip'], $row['proxy'], $row['host'], $row['lang']),
                 'user_agent' => StatsHelper::getRowUserAgent($row['user'], $row['refer']),

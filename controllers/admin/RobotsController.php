@@ -3,6 +3,7 @@
 namespace panix\mod\stats\controllers\admin;
 
 use panix\engine\CMS;
+use panix\engine\Html;
 use panix\mod\stats\components\StatsHelper;
 use panix\mod\stats\components\StatsController;
 use Yii;
@@ -35,37 +36,23 @@ class RobotsController extends StatsController
                 continue;
 
             if (isset($this->rbdn[$val])) {
-                $userList=[];
+                $userList = [];
                 foreach ($this->rbdn[$val] as $vl) {
-                    $userList[]=mb_strtolower($vl);
-                   // $re_query->andWhere(['like', 'LOWER(user)', mb_strtolower($vl)]);
+                    $userList[] = mb_strtolower($vl);
+                    // $re_query->andWhere(['like', 'LOWER(user)', mb_strtolower($vl)]);
 
                 }
                 $query->where(['like', 'LOWER(user)', $userList]);
             }
-            if (isset($this->hbdn[$val])){
-                $hostList=[];
+            if (isset($this->hbdn[$val])) {
+                $hostList = [];
                 foreach ($this->hbdn[$val] as $vl) {
-                    $hostList[]=mb_strtolower($vl);
+                    $hostList[] = mb_strtolower($vl);
 
                 }
                 $query->andWhere(['like', 'LOWER(host)', $hostList]);
             }
 
-            //   $res = $this->query->createCommand()->queryOne();
-            // print_r($res);die;
-           //   echo $re_query->createCommand()->rawSql;
-          //  echo '<br><br><br><br>';
-
-
-            //print_r($res);die;
-
-
-            //$sql = "SELECT COUNT(i), MAX(i) FROM {$this->tableSurf} WHERE (" . $zs . ") AND " . $this->_zp2 . " dt >= '$this->sdate' AND dt <= '$this->fdate'";
-
-//
-
-            //$r = $cmd->queryOne();
             $r = $query->createCommand()->queryOne();
 
             $d = $r['count_max'];
@@ -89,11 +76,6 @@ class RobotsController extends StatsController
             }
 
         }
-
-        //echo $query->createCommand()->rawSql;die;
-        $cmd = $query->createCommand()->rawSql;
-        // echo $cmd; die;
-
         arsort($cnt);
         $mmx = max($cnt);
         $cn = array_sum($cnt);
@@ -106,11 +88,11 @@ class RobotsController extends StatsController
 
                 $result[] = [
                     'num' => $k,
-                    'bot' => '<a target=_blank href="robots/detail?s_date=' . $this->sdate . '&f_date=' . $this->fdate . '&qs=' . $val . '">' . $val . '</a>',
+                    'bot' => Html::a($val, ['detail', 's_date' => $this->sdate, 'f_date' => $this->fdate, 'qs' => $val], ['target' => '_blank']),
                     'visit' => $ff_date[$val],
                     'count' => $co,
                     'progressbar' => $this->progressBar(ceil(($co * 100) / $mmx), number_format((($co * 100) / $cn), 1, '.', '')),
-                    'detail' => StatsHelper::linkDetail("robots/detail?s_date={$this->sdate}&f_date={$this->fdate}&qs={$val}")
+                    'detail' => StatsHelper::linkDetail(['detail', 's_date' => $this->sdate, 'f_date' => $this->fdate, 'qs' => $val])
                 ];
 
 
@@ -151,7 +133,7 @@ class RobotsController extends StatsController
         /** @var Query $query */
         $query = $this->query;
         $query->select('*');
-        if (Yii::$app->request->get('s_date') && Yii::$app->request->get('f_date')){
+        if (Yii::$app->request->get('s_date') && Yii::$app->request->get('f_date')) {
             $query->where(['>=', 'date', $this->sdate]);
             $query->andWhere(['<=', 'date', $this->fdate]);
         }

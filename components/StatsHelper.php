@@ -27,17 +27,17 @@ class StatsHelper
         if (!self::is_robot($user_agent, $refer)) {
             $brw = self::getBrowser($user_agent);
             if ($brw != "")
-                $content .= Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/browsers/' . $brw, array(
+                $content .= Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/browsers/' . $brw, [
                     //'title' => $user_agent,
                     'alt' => $user_agent,
-                    'title' => Yii::t('stats/default', 'BROWSER', array(
-                        '{name}' => $browser->getBrowser(), //.' '.$user_agent,
-                        '{v}' => $browser->getVersion()
-                    )),
+                    'title' => Yii::t('stats/default', 'BROWSER', [
+                        'name' => $browser->getBrowser(), //.' '.$user_agent,
+                        'v' => $browser->getVersion()
+                    ]),
                     'class' => 'img-thumbnail',
                     'data-toggle' => "tooltip",
                     'data-placement' => "top",
-                ));
+                ]);
         }
         $content .= self::getPlatformByImage($user_agent);
         $content .= self::getMobileByImage($user_agent);
@@ -62,13 +62,13 @@ class StatsHelper
             $name = $browser->getPlatform();
             $img = self::getPlatformByImage($user_agent, false);
         }
-        return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/' . $img, array(
+        return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/' . $img, [
             'data-toggle' => "tooltip",
             'data-placement' => "top",
             'class' => 'img-thumbnail',
             'title' => $name,
             'alt' => $name
-        ));
+        ]);
     }
 
     public static function getPlatformByImage($user_agent, $render = true)
@@ -78,13 +78,13 @@ class StatsHelper
         $browser->setUserAgent($user_agent);
         // return $browser->getPlatform();
         if ($browser->isRobot()) {
-            return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/robot.png', array(
+            return Html::img(Yii::$app->getModule('stats')->assetsUrl . '/images/platform/robot.png', [
                 'data-toggle' => "tooltip",
                 'data-placement' => "top",
                 'title' => 'Робот',
                 'class' => 'img-thumbnail',
                 'alt' => $browser->getPlatform(),
-            ));
+            ]);
         }
 
 
@@ -152,7 +152,7 @@ class StatsHelper
             $content .= "<a target=_blank href=\"http://www.tcpiputils.com/browse/ip-address/" . (($ip != "") ? $ip : $host) . "\">" . $host . "</a>";
         }
         if ($host != "") {
-            $content .= "<br>Язык: " . (!empty($p) ? $p : "<font color=grey>неизвестно</font>");
+            $content .= "<br>Язык: " . (!empty($p) ? $p : "<span style='color:grey'>неизвестно</span>");
             if (file_exists(Yii::getAlias('@webroot/uploads/language') . DIRECTORY_SEPARATOR . mb_strtolower($lang) . ".png")) {
                 $content .= Html::img('/uploads/language/' . mb_strtolower($lang) . '.png', ['alt' => $p]);
             }
@@ -216,11 +216,11 @@ class StatsHelper
 
         $content = '';
         if ($refer != "unknown")
-            $content .= "<a target=_blank href=\"?item=ip&qs=" . $refer . "\">" . $refer . "</a>";
+            $content .= Html::a($refer,['dd'])."<a target=_blank href=\"?item=ip&qs=" . $refer . "\">" . $refer . "</a>";
         else
             $content .= '<span class="text-muted">неизвестно</span>';
         if ($ip != "")
-            $content .= "<br><a target=_blank href=\"?item=ip&qs=" . $ip . "\">через proxy</a>";
+            $content .= Html::a($refer,['dd1'])."<br><a target=_blank href=\"?item=ip&qs=" . $ip . "\">через proxy</a>";
 
         return $content;
     }
@@ -237,7 +237,7 @@ class StatsHelper
         return $content;
     }
 
-    public static function renderReferer($ref)
+    public static function renderReferrer($ref)
     {
         $text = '';
         $refer = self::Ref($ref);
@@ -254,7 +254,7 @@ class StatsHelper
         else {
             $text .= '<a target="_blank" href="' . $ref . '">';
             if (stristr(urldecode($ref), "xn--")) {
-                $IDN = new \idna_convert(array('idn_version' => 2008));
+                $IDN = new \idna_convert(['idn_version' => 2008]);
                 $text .= $IDN->decode(urldecode($ref));
             } else
                 $text .= urldecode($ref);
@@ -281,7 +281,7 @@ class StatsHelper
         else {
             $content .= "<a target=_blank href=\"" . $ref . "\">";
             if (stristr(urldecode($ref), "xn--")) {
-                $IDN = new \idna_convert(array('idn_version' => 2008));
+                $IDN = new \idna_convert(['idn_version' => 2008]);
                 $content .= $IDN->decode(urldecode($ref));
             } else
                 $content .= urldecode($ref);
@@ -314,7 +314,7 @@ class StatsHelper
         "Sat" => "<span style='color:#de3163'>СБ:</span> ",
         "Sun" => "<span style='color:#de3163'>ВС:</span> "
     ];
-    public static $LANG = array(// ISO 639
+    public static $LANG = [// ISO 639
         "AA" => "Afar",
         "AB" => "Abkhazian",
         "AE" => "Avestan",
@@ -506,7 +506,7 @@ class StatsHelper
         "ZA" => "Zhuang",
         "ZH" => "Chinese",
         "ZU" => "Zulu"
-    );
+    ];
 
     public static function getBrowser($UA)
     {
@@ -533,7 +533,7 @@ class StatsHelper
 
     public static function get_encoding($str)
     {
-        $cp_list = array('utf-8', 'cp1251');
+        $cp_list = ['utf-8', 'cp1251'];
         foreach ($cp_list as $k => $codepage) {
             if (md5($str) === md5(iconv($codepage, $codepage, $str))) {
                 return $codepage;
@@ -562,11 +562,11 @@ class StatsHelper
         preg_match("/[?&]+" . $sw2 . "([^&]*)/i", $url . "&", $match2);
         $match2[1] = trim($match2[1]);
         if ($match2[1] == $match1[1])
-            return array($engine, $match1[1]);
+            return [$engine, $match1[1]];
         if (!empty($match2[1]))
-            return array($engine, ($match2[1] . " + " . $match1[1]));
+            return [$engine, ($match2[1] . " + " . $match1[1])];
         else
-            return array($engine, $match1[1]);
+            return [$engine, $match1[1]];
     }
 
     public static function GetBrw($brw)
@@ -669,13 +669,13 @@ class StatsHelper
                 return "<b><span style='color:#FF0000;'>Я</span>ndex</b>";
                 break;
             case "R":
-                return "<b><font color=#0000FF>R</font>ambler</b>";
+                return "<b><span style='color:#0000FF'>R</span>ambler</b>";
                 break;
             case "G":
-                return "<b><font color=#2159D6>G</font><font color=#C61800>o</font><font color=#D6AE00>o</font><font color=#2159D6>g</font><font color=#18A221>l</font><font color=#C61800>e</font></b>";
+                return "<b><span style='color:#2159D6'>G</span><span style='color:#C61800'>o</span><span style='color:#D6AE00'>o</span><span style='color:#2159D6'>g</span><span style='color:#18A221'>l</span><span style='color:#C61800'>e</span></b>";
                 break;
             case "M":
-                return "<b><font color=#F8AC32>@</font><font color=#00468c>mail</font><font color=#F8AC32>.ru</font></b>";
+                return "<b><span style='color:#F8AC32'>@</span><span style='color:#00468c'>mail</span><span style='color:#F8AC32'>.ru</span></b>";
                 break;
             case "H":
                 return "<b>Yahoo</b>";
@@ -707,7 +707,7 @@ class StatsHelper
             $url = iconv("CP1251", "UTF-8", $url);
         preg_match("/[?&]+" . $sw . "([^&]*)/i", $url . "&", $match1);
         $match1[1] = trim($match1[1]);
-        return array($engine, $match1[1]);
+        return [$engine, $match1[1]];
     }
 
     public static function se_mail2($ref)
@@ -725,11 +725,11 @@ class StatsHelper
         preg_match("/[?&]+" . $sw2 . "([^&]*)/i", $url . "&", $match2);
         $match2[1] = trim($match2[1]);
         if ($match2[1] == $match1[1])
-            return array($engine, $match1[1]);
+            return [$engine, $match1[1]];
         if (!empty($match2[1]))
-            return array($engine, ($match2[1] . " + " . $match1[1]));
+            return [$engine, ($match2[1] . " + " . $match1[1])];
         else
-            return array($engine, $match1[1]);
+            return [$engine, $match1[1]];
     }
 
     public static function se_rambler($ref)
@@ -751,9 +751,9 @@ class StatsHelper
         $match1[1] = trim($match1[1]);
         if (stristr($url, "infound=1")) {
             preg_match("/[?&]+" . $sw2 . "([^&]*)/i", $url . "&", $match2);
-            return array($engine, ($match2[1] . " + " . $match1[1]));
+            return [$engine, ($match2[1] . " + " . $match1[1])];
         } else
-            return array($engine, $match1[1]);
+            return [$engine, $match1[1]];
     }
 
     public static function se_yahoo($ref)
@@ -767,7 +767,7 @@ class StatsHelper
             $url = iconv("CP1251", "UTF-8", $url);
         preg_match("/[?&]+" . $sw . "([^&]*)/i", $url . "&", $match1);
         $match1[1] = trim($match1[1]);
-        return array($engine, $match1[1]);
+        return [$engine, $match1[1]];
     }
 
     public static function se_msn($ref)
@@ -832,7 +832,7 @@ class StatsHelper
                         $url = iconv("CP1251", "UTF-8", $url);
                     preg_match("/[?&]+" . $sw . "([^&]*)/i", $url . "&", $match1);
                     $match1[1] = trim($match1[1]);
-                    return array($engine, $match1[1]);
+                    return [$engine, $match1[1]];
                 }
             }
         }
