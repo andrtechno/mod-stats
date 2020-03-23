@@ -227,8 +227,8 @@ class BrowsersController extends StatsController
 
 
         foreach ($items as $row) { //StatsHelper::$MONTH[substr($row['dt'], 4, 2)]
-            //$ip = CMS::ip($row['ip']);
-            $ip = $row['ip'];
+            $ip = CMS::ip($row['ip']);
+            //$ip = $row['ip'];
 
             if ($row['proxy'] != "") {
                 $ip .= '<br>';
@@ -236,7 +236,7 @@ class BrowsersController extends StatsController
             }
 
             $this->result[] = array(
-                'date' => StatsHelper::$DAY[$row['day']] . ' ' . CMS::date(strtotime($row['date'] . ' ' . $row['time'])),
+                'date' => StatsHelper::$DAY[$row['day']] . ' ' . CMS::date(strtotime($row['date']),false) .' '.$row['time'],
                 'time' => $row['time'],
                 'refer' => StatsHelper::renderReferer($row['refer']),
                 'ip' => $ip,

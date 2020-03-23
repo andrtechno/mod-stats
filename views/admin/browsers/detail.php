@@ -16,13 +16,13 @@ echo GridView::widget([
         ],
         [
             'attribute' => 'time',
-            'header' => Yii::t('app/default', 'time'),
+            'header' => Yii::t('stats/default', 'TIMEVISIT'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],
         [
             'attribute' => 'refer',
-            'header' => Yii::t('app/default', 'refer'),
+            'header' => Yii::t('stats/default', 'REFER'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],
@@ -46,7 +46,7 @@ echo GridView::widget([
         ],
         [
             'attribute' => 'page',
-            'header' => Yii::t('stats/default', 'HOSTS'),
+            'header' => Yii::t('stats/default', 'PAGE'),
             'format' => 'raw',
             'contentOptions' => ['class' => 'text-center'],
         ],

@@ -615,7 +615,7 @@ class StatsHelper
                 $query->andWhere(['like', 'LOWER(user)', 'maxthon']);
                 $query->orWhere(['like', 'LOWER(user)', 'myie']);
                 return $query;
-               // return "AND (LOWER(user) LIKE '%maxthon%' OR LOWER(user) LIKE '%myie%')";
+                // return "AND (LOWER(user) LIKE '%maxthon%' OR LOWER(user) LIKE '%myie%')";
                 break;
             case "opera.png":
                 $queries[] = ['like', 'LOWER(user)', 'opera'];
@@ -629,8 +629,8 @@ class StatsHelper
                 $query->andWhere(['not like', 'LOWER(user)', ['maxthon', 'myie', 'msie', 'opera']]);
                 $query->andWhere(['like', 'LOWER(user)', 'firefox']);
 
-               // $queries[] = ['not like', 'LOWER(user)', ['maxthon', 'myie', 'msie', 'opera']];
-              //  $queries[] = ['like', 'LOWER(user)', 'firefox'];
+                // $queries[] = ['not like', 'LOWER(user)', ['maxthon', 'myie', 'msie', 'opera']];
+                //  $queries[] = ['like', 'LOWER(user)', 'firefox'];
                 return $query;
 
 
@@ -905,12 +905,12 @@ class StatsHelper
         }
         preg_match("/[?&]+" . $sw . "([^&]*)/i", $url . "&", $match1);
         preg_match("/[?&]+" . $sw2 . "([^&]*)/i", $url . "&", $match2);
-        if ($match2[1] == $match1[1])
-            return array($engine, $match1[1]);
+        if (isset($match2[1]) == isset($match1[1]))
+            return [$engine, $match1[1]];
         if (!empty($match2[1]))
-            return array($engine, ($match2[1] . " + " . $match1[1]));
+            return [$engine, ($match2[1] . " + " . $match1[1])];
         else
-            return array($engine, $match1[1]);
+            return [$engine, $match1[1]];
     }
 
     public static function Ref($ref)
@@ -925,35 +925,26 @@ class StatsHelper
             }
             if (stristr($reff, "://yandex") or stristr($reff, "://search.yaca.yandex") or stristr($reff, "://images.yandex"))
                 return self::se_yandex($ref);
+            else if (stristr($reff, "://google"))
+                return self::se_google($ref);
+            else if (stristr($reff, "://rambler") or stristr($reff, "://nova.rambler") or stristr($reff, "://search.rambler") or stristr($reff, "://ie4.rambler") or stristr($reff, "://ie5.rambler"))
+                return self::se_rambler($ref);
+            else if (stristr($reff, "://go.mail.ru") and stristr($reff, "words="))
+                return self::se_mail1($ref);
+            else if (stristr($reff, "://go.mail.ru") or stristr($reff, "://wap.go.mail.ru"))
+                return self::se_mail2($ref);
+            else if (stristr($reff, "://search.msn") or stristr($reff, "://search.live.com") or stristr($reff, "://ie.search.msn") or stristr($reff, "://bing"))
+                return self::se_msn($ref);
+            else if (stristr($reff, "://search.yahoo"))
+                return self::se_yahoo($ref);
+            else if (self::se_sp($ref) <> -1)
+                return self::se_sp($ref);
+            else if (stristr($ref, "?q=") or stristr($ref, "&q="))
+                return self::se_other($ref, "q=");
+            else if (stristr($ref, "query="))
+                return self::se_other($ref, "query=");
             else
-                if (stristr($reff, "://google"))
-                    return self::se_google($ref);
-                else
-                    if (stristr($reff, "://rambler") or stristr($reff, "://nova.rambler") or stristr($reff, "://search.rambler") or stristr($reff, "://ie4.rambler") or stristr($reff, "://ie5.rambler"))
-                        return self::se_rambler($ref);
-                    else
-                        if (stristr($reff, "://go.mail.ru") and stristr($reff, "words="))
-                            return self::se_mail1($ref);
-                        else
-                            if (stristr($reff, "://go.mail.ru") or stristr($reff, "://wap.go.mail.ru"))
-                                return self::se_mail2($ref);
-                            else
-                                if (stristr($reff, "://search.msn") or stristr($reff, "://search.live.com") or stristr($reff, "://ie.search.msn") or stristr($reff, "://bing"))
-                                    return self::se_msn($ref);
-                                else
-                                    if (stristr($reff, "://search.yahoo"))
-                                        return self::se_yahoo($ref);
-                                    else
-                                        if (self::se_sp($ref) <> -1)
-                                            return self::se_sp($ref);
-                                        else
-                                            if (stristr($ref, "?q=") or stristr($ref, "&q="))
-                                                return self::se_other($ref, "q=");
-                                            else
-                                                if (stristr($ref, "query="))
-                                                    return self::se_other($ref, "query=");
-                                                else
-                                                    return $ref;
+                return $ref;
         } else
             return $ref;
     }
