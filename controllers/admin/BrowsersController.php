@@ -202,8 +202,10 @@ class BrowsersController extends StatsController
         /** @var \panix\mod\stats\components\Query $query */
         $query = $this->query;
         $query->select('*');
-        $query->where(['>=', 'date', $this->sdate]);
-        $query->andWhere(['<=', 'date', $this->sdate]);
+        if(Yii::$app->request->get('s_date'))
+            $query->where(['>=', 'date', $this->sdate]);
+        if(Yii::$app->request->get('f_date'))
+            $query->andWhere(['<=', 'date', $this->fdate]);
         $query->browser(Yii::$app->request->get('brw'));
        // echo $query->createCommand()->rawSql;die;
        // if ($brw) {
