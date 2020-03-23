@@ -254,7 +254,7 @@ class StatsHelper
         else {
             $text .= '<a target="_blank" href="' . $ref . '">';
             if (stristr(urldecode($ref), "xn--")) {
-                $IDN = new idna_convert(array('idn_version' => 2008));
+                $IDN = new \idna_convert(array('idn_version' => 2008));
                 $text .= $IDN->decode(urldecode($ref));
             } else
                 $text .= urldecode($ref);
@@ -277,11 +277,11 @@ class StatsHelper
 
         $content = '';
         if ($ref == "")
-            $content .= "<font color=grey>неизвестно</font>";
+            $content .= "<span style='color:grey'>неизвестно</span>";
         else {
             $content .= "<a target=_blank href=\"" . $ref . "\">";
             if (stristr(urldecode($ref), "xn--")) {
-                $IDN = new idna_convert(array('idn_version' => 2008));
+                $IDN = new \idna_convert(array('idn_version' => 2008));
                 $content .= $IDN->decode(urldecode($ref));
             } else
                 $content .= urldecode($ref);
@@ -291,7 +291,7 @@ class StatsHelper
         return $content;
     }
 
-    public static $MONTH = array(
+    public static $MONTH = [
         "12" => "Декабрь",
         "11" => "Ноябрь",
         "10" => "Октябрь",
@@ -304,16 +304,16 @@ class StatsHelper
         "03" => "Март",
         "02" => "Февраль",
         "01" => "Январь"
-    );
-    public static $DAY = array(
+    ];
+    public static $DAY = [
         "Mon" => "ПН: ",
         "Tue" => "ВТ: ",
         "Wed" => "СР: ",
         "Thu" => "ЧТ: ",
         "Fri" => "ПТ: ",
-        "Sat" => "<font color='#de3163'>СБ:</font> ",
-        "Sun" => "<font color='#de3163'>ВС:</font> "
-    );
+        "Sat" => "<span style='color:#de3163'>СБ:</span> ",
+        "Sun" => "<span style='color:#de3163'>ВС:</span> "
+    ];
     public static $LANG = array(// ISO 639
         "AA" => "Afar",
         "AB" => "Abkhazian",
@@ -607,7 +607,7 @@ class StatsHelper
      * @param \yii\db\Query $query
      * @return array|string
      */
-    public static function GetBrwNew($brw, \yii\db\Query $query)
+    public static function __GetBrwNew($brw, \yii\db\Query $query)
     {
         $queries = [];
         switch ($brw) {
