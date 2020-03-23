@@ -1,7 +1,10 @@
 yandex|Yandex Bots
 stackrambler|Stack Rambler
 Mail.Ru|Mail.RU Bots
-google|Google Bots
+google.com/bot|Google Bot
+google.com/adsbot|AdsBot-Google
+google.com/mobile/adsbot|AdsBot-Google-Mobile
+developers.google.com/webmasters/APIs-Google|APIs-Google
 msnbot|Bing
 bing|Bing
 Slurp|Yahoo! Bot
@@ -12,7 +15,7 @@ spider|Spiders
 libwww-perl|Perl robots
 wget|Wget
 java|Java
-bot|bot
+bot|
 scanner|Scanners
 ia_archiver|Alexa
 checker|Checkers

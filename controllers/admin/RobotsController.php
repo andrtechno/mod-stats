@@ -24,47 +24,38 @@ class RobotsController extends StatsController
         /** @var \yii\db\Query $query */
         $query = $this->query;
         $query->select(['COUNT(i) as count', 'MAX(i) as count_max', 'date']);
-        if(Yii::$app->request->get('s_date'))
+        if (Yii::$app->request->get('s_date') && Yii::$app->request->get('f_date')) {
             $query->andWhere(['>=', 'date', $this->sdate]);
-        if(Yii::$app->request->get('f_date'))
             $query->andWhere(['<=', 'date', $this->fdate]);
+        }
 
         foreach ($this->robo as $val) {
 
-
-
-
-
-            $zs = "";
-            $pf = "";
             if (empty($val))
                 continue;
 
-
-
             if (isset($this->rbdn[$val])) {
-
+                $userList=[];
                 foreach ($this->rbdn[$val] as $vl) {
-
-                   // $zs .= $pf . "LOWER(user) LIKE '%" . mb_strtolower($vl) . "%'";
-                   // $pf = " OR ";
-                    $query->andWhere(['like', 'LOWER(user)', mb_strtolower($vl)]);
+                    $userList[]=mb_strtolower($vl);
+                   // $re_query->andWhere(['like', 'LOWER(user)', mb_strtolower($vl)]);
 
                 }
-               // CMS::dump($this->rbdn[$val]);
-              //  var_dump($val);
+                $query->where(['like', 'LOWER(user)', $userList]);
             }
-            if (isset($this->hbdn[$val]))
+            if (isset($this->hbdn[$val])){
+                $hostList=[];
                 foreach ($this->hbdn[$val] as $vl) {
-                    //$zs .= $pf . "LOWER(host) LIKE '%" . mb_strtolower($vl) . "%'";
-                   // $pf = " OR ";
-                    $query->andWhere(['like', 'LOWER(host)', mb_strtolower($vl)]);
-                }
+                    $hostList[]=mb_strtolower($vl);
 
+                }
+                $query->andWhere(['like', 'LOWER(host)', $hostList]);
+            }
 
             //   $res = $this->query->createCommand()->queryOne();
             // print_r($res);die;
-            //   echo $this->query->createCommand()->rawSql;die;
+           //   echo $re_query->createCommand()->rawSql;
+          //  echo '<br><br><br><br>';
 
 
             //print_r($res);die;
@@ -82,16 +73,15 @@ class RobotsController extends StatsController
             $cnt[$val] = $r['count'];
 
             if ($cnt[$val] > 0) {
-
-                $query = new \yii\db\Query;
-                $query->from($this->tableSurf);
-                $query->where(['i' => $d]);
-                $query->select(['date', 'time']);
+                $query1 = new \yii\db\Query;
+                $query1->from($this->tableSurf);
+                $query1->where(['i' => $d]);
+                $query1->select(['date', 'time']);
 
                 // $z2 = "SELECT dt,tm FROM {{surf}} WHERE i = " . $d;
                 // $cmd2 = $this->db->createCommand($z2);
                 // $r2 = $cmd2->queryOne();
-                $r2 = $query->createCommand()->queryOne();
+                $r2 = $query1->createCommand()->queryOne();
 
                 $ff_date[$val] = $r2['date'] . " &nbsp;<span style='color:#de3163'>" . $r2['time'] . "</span>";
             } else {
@@ -99,10 +89,10 @@ class RobotsController extends StatsController
             }
 
         }
-        $cmd = $query->createCommand()->rawSql;
-        //echo $cmd;
-       // die;
 
+        //echo $query->createCommand()->rawSql;die;
+        $cmd = $query->createCommand()->rawSql;
+        // echo $cmd; die;
 
         arsort($cnt);
         $mmx = max($cnt);
@@ -147,24 +137,24 @@ class RobotsController extends StatsController
         $qs = Yii::$app->request->get('qs');
         $this->pageName = $qs;
 
-        $this->breadcrumbs[]=[
-            'label'=>Yii::t('stats/default', 'MODULE_NAME'),
-            'url'=>['/admin/stats']
+        $this->breadcrumbs[] = [
+            'label' => Yii::t('stats/default', 'MODULE_NAME'),
+            'url' => ['/admin/stats']
         ];
-        $this->breadcrumbs[]=[
-            'label'=>Yii::t('stats/default', 'ROBOTS'),
-            'url'=>['/admin/stats/robots']
+        $this->breadcrumbs[] = [
+            'label' => Yii::t('stats/default', 'ROBOTS'),
+            'url' => ['/admin/stats/robots']
         ];
-        $this->breadcrumbs[]=$qs;
+        $this->breadcrumbs[] = $qs;
         $zs = "";
         $pf = "";
         /** @var Query $query */
         $query = $this->query;
         $query->select('*');
-        if(Yii::$app->request->get('s_date'))
-            $query->andWhere(['>=', 'date', $this->sdate]);
-        if(Yii::$app->request->get('f_date'))
+        if (Yii::$app->request->get('s_date') && Yii::$app->request->get('f_date')){
+            $query->where(['>=', 'date', $this->sdate]);
             $query->andWhere(['<=', 'date', $this->fdate]);
+        }
         if (isset($this->rbdn[$qs]))
             foreach ($this->rbdn[$qs] as $vl) {
                 $query->andWhere(['LIKE', 'LOWER(user)', mb_strtolower($vl)]);
@@ -178,19 +168,19 @@ class RobotsController extends StatsController
                 $pf = " OR ";
             }
 
-        $query->orderBy(['i'=>SORT_DESC]);
+        $query->orderBy(['i' => SORT_DESC]);
         $command = $query->createCommand();
-        $result=[];
+        $result = [];
         foreach ($command->queryAll() as $data) {
-                $result[] = [
-                    'date' => StatsHelper::$DAY[$data['day']] . $data['date'],
-                    'time' =>  $data['time'],
-                    'refer' => StatsHelper::Ref($data['refer']),
-                    'ip' => $data['ip'],
-                    'host' => StatsHelper::getRowHost($data['ip'],$data['proxy'],$data['host'],$data['lang']),
-                    'user' => $data['user'],
-                    'req' => $data['req'],
-                ];
+            $result[] = [
+                'date' => StatsHelper::$DAY[$data['day']] . $data['date'],
+                'time' => $data['time'],
+                'refer' => StatsHelper::Ref($data['refer']),
+                'ip' => $data['ip'],
+                'host' => StatsHelper::getRowHost($data['ip'], $data['proxy'], $data['host'], $data['lang']),
+                'user_agent' => $data['user'],
+                'req' => $data['req'],
+            ];
 
         }
         $dataProvider = new \yii\data\ArrayDataProvider([

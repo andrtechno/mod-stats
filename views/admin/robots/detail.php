@@ -1,7 +1,8 @@
 
 <?php
 use panix\engine\grid\GridView;
-
+use panix\engine\widgets\Pjax;
+Pjax::begin();
 echo GridView::widget([
     'tableOptions' => ['class' => 'table table-striped'],
     'dataProvider' => $dataProvider,
@@ -52,5 +53,5 @@ echo GridView::widget([
         ],
     ]
 ]);
-
+Pjax::end();
 
