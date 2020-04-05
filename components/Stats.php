@@ -406,7 +406,12 @@ class Stats extends \yii\base\Component
 
             $refer = Yii::$app->request->referrer;
             //$refer = $_SERVER['HTTP_REFERER'];
-            $lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+            if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])){
+                $lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+            }else{
+                $lang = 'unknown HTTP_ACCEPT_LANGUAGE';
+            }
+
             $req = $_SERVER['REQUEST_URI'];
             $httpxforward = (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : false;
             if ($ip = $httpxforward) {
